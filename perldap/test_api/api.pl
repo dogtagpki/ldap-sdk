@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #############################################################################
-# $Id: api.pl,v 1.9 2007/06/19 11:27:06 gerv%gerv.net Exp $
+# $Id: api.pl,v 1.8.2.1 2007/06/14 09:21:18 gerv%gerv.net Exp $
 #
 # ***** BEGIN LICENSE BLOCK *****
 # Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -18,7 +18,7 @@
 # The Original Code is PerLDAP.
 #
 # The Initial Developer of the Original Code is
-# Netscape Communications Corp.
+# Netscape Communications Corporation.
 # Portions created by the Initial Developer are Copyright (C) 2001
 # the Initial Developer. All Rights Reserved.
 #

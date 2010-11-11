@@ -1,6 +1,6 @@
 #!/usr/bin/perl5
 #############################################################################
-# $Id: changes2ldif.pl,v 1.4 2007/06/19 11:27:05 gerv%gerv.net Exp $
+# $Id: changes2ldif.pl,v 1.3.2.4 2007/06/14 09:21:17 gerv%gerv.net Exp $
 #
 # ***** BEGIN LICENSE BLOCK *****
 # Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -15,15 +15,16 @@
 # for the specific language governing rights and limitations under the
 # License.
 #
-# The Original Code is PerLDAP.
+# The Original Code is PerLDAP. 
 #
 # The Initial Developer of the Original Code is
-# Netscape Communications Corp.
+# Netscape Communications Corporation.
 # Portions created by the Initial Developer are Copyright (C) 2001
 # the Initial Developer. All Rights Reserved.
 #
 # Contributor(s):
 #   Clayton Donley
+#   Leif Hedstrom <leif@perldap.org>
 #
 # Alternatively, the contents of this file may be used under the terms of
 # either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -55,13 +56,13 @@ no strict "vars";
 # Constants, shouldn't have to edit these...
 #
 $APPNAM	= "changes2ldif";
-$USAGE	= "$APPNAM [-nv] -b base -h host -D bind -w pswd -P cert [min [max]]";
+$USAGE	= "$APPNAM [-nv] -b base -h host -D bind -w pswd -P cert -V ver [min [max]]";
 
 
 #################################################################################
 # Check arguments, and configure some parameters accordingly..
 #
-if (!getopts('nvb:h:D:p:s:w:P:'))
+if (!getopts('nvb:h:D:p:s:w:P:V:'))
 {
    print "usage: $APPNAM $USAGE\n";
    exit;
@@ -73,7 +74,7 @@ $ld{root} = "cn=changelog" if (!defined($ld{root}) || $ld{root} eq "");
 #################################################################################
 # Instantiate an LDAP object, which also binds to the LDAP server.
 #
-$conn = new Mozilla::LDAP::Conn(\%ld);
+$conn = Mozilla::LDAP::Conn->new(\%ld);
 die "Could't connect to LDAP server $ld{host}" unless $conn;
 
 

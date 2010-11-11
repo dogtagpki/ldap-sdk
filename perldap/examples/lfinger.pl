@@ -1,6 +1,6 @@
 #!/usr/bin/perl5
 #############################################################################
-# $Id: lfinger.pl,v 1.12 2007/06/19 11:27:05 gerv%gerv.net Exp $
+# $Id: lfinger.pl,v 1.11.2.4 2007/06/14 09:21:17 gerv%gerv.net Exp $
 #
 # ***** BEGIN LICENSE BLOCK *****
 # Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -18,12 +18,13 @@
 # The Original Code is PerLDAP.
 #
 # The Initial Developer of the Original Code is
-# Netscape Communications Corp.
+# Netscape Communications Corporation.
 # Portions created by the Initial Developer are Copyright (C) 2001
 # the Initial Developer. All Rights Reserved.
 #
 # Contributor(s):
 #   Clayton Donley
+#   Leif Hedstrom <leif@perldap.org>
 #
 # Alternatively, the contents of this file may be used under the terms of
 # either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -55,7 +56,7 @@ use Mozilla::LDAP::Utils;		# LULU, utilities.
 # effectively with appropriate ACI/ACLs.
 #
 $APPNAM	= "lfinger";
-$USAGE	= "$APPNAM -m -b base -h host -D bind -w pswd -P cert user_info";
+$USAGE	= "$APPNAM -m -b base -h host -D bind -w pswd -P cert -V ver user_info";
 
 @ATTRIBUTES = ("uid", "cn", "homedirectory", "loginshell", "pager",
 	       "telephonenumber", "facsimiletelephonenumber", "mobile");
@@ -101,7 +102,7 @@ sub printIt
 #############################################################################
 # Check arguments, and configure some parameters accordingly..
 #
-if (!getopts('mb:h:D:p:w:P:') || !defined($ARGV[$[]))
+if (!getopts('mb:h:D:p:w:P:V:') || !defined($ARGV[$[]))
 {
    print "usage: $APPNAM $USAGE\n";
    exit;
@@ -113,7 +114,7 @@ $user=$ARGV[$[];
 #############################################################################
 # Instantiate an LDAP object, which also binds to the LDAP server.
 #
-$conn = new Mozilla::LDAP::Conn(\%ld);
+$conn = Mozilla::LDAP::Conn->new(\%ld);
 die "Could't connect to LDAP server $ld{host}" unless $conn;
 
 

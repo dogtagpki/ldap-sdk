@@ -1,6 +1,6 @@
 #!/usr/bin/perl5
 #############################################################################
-# $Id: monitor.pl,v 1.4 2007/06/19 11:27:05 gerv%gerv.net Exp $
+# $Id: monitor.pl,v 1.3.2.4 2007/06/14 09:21:17 gerv%gerv.net Exp $
 #
 # ***** BEGIN LICENSE BLOCK *****
 # Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -15,15 +15,16 @@
 # for the specific language governing rights and limitations under the
 # License.
 #
-# The Original Code is PerLDAP.
+# The Original Code is PerLDAP. 
 #
 # The Initial Developer of the Original Code is
-# Netscape Communications Corp.
+# Netscape Communications Corporation.
 # Portions created by the Initial Developer are Copyright (C) 2001
 # the Initial Developer. All Rights Reserved.
 #
 # Contributor(s):
 #   Clayton Donley
+#   Leif Hedstrom <leif@perldap.org>
 #
 # Alternatively, the contents of this file may be used under the terms of
 # either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -52,13 +53,13 @@ use Mozilla::LDAP::Utils;		# LULU, utilities.
 # Constants, shouldn't have to edit these...
 #
 $APPNAM	= "monitor";
-$USAGE	= "$APPNAM [-nv] -b base -h host -D bind -w pswd -P cert";
+$USAGE	= "$APPNAM [-nv] -b base -h host -D bind -w pswd -P cert -V ver";
 
 
 #################################################################################
 # Check arguments, and configure some parameters accordingly..
 #
-if (!getopts('b:h:D:p:w:P:'))
+if (!getopts('b:h:D:p:w:P:V:'))
 {
    print "usage: $APPNAM $USAGE\n";
    exit;
@@ -70,7 +71,7 @@ if (!getopts('b:h:D:p:w:P:'))
 # Instantiate an LDAP object, which also binds to the LDAP server, and then
 # do the simple search.
 #
-$conn = new Mozilla::LDAP::Conn(\%ld);
+$conn = Mozilla::LDAP::Conn->new(\%ld);
 die "Could't connect to LDAP server $ld{host}" unless $conn;
 
 $entry = $conn->search($ld{root}, "base", "objectclass=*");

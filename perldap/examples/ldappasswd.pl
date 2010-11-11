@@ -1,6 +1,6 @@
 #!/usr/bin/perl5
 #############################################################################
-# $Id: ldappasswd.pl,v 1.8 2007/06/19 11:27:05 gerv%gerv.net Exp $
+# $Id: ldappasswd.pl,v 1.7.2.5 2007/06/14 09:21:17 gerv%gerv.net Exp $
 #
 # ***** BEGIN LICENSE BLOCK *****
 # Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -18,12 +18,13 @@
 # The Original Code is PerLDAP.
 #
 # The Initial Developer of the Original Code is
-# Netscape Communications Corp. 
+# Netscape Communications Corporation.
 # Portions created by the Initial Developer are Copyright (C) 2001
 # the Initial Developer. All Rights Reserved.
 #
 # Contributor(s):
 #   Clayton Donley
+#   Leif Hedstrom <leif@perldap.org>
 #
 # Alternatively, the contents of this file may be used under the terms of
 # either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -53,7 +54,7 @@ use Mozilla::LDAP::Utils;		# LULU, utilities.
 # Constants, shouldn't have to edit these...
 #
 $APPNAM	= "ldappasswd";
-$USAGE	= "$APPNAM [-nv] -b base -h host -D bind -w pswd -P cert search ...";
+$USAGE	= "$APPNAM [-nv] -b base -h host -D bind -w pswd -P cert -V ver search ...";
 
 @ATTRIBUTES = ("uid", "userpassword");
 
@@ -61,7 +62,7 @@ $USAGE	= "$APPNAM [-nv] -b base -h host -D bind -w pswd -P cert search ...";
 #############################################################################
 # Check arguments, and configure some parameters accordingly..
 #
-if (!getopts('nvb:s:h:D:w:P:')) {
+if (!getopts('nvb:s:h:D:w:P:V:')) {
    print "usage: $APPNAM $USAGE\n";
    exit;
 }
@@ -82,14 +83,11 @@ do
 } until ($new eq $new2);
 print "\n";
 
-$crypted = Mozilla::LDAP::Utils::unixCrypt("$new");
-
-
 #############################################################################
 # Now do all the searches, one by one. If there are no search criteria, we
 # will change the password for the user running the script.
 #
-$conn = new Mozilla::LDAP::Conn(\%ld);
+$conn = Mozilla::LDAP::Conn->new(\%ld);
 die "Could't connect to LDAP server $ld{host}" unless $conn;
 
 foreach $search ($#ARGV >= $[ ? @ARGV : $ld{bind})
@@ -101,7 +99,7 @@ foreach $search ($#ARGV >= $[ ? @ARGV : $ld{bind})
 
   while ($entry)
     {
-      $entry->{userpassword} = ["{crypt}" . $crypted];
+      $entry->{userpassword} = [$new];
       print "Changing password for: $entry->{dn}\n" if $opt_v;
 
       if (!$opt_n)

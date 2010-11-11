@@ -1,5 +1,5 @@
 #############################################################################
-# $Id: Conn.pm,v 1.25 2007/06/19 11:27:05 gerv%gerv.net Exp $
+# $Id: Conn.pm,v 1.24.2.18 2010/08/03 20:27:49 nkinder%redhat.com Exp $
 #
 # ***** BEGIN LICENSE BLOCK *****
 # Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -17,12 +17,14 @@
 # The Original Code is PerLDAP.
 #
 # The Initial Developer of the Original Code is
-# Netscape Communications Corp.
+# Netscape Communications Corporation.
 # Portions created by the Initial Developer are Copyright (C) 2001
 # the Initial Developer. All Rights Reserved.
 #
 # Contributor(s):
 #   Clayton Donley
+#   Leif Hedstrom <leif@perldap.org>
+#   Michelle Hedstrom <mwyner@perldap.org>
 #
 # Alternatively, the contents of this file may be used under the terms of
 # either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -44,16 +46,17 @@
 #    object class, which is the data type returned from a search
 #    operation for instance.
 
+require 5.005;
 package Mozilla::LDAP::Conn;
 
-use Mozilla::LDAP::Utils 1.4 ();
-use Mozilla::LDAP::API 1.4 qw(/.+/);
-use Mozilla::LDAP::Entry 1.4 ();
+use Mozilla::LDAP::Utils 1.5 ();
+use Mozilla::LDAP::API 1.5 qw(/.+/);
+use Mozilla::LDAP::Entry 1.5 ();
 
 use strict;
 use vars qw($VERSION);
 
-$VERSION = "1.41";
+$VERSION = "1.5";
 
 
 #############################################################################
@@ -63,27 +66,46 @@ $VERSION = "1.41";
 #
 sub new
 {
-  my ($class, $self) = (shift, {});
+  my $class = shift;
+  my $self = {};
 
   if (ref $_[$[] eq "HASH")
     {
-      my ($hash) = $_[$[];
+      my $hash = shift;
 
       $self->{"host"} = $hash->{"host"} if defined($hash->{"host"});
       $self->{"port"} = $hash->{"port"} if defined($hash->{"port"});
       $self->{"binddn"} = $hash->{"bind"} if defined($hash->{"bind"});
       $self->{"bindpasswd"} = $hash->{"pswd"} if defined($hash->{"pswd"});
+      $self->{"bindpasswd"} = $hash->{"password"} if defined($hash->{"password"});
       $self->{"certdb"} = $hash->{"cert"} if defined($hash->{"cert"});
+      $self->{"certdb"} = $hash->{"certificate"} if defined($hash->{"certificate"});
+      $self->{"version"} = $hash->{"vers"} || $hash->{"version"} || LDAP_VERSION3;
+      $self->{"usenspr"} = 1 if (defined($hash->{"nspr"}) && $hash->{"nspr"});
+      $self->{"callback"} = $hash->{"callback"} if defined($hash->{"callback"});
+      $self->{"certname"} = $hash->{"certname"} if defined($hash->{"certname"});
+      $self->{"keypwd"} = $hash->{"keypwd"} if defined($hash->{"keypwd"});
+      $self->{"starttls"} = $hash->{"starttls"} if defined($hash->{"starttls"});
+      $self->{"entryclass"} = $hash->{"entryclass"} || 'Mozilla::LDAP::Entry';
+      if (defined($hash->{"timeout"})) {
+        die "Can only use the timeout option with NSPR enabled connections"
+          unless defined($self->{"usenspr"});
+        $self->{"timeout"} = $hash->{"timeout"};
+      }
     }
   else
     {
-      my ($host, $port, $binddn, $bindpasswd, $certdb, $authmeth) = @_;
+      my ($host, $port, $binddn, $bindpasswd, $certdb, $authmeth,
+          $version, $nspr) = @_;
 
       $self->{"host"} = $host if defined($host);
       $self->{"port"} = $port if defined($port);
       $self->{"binddn"} = $binddn if defined($binddn);
       $self->{"bindpasswd"} = $bindpasswd if defined($bindpasswd);
       $self->{"certdb"} = $certdb if defined($certdb);
+      $self->{"version"} = $version || LDAP_VERSION3;
+      $self->{"usenspr"} = 1 if (defined($nspr) && $nspr);
+      $self->{"entryclass"} = "Mozilla::LDAP::Entry";
     }
 
   # Anonymous bind is the default...
@@ -114,7 +136,7 @@ sub new
 #
 sub DESTROY
 {
-  my ($self) = shift;
+  my $self = shift;
 
   return unless defined($self->{"ld"});
 
@@ -128,29 +150,90 @@ sub DESTROY
 #
 sub init
 {
-  my ($self) = shift;
+  my $self = shift;
   my ($ret, $ld);
 
   return 0 unless (defined($self->{"host"}));
   return 0 unless (defined($self->{"port"}));
 
+  # Set protocol version to 3.
+  ldap_set_option(undef, LDAP_OPT_PROTOCOL_VERSION, LDAP_VERSION3);
+
   if (defined($self->{"certdb"}) && ($self->{"certdb"} ne ""))
-    {
+    { #use SSL
       $ret = ldapssl_client_init($self->{"certdb"}, 0);
       return 0 if ($ret < 0);
 
-      $ld = ldapssl_init($self->{"host"}, $self->{"port"}, 1);
+      if ($self->{"starttls"}) {
+          $ld = ldap_init($self->{"host"}, $self->{"port"});
+          return 0 unless $ld;
+
+          $ret = prldap_install_routines($ld, 0);
+          return 0 unless ($ret == LDAP_SUCCESS);
+      } else { # regular ssl
+          $ld = ldapssl_init($self->{"host"}, $self->{"port"}, 1);
+      }
+
+      if ($self->{"certname"}) { # enable clientauth
+          $ret = ldapssl_enable_clientauth($ld, 0, $self->{"keypwd"}, $self->{"certname"});
+          return 0 unless ($ret == LDAP_SUCCESS);
+      }
+
+      if ($self->{"starttls"}) {
+          $ret = ldap_start_tls_s($ld, 0, 0);
+          return 0 unless ($ret == LDAP_SUCCESS);
+      }
     }
   else
     {
       $ld = ldap_init($self->{"host"}, $self->{"port"});
     }
   return 0 unless $ld;
-
   $self->{"ld"} = $ld;
-  $ret = ldap_simple_bind_s($ld, $self->{"binddn"}, $self->{"bindpasswd"});
 
-  return (($ret == LDAP_SUCCESS) ? 1 : 0);
+  if (defined($self->{"usenspr"})) {
+    if (!$self->{"starttls"}) { # already did this above for starttls
+        $ret = prldap_install_routines($self->{"ld"}, 0);
+        return 0 unless ($ret == LDAP_SUCCESS);
+    }
+    if (defined($self->{"timeout"})) {
+      $ret = prldap_set_session_option($self->{"ld"}, 0,
+                                       PRLDAP_OPT_IO_MAX_TIMEOUT,
+                                       $self->{"timeout"});
+      return 0 unless ($ret == LDAP_SUCCESS);
+    }
+  }
+
+  $self->setVersion($self->{"version"});
+
+  if ($self->{"certname"}) # client auth - must use sasl bind
+    {
+      my $rc = ldap_sasl_bind_s($ld, "", "EXTERNAL", 0, 0, 0, 0);
+      if ($rc != LDAP_SUCCESS) {
+          my ($dn, $errmsg);
+          $rc = $self->getErrorCode(\$dn, \$errmsg);
+          print "Error: $rc - ", $self->getErrorString(), ": $errmsg for certname ", $self->{"certname"}, "\n";
+      }
+      return (($rc == LDAP_SUCCESS) ? 1 : 0);
+    }
+  elsif (defined($self->{"callback"}))
+    {
+      my ($result, $ret);
+      my $id = ldap_simple_bind($ld, $self->{"binddn"}, $self->{"bindpasswd"});
+
+      $ret = ldap_result($ld, $id, 0, 1, $result);
+      return 0 unless ($ret == LDAP_RES_BIND);
+
+      # The callback must return  1 or 0 (success or failure on the login).
+      $ret = $self->{"callback"}($self, $result);
+      ldap_msgfree($result);
+      return $ret;
+    }
+  else
+    {
+      $ret = ldap_simple_bind_s($ld, $self->{"binddn"}, $self->{"bindpasswd"});
+      return (($ret == LDAP_SUCCESS) ? 1 : 0);
+    }
 }
 
 
@@ -161,13 +244,18 @@ sub init
 #
 sub newEntry
 {
-  my (%entry);
-  my ($obj);
+  my ($self, $dn) = @_;
+  my $entry;
 
-  tie %entry, 'Mozilla::LDAP::Entry';
-  $obj = bless \%entry, 'Mozilla::LDAP::Entry';
+  if (ref $self) {
+    $entry = $self->{"entryclass"}->new();
+  } else {
+    $entry = Mozilla::LDAP::Entry->new();
+  }
 
-  return $obj;
+  $entry->setDN($dn) if (defined($dn) && $dn ne "");
+
+  return $entry;
 }
 
 
@@ -188,7 +276,7 @@ sub isURL
 #
 sub getLD
 {
-  my ($self) = shift;
+  my $self = shift;
 
   return $self->{"ld"} if defined($self->{"ld"});
 }
@@ -200,7 +288,7 @@ sub getLD
 #
 sub getRes
 {
-  my ($self) = shift;
+  my $self = shift;
 
   return $self->{"ldres"} if defined($self->{"ldres"});
 }
@@ -213,10 +301,24 @@ sub getRes
 #
 sub getErrorCode
 {
-  my ($self, $match, $msg) = @_;
-  my ($ret);
+  my $self = shift;
+  my ($match, $msg);
 
   return LDAP_SUCCESS unless defined($self->{"ld"});
+
+  if (ref $_[$[] eq "HASH")
+    {
+      my $hash = shift;
+
+      $match = $hash->{"match"} if defined($hash->{"match"});
+      $msg = $hash->{"mesg"} if defined($hash->{"mesg"});
+    }
+  else
+    {
+      ($match, $msg) = @_;
+    }
+
+  return $self->{"searchres"} if defined($self->{"searchres"});
   return ldap_get_lderrno($self->{"ld"}, $match, $msg);
 }
 *getError = \*getErrorCode;
@@ -227,11 +329,18 @@ sub getErrorCode
 #
 sub getErrorString 
 {
-  my ($self) = shift;
-  my ($err);
+  my $self = shift;
+  my $err;
   
   return LDAP_SUCCESS unless defined($self->{"ld"});
-  $err = ldap_get_lderrno($self->{"ld"}, undef, undef);
+  if (defined($self->{"searchres"}))
+    {
+      $err = $self->{"searchres"};
+    }
+  else
+    {
+      $err = ldap_get_lderrno($self->{"ld"}, undef, undef);
+    }
 
   return ldap_err2string($err);
 }
@@ -257,9 +366,42 @@ sub printError
 #
 sub search
 {
-  my ($self, $basedn, $scope, $filter, $attrsonly, @attrs) = @_;
+  my $self = shift;
+  my ($basedn, $scope, $filter, $attrsonly, $attrs, $res, $sortattrs, $cmp);
 
-  $scope = Mozilla::LDAP::Utils::str2Scope($scope);
+  if (ref $_[$[] eq "HASH")
+    {
+      my $hash = shift;
+
+      $basedn = $hash->{"base"} || "";
+      $scope = Mozilla::LDAP::Utils::str2Scope($hash->{"scope"});
+      $filter = $hash->{"filter"} || "(objectclass=*)";
+      $attrsonly = $hash->{"attrsonly"} || undef;
+      $attrs = $hash->{"attrs"} || undef;
+      $sortattrs = $hash->{"sortattrs"} || undef;
+      $cmp = $hash->{"cmp"} || undef;
+    }
+  else
+    {
+      my @rest;
+
+      ($basedn, $scope, $filter, $attrsonly, @rest) = @_;
+      $scope = Mozilla::LDAP::Utils::str2Scope($scope);
+      if (ref $rest[0] eq "ARRAY")
+        {
+          $attrs = $rest[0];
+        }
+      elsif (scalar(@rest) > 0)
+        {
+          $attrs = \@rest;
+        }
+      else
+        {
+          $attrs = undef;
+          $sortattrs = undef;
+          $cmp = undef;
+        }
+    }
   $filter = "(objectclass=*)" if ($filter =~ /^ALL$/i);
 
   if (defined($self->{"ldres"}))
@@ -267,24 +409,63 @@ sub search
       ldap_msgfree($self->{"ldres"});
       undef $self->{"ldres"};
     }
+  $self->{"ldres"} = 0;		# This gets rid of the annoying warning
+  if (defined($self->{"searchres"}))
+    {
+      undef $self->{"searchres"};
+    }
 
   if (ldap_is_ldap_url($filter))
     {
-      if (! ldap_url_search_s($self->{"ld"}, $filter, $attrsonly,
-			      $self->{"ldres"}))
+      $res = ldap_url_search_s($self->{"ld"}, $filter, $attrsonly,
+                               $self->{"ldres"});
+      if ($res == LDAP_SUCCESS || $res == LDAP_TIMELIMIT_EXCEEDED ||
+          $res == LDAP_SIZELIMIT_EXCEEDED ||$res == LDAP_ADMINLIMIT_EXCEEDED)
 	{
+          $self->{"searchres"} = $res unless $res == LDAP_SUCCESS;
 	  $self->{"ldfe"} = 1;
+          if (defined($sortattrs))
+            {
+              if (scalar(@{$sortattrs}) > 1)
+                {
+                  ldap_multisort_entries($self->{"ld"}, $self->{"ldres"},
+                                         $sortattrs, $cmp);
+                }
+              else
+                {
+                  ldap_sort_entries($self->{"ld"}, $self->{"ldres"},
+                                    $sortattrs->[0], $cmp);
+                }
+            }
+
 	  return $self->nextEntry();
 	}
     }
   else
     {
-      if (! ldap_search_s($self->{"ld"}, $basedn, $scope, $filter,
-			  defined(\@attrs) ? \@attrs : 0,
-			  defined($attrsonly) ? $attrsonly : 0,
-			  $self->{"ldres"}))
-	{
+      $res = ldap_search_s($self->{"ld"}, $basedn, $scope, $filter,
+                           defined($attrs) ? $attrs : 0,
+                           defined($attrsonly) ? $attrsonly : 0,
+                           $self->{"ldres"});
+      if ($res == LDAP_SUCCESS || $res == LDAP_TIMELIMIT_EXCEEDED ||
+          $res == LDAP_SIZELIMIT_EXCEEDED ||$res == LDAP_ADMINLIMIT_EXCEEDED)
+        {
+          $self->{"searchres"} = $res unless $res == LDAP_SUCCESS;
 	  $self->{"ldfe"} = 1;
+          if (defined($sortattrs))
+            {
+              if (scalar(@{$sortattrs}) > 1)
+                {
+                  ldap_multisort_entries($self->{"ld"}, $self->{"ldres"},
+                                         $sortattrs, $cmp);
+                }
+              else
+                {
+                  ldap_sort_entries($self->{"ld"}, $self->{"ldres"},
+                                    $sortattrs->[0], $cmp);
+                }
+            }
+
 	  return $self->nextEntry();
 	}
     }
@@ -299,18 +480,39 @@ sub search
 #
 sub searchURL
 {
-  my ($self, $url, $attrsonly) = @_;
+  my $self = shift;
+  my ($url, $attrsonly, $res);
+
+  if (ref $_[$[] eq "HASH")
+    {
+      my $hash = shift;
+
+      $url = $hash->{"url"};
+      $attrsonly = $hash->{"attrsonly"} || 0;
+    }
+  else
+    {
+      ($url, $attrsonly) = @_;
+    }
 
   if (defined($self->{"ldres"}))
     {
       ldap_msgfree($self->{"ldres"});
       undef $self->{"ldres"};
     }
-      
-  if (! ldap_url_search_s($self->{"ld"}, $url,
-			  defined($attrsonly) ? $attrsonly : 0,
-			  $self->{"ldres"}))
+  $self->{"ldres"} = 0;		# This avoids the annoying warnings
+  if (defined($self->{"searchres"}))
     {
+      undef $self->{"searchres"};
+    }
+      
+  $res = ldap_url_search_s($self->{"ld"}, $url,
+                           defined($attrsonly) ? $attrsonly : 0,
+                           $self->{"ldres"});
+  if ($res == LDAP_SUCCESS || $res == LDAP_TIMELIMIT_EXCEEDED ||
+      $res == LDAP_SIZELIMIT_EXCEEDED ||$res == LDAP_ADMINLIMIT_EXCEEDED)
+    {
+      $self->{"searchres"} = $res unless $res == LDAP_SUCCESS;
       $self->{"ldfe"} = 1;
       return $self->nextEntry();
     }
@@ -327,13 +529,25 @@ sub searchURL
 #
 sub browse
 {
-  my ($self, $basedn, @attrs) = @_;
-  my ($scope, $filter);
+  my $self = shift;
+  my ($basedn, @attrs, $scope, $attrsonly);
 
+  if (ref $_[$[] eq "HASH")
+    {
+      my $hash = shift;
+
+      $basedn = $hash->{"base"} || "";
+      $attrsonly = $hash->{"attrsonly"} || 0;
+      @attrs = @{$hash->{"attrs"}} if defined($hash->{"attrs"});
+    }
+  else
+    {
+      ($basedn, @attrs) = @_;
+      $attrsonly = 0;
+    }
   $scope = Mozilla::LDAP::Utils::str2Scope("BASE");
-  $filter = "(objectclass=*)" ;
 
-  return $self->search($basedn, $scope, $filter, 0, @attrs);
+  return $self->search($basedn, $scope, "(objectclass=*)", $attrsonly, @attrs);
 }
 
 
@@ -343,7 +557,21 @@ sub browse
 #
 sub compare
 {
-  my ($self, $dn, $attr, $value) = @_;
+  my $self = shift;
+  my ($dn, $attr, $value);
+
+  if (ref $_[$[] eq "HASH")
+    {
+      my $hash = shift;
+
+      $dn = $hash->{"dn"} if defined($hash->{"dn"});
+      $attr = $hash->{"attr"} if defined($hash->{"attr"});
+      $value = $hash->{"value"} if defined($hash->{"value"});
+    }
+  else
+    {
+      ($dn, $attr, $value) = @_;
+    }
 
   return ldap_compare_s($self->{"ld"}, $dn, $attr, $value) ==
     LDAP_COMPARE_TRUE;
@@ -359,10 +587,10 @@ sub nextEntry
   my ($self) = shift;
   my (%entry, @ocorder, @vals);
   my ($attr, $lcattr, $obj, $ldentry, $berv, $dn, $count);
-  my ($ber) = \$berv;
+  my $ber = \$berv;
 
   # I use the object directly, to avoid setting the "change" flags
-  $obj = tie %entry, 'Mozilla::LDAP::Entry';
+  $obj = tie %entry, $self->{"entryclass"};
 
   $self->{"dn"} = "";
   if ($self->{"ldfe"} == 1)
@@ -398,7 +626,7 @@ sub nextEntry
   $self->{"dn"} = $dn;
 
   $attr = ldap_first_attribute($self->{"ld"}, $self->{"ldentry"}, $ber);
-  return (bless \%entry, 'Mozilla::LDAP::Entry') unless $attr;
+  return (bless \%entry, $self->{"entryclass"}) unless $attr;
 
   $lcattr = lc $attr;
   @vals = ldap_get_values_len($self->{"ld"}, $self->{"ldentry"}, $attr);
@@ -421,7 +649,7 @@ sub nextEntry
 
   ldap_ber_free($ber, 0) if $ber;
 
-  return bless \%entry, 'Mozilla::LDAP::Entry';
+  return bless \%entry, $self->{"entryclass"};
 }
 
 # This is deprecated...
@@ -433,20 +661,17 @@ sub nextEntry
 #
 sub close
 {
-  my ($self) = shift;
-  my ($ret) = 1;
+  my $self = shift;
 
   ldap_unbind_s($self->{"ld"}) if defined($self->{"ld"});
-
   if (defined($self->{"ldres"}))
     {
       ldap_msgfree($self->{"ldres"});
       undef $self->{"ldres"};
     }
+  undef $self->{"ld"} if defined($self->{"ld"});
 
-  undef $self->{"ld"};
-
-  return (($ret == LDAP_SUCCESS) ? 1 : 0);
+  return 1;
 }
 
 
@@ -456,10 +681,10 @@ sub close
 sub delete
 {
   my ($self, $id) = @_;
-  my ($ret) = 1;
-  my ($dn) = $id;
+  my $ret = LDAP_SUCCESS;
+  my $dn = $id;
 
-  if (ref($id) eq 'Mozilla::LDAP::Entry')
+  if (UNIVERSAL::isa($id, 'Mozilla::LDAP::Entry'))
     {
       $dn = $id->getDN();
     }
@@ -481,22 +706,22 @@ sub delete
 sub add
 {
   my ($self, $entry) = @_;
-  my (%ent);
-  my ($ref, $key, $val);
+  my %ent;
+  my ($key, $val);
   my ($ret, $gotcha) = (1, 0);
 
-  $ref = ref($entry);
-  if ($ref eq 'Mozilla::LDAP::Entry')
+  if (UNIVERSAL::isa($entry, 'Mozilla::LDAP::Entry'))
     {
       foreach $key (@{$entry->{"_oc_order_"}})
 	{
 	  next if (($key eq "dn") || ($key =~ /^_.+_$/));
+          next if $entry->{"_${key}_deleted_"};
 	  $ent{$key} = { "ab" => $entry->{$key} };
 	  $gotcha++;
 	  $entry->attrClean($key);
 	}
     }
-  elsif  ($ref eq 'HASH')
+  elsif  (ref $entry eq 'HASH')
     {
       foreach $key (keys(%{$entry}))
 	{
@@ -529,9 +754,22 @@ sub add
 #
 sub modifyRDN
 {
-  my ($self, $rdn, $dn, $del) = ($_[$[], $_[$[ + 1], $_[$[ + 2], $_[$[ + 3]);
-  my (@vals);
-  my ($ret) = 1;
+  my $self = shift;
+  my ($rdn, $dn, $del, @vals);
+  my $ret = LDAP_SUCCESS;
+
+  if (ref $_[$[] eq "HASH")
+    {
+      my $hash = shift;
+
+      $rdn = $hash->{"rdn"} if defined($hash->{"rdn"});
+      $dn = $hash->{"dn"} if defined($hash->{"dn"});
+      $del = $hash->{"delete"} if defined($hash->{"delete"});
+    }
+  else
+    {
+      ($rdn, $dn, $del) = @_;
+    }
 
   $del = 1 unless (defined($del) && ($del ne ""));
   $dn = $self->{"dn"} unless (defined($dn) && ($dn ne ""));
@@ -561,7 +799,7 @@ sub update
   my ($self, $entry) = @_;
   my ($vals, @add, @remove, %mod, %new);
   my ($key, $val);
-  my ($ret) = 1;
+  my $ret = LDAP_SUCCESS;
   local $_;
 
   foreach $key (@{$entry->{"_oc_order_"}})
@@ -616,7 +854,7 @@ sub update
   # This is here for debug purposes only...
   if ($main::LDAP_DEBUG)
     {
-      my ($op);
+      my $op;
 
       foreach $key (keys(%mod))
 	{
@@ -633,7 +871,7 @@ sub update
     }
 
   $ret = ldap_modify_s($self->{"ld"}, $entry->{"dn"}, \%mod)
-    if (scalar(keys(%mod)));
+    if %mod;
 
   return (($ret == LDAP_SUCCESS) ? 1 : 0);
 }
@@ -673,13 +911,332 @@ sub setDefaultRebindProc
 sub simpleAuth
 {
   my ($self, $dn, $pswd) = @_;
-  my ($ret);
+  my $ret;
 
   $ret = ldap_simple_bind_s($self->{"ld"}, $dn, $pswd);
 
   return (($ret == LDAP_SUCCESS) ? 1 : 0);
 }
 
+
+#############################################################################
+# Set arbitrary option (this is flaky, can only handle "int" options ...)
+#
+sub setOption
+{
+  my $self = shift;
+  my ($option, $value, $ret);
+
+  if (ref $_[$[] eq "HASH")
+    {
+      my $hash = shift;
+
+      $option = $hash->{"option"};
+      $value = $hash->{"value"};
+    }
+  else
+    {
+      ($option, $value) = @_;
+    }
+
+  $ret = ldap_set_option($self->{"ld"}, $option, $value);
+  return (($ret == LDAP_SUCCESS) ? 1 : 0);
+}
+
+sub getOption
+{
+  my ($self, $option) = @_;
+  my ($ret, $value);
+
+  $ret = ldap_get_option($self->{"ld"}, $option, $value);
+  return (($ret == LDAP_SUCCESS) ? $value : undef);
+}
+
+
+#############################################################################
+# Set/get LDAP protocol version
+#
+sub setVersion
+{
+  my ($self, $ver) = @_;
+  my $ret = LDAP_SUCCESS;
+
+  if ($ver eq "1")
+    {
+      $self->{"version"} = LDAP_VERSION1;
+    }
+  elsif ($ver eq "2")
+    {
+      $self->{"version"} = LDAP_VERSION2;
+    }
+  else
+    {
+      $self->{"version"} = LDAP_VERSION3;
+    }
+
+  if ($self->{"version"} ne LDAP_VERSION2)
+    {
+      $ret = ldap_set_option($self->{"ld"}, LDAP_OPT_PROTOCOL_VERSION,
+                             $self->{"version"});
+      return (($ret == LDAP_SUCCESS) ? 1 : 0);
+    }
+
+  return 1;
+}
+
+sub getVersion
+{
+  return $_[0]->{"version"};
+}
+
+
+#############################################################################
+# Set sizelimit, convenience wrapper.
+#
+sub setSizelimit
+{
+  my ($self, $limit) = @_;
+  my $ret;
+
+  $ret = $self->setOption(LDAP_OPT_SIZELIMIT, $limit);
+  return (($ret == LDAP_SUCCESS) ? 1 : 0);
+}
+
+sub getSizelimit
+{
+  my $self = shift;
+  my ($ret, $limit);
+
+  $ret = ldap_get_option($self->{"ld"}, LDAP_OPT_SIZELIMIT, $limit);
+  return (($ret == LDAP_SUCCESS) ? $limit : undef);
+}
+
+
+#############################################################################
+# Install NSPR I/O, threading, and DNS functions so they will be used by
+# the LDAP * handle (ld)
+sub installNSPR
+{
+  my $arg = shift;
+  my $shared = shift || 0;
+  my $ret;
+
+  if (ref $arg)
+    {
+      $arg->close();
+      $arg->{"usenspr"} = 1;
+      $arg->init();
+    }
+  else
+    {
+      $ret = prldap_install_routines(0, $shared);
+    }
+
+  return (($ret == LDAP_SUCCESS) ? 1 : 0);
+}
+
+
+#############################################################################
+# Set the NSPR I/O timeout (in milliseconds). This can only be used after
+# you have installed the NSPR layer (using installNSPR).
+#
+sub setNSPRTimeout
+{
+  my $arg = shift;
+  my $timeout = shift || 0;
+  my $ret;
+
+  if (ref $arg)
+    {
+      return 0 unless defined($arg->{"usenspr"});
+      $ret = prldap_set_session_option($arg->{"ld"}, 0,
+                                       PRLDAP_OPT_IO_MAX_TIMEOUT,
+                                       $timeout);
+    }
+  else
+    {
+      $ret = prldap_set_session_option(0, 0,
+                                       PRLDAP_OPT_IO_MAX_TIMEOUT,
+                                       $timeout);
+    }
+
+  return (($ret == LDAP_SUCCESS) ? 1 : 0);
+}
+
+
+#############################################################################
+# SearchIter allows PerLDAP to support asynchronous searching - that is, to
+# support having a Conn doing two or more simultaneous searches.  Objects
+# of the class SearchIter should not be created directly, but should only
+# be created by calling the Conn->async_search method (see below).  The
+# nextEntry method is used to iterate over the search results and works
+# just like the Conn method of the same name.  If search result
+# processing is aborted before all of the search results have been
+# returned, the abandon method should be called to close the connection
+# to allow the server and client to reclaim resources.
+#
+{
+  package SearchIter;
+
+  import Mozilla::LDAP::API qw(:api :ssl :apiv3 :constant); # Direct access to C API
+
+  # arguments to new() are the Conn object used to invoke the search
+  # and the msgid returned from the ldap_search* call
+  sub new {
+	my $that = shift;
+	my ($conn, $msgid, $timeout) = @_;
+	my $class = ref($that) || $that;
+    if (!$timeout) {
+	  ldap_get_option($conn->getLD(), LDAP_OPT_TIMELIMIT(), \$timeout);
+	  if (!$timeout) {
+		  $timeout = 30; # 30 seconds
+	  }
+	}
+	my $self = { conn => $conn, msgid => $msgid, timeout => $timeout };
+	bless $self, $class;
+	return $self;
+  }
+
+  # just returns the error code from the underlying Conn
+  sub getErrorCode {
+	my $self = shift;
+	return $self->{conn}->getErrorCode();
+  }
+
+  # this function returns the next Entry
+  sub nextEntry {
+	my $self = shift;
+	my $timeout = shift;
+	my ($rc, $ld, $res);
+	my (%entry, $obj, $berv);
+	my $ber = \$berv;
+
+	return "" unless $self->{msgid};
+	if ($timeout) {
+	  $self->{timeout} = $timeout; # change timeout
+	} else {
+	  $timeout = $self->{timeout}; # use pre configured one
+	}
+
+	# I use the object directly, to avoid setting the "change" flags
+	$obj = tie %entry, 'Mozilla::LDAP::Entry';
+
+	$ld = $self->{conn}->getLD();
+	$rc = ldap_result($ld, $self->{msgid}, 0, $timeout, $res);
+	if ($rc == -1) { # error
+	  print "Error getting ldap result for msgid ", $self->{msgid}, "\n";
+	  undef $self->{msgid};
+	} elsif ($rc == 0) { # timeout
+	  print "Timeout getting ldap result for msgid ", $self->{msgid}, "\n";
+	} elsif ($rc == LDAP_RES_SEARCH_RESULT()) { # done - get result
+#	  print "Search done, got result for msgid ", $self->{msgid}, "\n" if $verbose;
+	  undef $self->{msgid};
+	} elsif ($rc == LDAP_RES_SEARCH_REFERENCE()) { # referral?
+	  print "Got a referral as a search result\n";
+	} else { # regular entry search result
+	  my $dn = ldap_get_dn($ld, $res);
+	  $self->{dn} = $dn; # keep last DN that was read
+	  $self->{res} = $res; # keep last res that was read
+#	  print "Got $dn as next entry for msgid ", $self->{msgid}, "\n" if $verbose;
+	  $obj->{"_oc_numattr_"} = 0;
+	  $obj->{"_oc_keyidx_"} = 0;
+	  $obj->{"dn"} = $dn;
+	  my $attr = ldap_first_attribute($ld, $res, $ber);
+	  return (bless \%entry, 'Mozilla::LDAP::Entry') unless $attr;
+
+	  my $lcattr = lc $attr;
+	  my @vals = ldap_get_values_len($ld, $res, $attr);
+	  $obj->{$lcattr} = [@vals];
+	  my @ocorder;
+	  push(@ocorder, $lcattr);
+
+	  my $count = 1;
+	  while ($attr = ldap_next_attribute($ld, $res, $ber)) {
+		$lcattr = lc $attr;
+		@vals = ldap_get_values_len($ld, $res, $attr);
+		$obj->{$lcattr} = [@vals];
+		push(@ocorder, $lcattr);
+		$count++;
+	  }
+
+	  $obj->{"_oc_order_"} = \@ocorder;
+	  $obj->{"_oc_numattr_"} = $count;
+
+	  ldap_ber_free($ber, 0) if $ber;
+	  ldap_msgfree($res) if $res;
+
+	  return bless \%entry, 'Mozilla::LDAP::Entry';
+	}
+
+	ldap_msgfree($res) if $res;
+	return ""; # search failed
+  }
+
+  # use this method when it is desired to abort search result processing
+  # before all of the results have been returned from the server
+  sub abandon {
+	my $self = shift;
+	ldap_abandon($self->{conn}->getLD(), $self->{msgid});
+	undef $self->{msgid};
+  }
+}
+
+#############################################################################
+# This starts an asynchronous search.  It returns a SearchIter
+# use the SearchIter->nextEntry method to get the next entry
+# you can have multiple async searches going at once, so you can do
+# nested searches, for example
+# use SearchIter->getErrorCode() to see if the search had errors
+#
+sub async_search
+{
+  my $self = shift;
+  my ($basedn, $scope, $filter, $attrsonly, $attrs, $msgid, $iter);
+
+  if (ref $_[$[] eq "HASH")
+    {
+      my $hash = shift;
+
+      $basedn = $hash->{"base"} || "";
+      $scope = Mozilla::LDAP::Utils::str2Scope($hash->{"scope"});
+      $filter = $hash->{"filter"} || "(objectclass=*)";
+      $attrsonly = $hash->{"attrsonly"} || undef;
+      $attrs = $hash->{"attrs"} || undef;
+    }
+  else
+    {
+      my @rest;
+
+      ($basedn, $scope, $filter, $attrsonly, @rest) = @_;
+      $scope = Mozilla::LDAP::Utils::str2Scope($scope);
+      if (ref($rest[0]) eq "ARRAY")
+        {
+          $attrs = $rest[0];
+        }
+      elsif (scalar(@rest) > 0)
+        {
+          $attrs = \@rest;
+        }
+      else
+        {
+          $attrs = undef;
+        }
+    }
+  $filter = "(objectclass=*)" if ($filter =~ /^ALL$/i);
+
+  if (ldap_is_ldap_url($filter))
+    {
+      $msgid = ldap_url_search($self->{"ld"}, $filter, $attrsonly);
+    }
+  else
+    {
+      $msgid = ldap_search($self->{"ld"}, $basedn, $scope, $filter,
+                           defined($attrs) ? $attrs : 0,
+                           defined($attrsonly) ? $attrsonly : 0)
+	}
+  $iter = new SearchIter($self, $msgid);
+  return $iter;
+}
 
 #############################################################################
 # Mandatory TRUE return value.
@@ -730,8 +1287,8 @@ internal state. It depends heavily on the ::Entry class, which are used to
 retrieve, modify and update a single entry.
 
 The B<search> and B<nextEntry> methods returns Mozilla::LDAP::Entry
-objects, naturally. You also have to instantiate (and modify) a new
-::Entry object when you want to add new entries to an LDAP
+objects, or an appropriately subclass of it. You also have to instantiate
+(and modify) a new ::Entry object when you want to add new entries to an LDAP
 server. Alternatively, the add() method will also take a hash array as
 argument, to make it easy to create new LDAP entries.
 
@@ -779,11 +1336,12 @@ Before you can do anything with PerLDAP, you'll need to instantiate at
 least one Mozilla::LDAP::Conn object, and connect it to an LDAP server. As
 you probably guessed already, this is done with the B<new> method:
 
-    $conn = new Mozilla::LDAP::Conn("ldap", "389", $bind, $pswd, $cert);
+    $conn = Mozilla::LDAP::Conn->new("ldap", "389", $bind, $pswd, $cert, $ver);
     die "Couldn't connect to LDAP server ldap" unless  $conn;
 
 The arguments are: Host name, port number, and optionally a bind-DN, it's
-password, and a certificate. If there is no bind-DN, the connection will
+password, and a certificate. A recent addition is the LDAP protocol version,
+which is by default LDAP v3. If there is no bind-DN, the connection will
 be bound as the anonymous user. If the certificate file is specified, the
 connection will be over SSL, and you should then probably connect to port
 636. You have to check that the object was created properly, and take
@@ -794,7 +1352,7 @@ providing each individual argument, you can provide one hash array
 (actually, a pointer to a hash). For example:
 
     %ld = Mozilla::LDAP::Utils::ldapArgs();
-    $conn = new Mozilla::LDAP::Conn(\%ld);
+    $conn = Mozilla::LDAP::Conn->new(\%ld);
 
 The components of the hash are:
 
@@ -804,10 +1362,36 @@ The components of the hash are:
     $ld->{"bind"}
     $ld->{"pswd"}
     $ld->{"cert"}
+    $ld->{"vers"}
 
 and (not used in the B<new> method)
 
     $ld->{"scope"}
+
+New for PerLDAP v1.5 and later are the following:
+
+    $ld->{"nspr"}
+    $ld->{"timeout"}
+    $ld->{"callback"}
+    $ld->{"entryclass"}
+
+The B<nspr> flag (1/0) indicates that we wish to use the NSPR layer for
+the LDAP connection. This obviously only works if PerLDAP has been compiled
+with NSPR support and libraries. The default is for NSPR to be disabled.
+
+For an NSPR enabled connection, you can also provide an optional timeout
+parameter, which will be used during the lifetime of the connection. This
+includes the initial setup and connection to the LDAP server. You can change
+this parameter later using the B<setNSPRTimeout()> method.
+
+During the bind process, you can provide a callback function to be called
+when the asynchronus bind has completed. The callback should take two
+arguments, a reference to the ::Conn object ("self") and a result structure
+as returned by the call to B<ldap_result()>.
+
+Finally, you can optionally specify what class the different methods
+should use when instantiating B<Entry> result objects. The default is
+Mozilla::LDAP::Entry.
 
 Once a connection is established, the package will take care of the
 rest. If for some reason the connection is lost, the object should
@@ -846,7 +1430,7 @@ requires indexes to perform reasonably well.
 Ok, now we are prepared to actually do a real search on the LDAP server:
 
     $base = "o=netscape.com";
-    $conn = new Mozilla::LDAP::Conn("ldap", "389", "", ""); die "No LDAP
+    $conn = Mozilla::LDAP::Conn->new("ldap", "389", "", ""); die "No LDAP
     connection" unless $conn;
 
     $entry = $conn->search($base, "subtree", "(uid=leif)");
@@ -863,7 +1447,8 @@ Ok, now we are prepared to actually do a real search on the LDAP server:
       }
 
 This is in fact a poor mans implementation of the I<ldapsearch> command
-line utility. The B<search> method returns an Mozilla::LDAP::Entry object,
+line utility. The B<search> method returns an Mozilla::LDAP::Entry
+object (or derived subclass),
 which holds the first entry from the search, if any. To get the second and
 subsequent entries you call the B<entry> method, until there are no more
 entries. The B<printLDIF> method is a convenient function, requesting the
@@ -901,7 +1486,7 @@ filter string. This can be used to easily parse and process URLs, which is
 a compact way of storing a "link" to some specific LDAP information. To
 process such a search, you use the B<searchURL> method:
 
-    $entry->searchURL("ldap:///o=netscape.com??sub?(uid=leif");
+    $entry->searchURL("ldap:///o=netscape.com??sub?(uid=leif)");
 
 As it turns out, the B<search> method also supports LDAP URL searches. If
 the search filter looks like a proper URL, we will actually do an URL
@@ -912,7 +1497,7 @@ search to only retrieve certain attributes. With the LDAP URLs you specify
 this as an optional parameter, and with the B<search> method you add two
 more options, like
 
-    $entry = $conn->search($base, "sub", $filter, 0, ("mail", "cn");
+    $entry = $conn->search($base, "sub", $filter, 0, ("mail", "cn"));
 
 The last argument specifies an array of attributes to retrieve, the fewer
 the attributes, the faster the search will be. The second to last argument
@@ -920,6 +1505,30 @@ is a boolean value indicating if we should retrieve only the attribute
 names (and no values). In most cases you want this to be FALSE, to
 retrieve both the attribute names, and all their values. To do this with
 the B<searchURL> method, add a second argument, which should be 0 or 1.
+
+=head1 PERFORMING ASYNCHRONOUS SEARCHES
+
+Conn also supports an async_search method that takes the same arguments
+as the search method but returns an instance of SearchIter instead
+of Entry.  As its name implies, the SearchIter is used to iterate
+through the search results.  The nextEntry method works just like
+the nextEntry method of Conn.  The abandon method should be called
+if search result processing is aborted before the last result is
+received, to allow the client and server to release resources.
+Example:
+
+	$iter = $conn->async_search($base, $scope, $filter, ...);
+    if ($rc = $iter->getResultCode()) {
+	    # process error condition
+	} else {
+	    while (my $entry = $iter->nextEntry) {
+			# process entry
+            if (some abort condition) {
+                $iter->abandon;
+                last;
+            }
+        }
+    }
 
 =head1 MODIFYING AND CREATING NEW LDAP ENTRIES
 
@@ -932,7 +1541,7 @@ new entry, the first thing to set it it's DN, like
 
 alternatively you can still use the B<new> method on the Entry class, like
 
-    $entry = new Mozilla::LDAP::Entry;
+    $entry = Mozilla::LDAP::Entry->new();
 
 You should not do this for an existing LDAP entry, changing the RDN (or
 DN) for such an entry must be done with B<modifyRDN>. To populate (or
@@ -1008,8 +1617,9 @@ attributes to return from the entry.  Note that this does not support the
 
 =item B<close>
 
-Close the LDAP connection, and clean up the object. If you don't call this
-directly, the destructor for the object instance will do the job for you.
+Close the LDAP connection, and clean up the object. If you don't
+call this directly, the destructor for the object instance will do the job
+for you.
 
 =item B<compare>
 
@@ -1067,7 +1677,7 @@ authentication method (i.e. with a password).
 A typical usage could be something like
 
     %ld = Mozilla::LDAP::Utils::ldapArgs();
-    $conn = new Mozilla::LDAP::Conn(\%ld);
+    $conn = Mozilla::LDAP::Conn->new(\%ld);
 
 Also, remember that if you use SSL, the port is (usually) 636.
 
@@ -1129,7 +1739,7 @@ example:
 
     $user = "leif";
     $password = "secret";
-    $conn = new Mozilla::LDAP::Conn($host, $port);	# Anonymous bind
+    $conn = Mozilla::LDAP::Conn->new($host, $port);	# Anonymous bind
     die "Could't connect to LDAP server $host" unless $conn;
 
     $entry = $conn->search($base, $scope, "(uid=$user)", 0, (uid));
@@ -1231,6 +1841,59 @@ the function to use, you give it the DN, password and Auth method. Then
 we'll use a default rebind procedure (internal in C) to handle the rebind
 credentials. This was a solution for the Windows/NT problem/bugs we have
 with rebind procedures written in Perl.
+
+=item B<setVersion>
+
+Change the LDAP protocol version on the already initialized connection.
+The default is LDAP v3 (new for PerLDAP v1.5!), but you can downgrade
+the connection to LDAP v2 if necessary using this function. Example:
+
+    $conn->setVersion(2);
+   
+
+=item B<getVersion>
+
+Return the protocol version currently in used by the connection.
+
+=item B<setSizelimit>
+
+Set the sizelimit on a connection, to limit the maximum number of
+entries that we want to retrieve. For example:
+
+   $conn->setSizelimit(10);
+
+=item B<getSizelimit>
+
+Get the current sizelimit on a connection (if any).
+
+=item B<setOption>
+
+Set an (integer) LDAP option.
+
+=item B<getOption>
+
+Get an (integer) LDAP option.
+
+=item B<installNSPR>
+
+Install NSPR I/O, threading, and DNS functions so they will be used by
+'ld'.
+
+Pass a non-zero value for the 'shared' parameter if you plan to use
+this LDAP * handle from more than one thread. This is highly unlikely
+since PerLDAP is asynchronous.
+
+=item B<setNSPRTimeout>
+
+Set the TCP timeout value, in millisecond, for the NSPR enabled connection.
+It's an error to call this before calling installNSPR(), unless you
+created the new connection object with the B<nspr> option.
+
+This method can also be invoked as a class method, and it will then apply
+to all new connections created. Like
+
+    Mozilla::LDAP::Conn->installNSPR(1);
+    Mozilla::LDAP::Conn->setNSPRTimeout(1000);
 
 =back
 

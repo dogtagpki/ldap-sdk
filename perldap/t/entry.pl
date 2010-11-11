@@ -1,6 +1,6 @@
 #!/usr/bin/perl5
 #############################################################################
-# $Id: entry.pl,v 1.4 2007/06/19 11:27:06 gerv%gerv.net Exp $
+# $Id: entry.pl,v 1.3.2.4 2007/06/14 09:21:17 gerv%gerv.net Exp $
 #
 # ***** BEGIN LICENSE BLOCK *****
 # Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -18,7 +18,7 @@
 # The Original Code is PerLDAP.
 #
 # The Initial Developer of the Original Code is
-# Netscape Communications Corp.
+# Netscape Communications Corporation.
 # Portions created by the Initial Developer are Copyright (C) 2001
 # the Initial Developer. All Rights Reserved.
 #
@@ -55,11 +55,9 @@ no strict "vars";
 # Configurations, modify these as needed.
 #
 $BIND	= "uid=ldapadmin";
-$BASE	= "o=Netscape Communications Corp.,c=US";
+$BASE	= "o=ogre.com";
 $PEOPLE	= "ou=people";
-$GROUPS	= "ou=groups";
 $UID	= "leif-test";
-$CN	= "test-group-1";
 
 
 #################################################################################
@@ -91,7 +89,7 @@ sub getConn
     {
       if (!defined($main::mainConn))
 	{
-	  $main::mainConn = new Mozilla::LDAP::Conn(\%main::ld);
+	  $main::mainConn = Mozilla::LDAP::Conn->new(\%main::ld);
 	  die "Could't connect to LDAP server $main::ld{host}"
 	    unless $main::mainConn;
 	}
@@ -99,7 +97,7 @@ sub getConn
     }
   else
     {
-      $conn = new Mozilla::LDAP::Conn(\%main::ld);
+      $conn = Mozilla::LDAP::Conn->new(\%main::ld);
       die "Could't connect to LDAP server $main::ld{host}" unless $conn;
     }
 
@@ -119,7 +117,7 @@ sub dotPrint
 
 sub attributeEQ
 {
-  my @a, @b;
+  my (@a, @b);
   my $i;
 
   @a = @{$_[0]};
@@ -141,11 +139,12 @@ sub attributeEQ
 #################################################################################
 # Setup the test entries.
 #
+undef $reuseConn;
+
 $filter = "(uid=$UID)";
 $conn = getConn();
-$nentry = $conn->newEntry();
+$nentry = $conn->newEntry("uid=$UID, $PEOPLE, $BASE");
 
-$nentry->setDN("uid=$UID, $PEOPLE, $BASE");
 $nentry->{objectclass} = [ "top", "person", "inetOrgPerson", "mailRecipient" ];
 $nentry->addValue("uid", $UID);
 $nentry->addValue("sn", "Hedstrom");
@@ -163,5 +162,7 @@ $nentry->addValue("mail", "leif\@ogre.com");
 $ent = $conn->search($ld{root}, $ld{scope}, $filter);
 $conn->delete($ent->getDN()) if $ent;
 $conn->add($nentry);
+
+$nentry->printLDIF();
 
 $conn->close();

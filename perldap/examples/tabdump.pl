@@ -1,6 +1,6 @@
 #!/usr/bin/perl5
 #############################################################################
-# $Id: tabdump.pl,v 1.5 2007/06/19 11:27:05 gerv%gerv.net Exp $
+# $Id: tabdump.pl,v 1.4.2.4 2007/06/14 09:21:17 gerv%gerv.net Exp $
 #
 # ***** BEGIN LICENSE BLOCK *****
 # Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -18,12 +18,13 @@
 # The Original Code is PerLDAP.
 #
 # The Initial Developer of the Original Code is
-# Netscape Communications Corp. 
+# Netscape Communications Corporation.
 # Portions created by the Initial Developer are Copyright (C) 2001
 # the Initial Developer. All Rights Reserved.
 #
 # Contributor(s):
 #   Clayton Donley
+#   Leif Hedstrom <leif@perldap.org>
 #
 # Alternatively, the contents of this file may be used under the terms of
 # either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -52,13 +53,13 @@ use Mozilla::LDAP::Utils;		# LULU, utilities.
 # Constants, shouldn't have to edit these...
 #
 $APPNAM	= "tabdump";
-$USAGE	= "$APPNAM [-nv] -b base -h host -D bind -w pswd -P [-t <sep>] cert attr1,attr2,.. srch";
+$USAGE	= "$APPNAM [-nv] -b base -h host -D bind -w pswd -P cert -V ver -t <sep> attr1,attr2,.. srch";
 
 
 #################################################################################
 # Check arguments, and configure some parameters accordingly..
 #
-if (!getopts('nvb:h:D:p:s:w:P:t:'))
+if (!getopts('nvb:h:D:p:s:w:P:t:V:'))
 {
    print "usage: $APPNAM $USAGE\n";
    exit;
@@ -75,7 +76,7 @@ die "Need to specify a list of attributes and the search filter.\n"
 #################################################################################
 # Do the searches, and produce the output.
 #
-$conn = new Mozilla::LDAP::Conn(\%ld);
+$conn = Mozilla::LDAP::Conn->new(\%ld);
 die "Could't connect to LDAP server $ld{host}" unless $conn;
 
 @attr = split(/,/, $attributes);

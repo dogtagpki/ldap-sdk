@@ -1,6 +1,6 @@
 #!/usr/bin/perl5
 #############################################################################
-# $Id: rename.pl,v 1.6 2007/06/19 11:27:05 gerv%gerv.net Exp $
+# $Id: rename.pl,v 1.5.2.4 2007/06/14 09:21:17 gerv%gerv.net Exp $
 #
 # ***** BEGIN LICENSE BLOCK *****
 # Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -15,15 +15,16 @@
 # for the specific language governing rights and limitations under the
 # License.
 #
-# The Original Code is PerLDAP.
+# The Original Code is PerLDAP. 
 #
 # The Initial Developer of the Original Code is
-# Netscape Communications Corp. 
+# Netscape Communications Corporation.
 # Portions created by the Initial Developer are Copyright (C) 2001
 # the Initial Developer. All Rights Reserved.
 #
 # Contributor(s):
 #   Clayton Donley
+#   Leif Hedstrom <leif@perldap.org>
 #
 # Alternatively, the contents of this file may be used under the terms of
 # either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -52,13 +53,13 @@ use Mozilla::LDAP::Utils;		# LULU, utilities.
 # Constants, shouldn't have to edit these...
 #
 $APPNAM	= "rename";
-$USAGE	= "$APPNAM [-nvI] -b base -h host -D bind -w pswd -P cert filter new_rdn";
+$USAGE	= "$APPNAM [-nvI] -b base -h host -D bind -w pswd -P cert -V ver filter new_rdn";
 
 
 #############################################################################
 # Check arguments, and configure some parameters accordingly..
 #
-if (!getopts('nvIb:h:D:w:P:'))
+if (!getopts('nvIb:h:D:w:P:V:'))
 {
   print "usage: $APPNAM $USAGE\n";
   exit;
@@ -77,7 +78,7 @@ if (($search eq "") || ($rdn eq ""))
 #############################################################################
 # Instantiate an LDAP object, which also binds to the LDAP server.
 #
-$conn = new Mozilla::LDAP::Conn(\%ld);
+$conn = Mozilla::LDAP::Conn->new(\%ld);
 die "Could't connect to LDAP server $ld{host}" unless $conn;
 
 $key = "Y" if $opt_I;

@@ -1,5 +1,5 @@
 #############################################################################
-# $Id: Utils.pm,v 1.15 2007/06/19 11:27:05 gerv%gerv.net Exp $
+# $Id: Utils.pm,v 1.14.2.6 2007/06/14 09:21:15 gerv%gerv.net Exp $
 #
 # ***** BEGIN LICENSE BLOCK *****
 # Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -17,12 +17,13 @@
 # The Original Code is PerLDAP.
 #
 # The Initial Developer of the Original Code is
-# Netscape Communications Corp.
+# Netscape Communications Corporation.
 # Portions created by the Initial Developer are Copyright (C) 2001
 # the Initial Developer. All Rights Reserved.
 #
 # Contributor(s):
 #   Clayton Donley
+#   Leif Hedstrom <leif@perldap.org>
 #
 # Alternatively, the contents of this file may be used under the terms of
 # either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -41,9 +42,10 @@
 # DESCRIPTION
 #    Lots of Useful Little Utilities, for LDAP related operations.
 
+require 5.005;
 package Mozilla::LDAP::Utils;
 
-use Mozilla::LDAP::API 1.4 qw(:constant);
+use Mozilla::LDAP::API 1.5 qw(:constant);
 use Mozilla::LDAP::Conn;
 use Exporter;
 
@@ -51,19 +53,16 @@ use strict;
 use vars qw($VERSION @ISA %EXPORT_TAGS);
 
 @ISA = qw(Exporter);
-$VERSION = "1.4";
+$VERSION = "1.5";
 
 %EXPORT_TAGS = (
 		all => [qw(normalizeDN
 			   isUrl
 			   printEntry
 			   printentry
-			   encodeBase64
-			   decodeBase64
 			   str2Scope
 			   askPassword
 			   ldapArgs
-			   unixCrypt
 			   userCredentials
 			   answer)]
 		);
@@ -128,60 +127,6 @@ sub printEntry
 
 
 #############################################################################
-# Perform Base64 encoding, this is based on MIME::Base64.pm, written
-# by Gisle Aas <gisle@aas.no>. If possible, use the MIME:: package instead.
-#
-sub encodeBase64
-{
-  my ($res) = "";
-  my ($eol) = "$_[1]";
-  my ($padding);
-
-  pos($_[0]) = 0;                          # ensure start at the beginning
-  while ($_[0] =~ /(.{1,45})/gs) {
-    $res .= substr(pack('u', $1), 1);
-    chop($res);
-  }
-
-  $res =~ tr|` -_|AA-Za-z0-9+/|;               # `# help emacs
-  $padding = (3 - length($_[0]) % 3) % 3;
-  $res =~ s/.{$padding}$/'=' x $padding/e if $padding;
-
-  if (length $eol) {
-    $res =~ s/(.{1,76})/$1$eol/g;
-  }
-
-  return $res;
-}
- 
- 
-#############################################################################
-# Perform Base64 decoding, this is based on MIME::Base64.pm, written
-# by Gisle Aas <gisle@aas.no>. If possible, use the MIME:: package instead.
-#
-sub decodeBase64
-{
-  my ($str) = shift;
-  my ($res) = "";
-  my ($len);
- 
-  $str =~ tr|A-Za-z0-9+=/||cd;
-  Carp::croak("Base64 decoder requires string length to be a multiple of 4")
-    if length($str) % 4;
-
-  $str =~ s/=+$//;                        # remove padding
-  $str =~ tr|A-Za-z0-9+/| -_|;            # convert to uuencoded format
-  while ($str =~ /(.{1,60})/gs)
-    {
-      $len = chr(32 + length($1)*3/4);
-      $res .= unpack("u", $len . $1 );    # uudecode
-    }
-
-  return $res;
-}
-
-
-#############################################################################
 # Convert a "human" readable string to an LDAP scope value
 #
 sub str2Scope
@@ -214,12 +159,19 @@ sub str2Scope
 sub askPassword
 {
   my ($prompt) = shift;
+  my ($promptstr) = shift;
   my ($hasReadKey) = 0;
 
   eval "use Term::ReadKey";
   $hasReadKey=1 unless ($@);
 
-  print "LDAP password: " if $prompt;
+  if ($prompt) {
+      if ($promptstr) {
+          print $promptstr;
+      } else {
+          print "LDAP password: ";
+      }
+  }
   if ($hasReadKey)
     {
       ReadMode(2);
@@ -260,29 +212,24 @@ sub ldapArgs
   $ld{"bind"} = $main::opt_D || $bind || "";
   $ld{"pswd"} = $main::opt_w || "";
   $ld{"cert"} = $main::opt_P || "";
+  $ld{"certname"} = $main::opt_N || "";
+  $ld{"keypwd"} = $main::opt_W || "";
+  $ld{"starttls"} = (defined($main::opt_Z) ? 1 : 0);
   $ld{"scope"} = (defined($main::opt_s) ? $main::opt_s : LDAP_SCOPE_SUBTREE);
+  $ld{"vers"} = (defined($main::opt_V) && $main::opt_V eq "2") ?
+    LDAP_VERSION2 : LDAP_VERSION3;
 
   if (($ld{"bind"} ne "") && ($ld{"pswd"} eq ""))
     {
       $ld{pswd} = askPassword(1);
     }
 
+  if (($ld{"certname"} ne "") && ($ld{"keypwd"} eq ""))
+    {
+      $ld{keypwd} = askPassword(1, "Enter PIN for " . $ld{"certname"} . ": ");
+    }
+
   return %ld;
-}
-
-
-#############################################################################
-# Create a Unix-type password, using the "crypt" function. A random salt
-# is always generated, perhaps it should be an optional argument?
-#
-sub unixCrypt
-{
-   my ($ascii) =
-      "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-   my ($salt) = substr($ascii, rand(62), 1) . substr($ascii, rand(62), 1);
-
-   srand(time ^ $$);
-   crypt($_[0], $salt);
 }
 
 
@@ -299,8 +246,8 @@ sub userCredentials
     {
       my ($base) = $ld->{"base"} || $ld->{"root"};
 
-      $conn = new Mozilla::LDAP::Conn($ld);
-      die "Could't connect to LDAP server " . $ld->{"host"} unless $conn;
+      $conn = Mozilla::LDAP::Conn->new($ld);
+      die "Couldn't connect to LDAP server " . $ld->{"host"} unless $conn;
 
       $search = "(&(objectclass=inetOrgPerson)(uid=$ENV{USER}))";
       $entry = $conn->search($base, "subtree", $search, 0, ("uid"));

@@ -1,5 +1,5 @@
 #############################################################################
-# $Id: LDIF.pm,v 1.9 2007/06/19 11:27:05 gerv%gerv.net Exp $
+# $Id: LDIF.pm,v 1.8.2.4 2007/06/14 09:21:15 gerv%gerv.net Exp $
 #
 # 
 # ***** BEGIN LICENSE BLOCK *****
@@ -24,7 +24,7 @@
 # the Initial Developer. All Rights Reserved.
 #
 # Contributor(s):
-#   Leif Hedstrom <leif@netscape.com>
+#   Leif Hedstrom <leif@perldap.org>
 #   John M. Kristian <kristian@netscape.com>
 #
 # Alternatively, the contents of this file may be used under the terms of
@@ -56,25 +56,28 @@ require Exporter;
 
 use strict;
 
+my $base64message = "Can't use MIME::Base64!
+Your version of perl does not have the module MIME::Base64.
+LDIF files may be have base64 encoded values.  An attribute followed
+by two colons (::) instead of a single colon (:) indicates the
+attribute value is base64 encoded binary.  Please install the
+MIME::Base64 module from CPAN or use the perl CPAN module to
+install this module.  The url is:
+http://www.perl.com/CPAN/modules/by-module/MIME/
+If you have trouble, try simply putting Base64.pm
+in a subdirectory named MIME, in one of the directories named in @INC
+(site_perl is a good choice).";
+
 BEGIN {
     eval 'use MIME::Base64';
     if ($@) {
 	my $complaint = $@;
-	eval q{
-	    require Mozilla::LDAP::Utils;
-	    *decode_base64 = \&Mozilla::LDAP::Utils::decodeBase64;
-	    *encode_base64 = \&Mozilla::LDAP::Utils::encodeBase64;
-	};
-	if ($@) {
+	if ($^W) {
 	    warn $complaint;
-	    die "Can't use MIME::Base64";
-# Get a copy from http://www.perl.com/CPAN/modules/by-module/MIME/
-# and install it.  If you have trouble, try simply putting Base64.pm
-# in a subdirectory named MIME, in one of the directories named in @INC
-# (site_perl is a good choice).
-	} elsif ($^W) {
+	    warn $base64message;
+	} else {
 	    warn $complaint;
-	    warn "Can't use MIME::Base64";
+	    die $base64message;
 	}
     }
 }
@@ -791,14 +794,14 @@ Mozilla::LDAP::LDIF - read or write LDIF (LDAP Data Interchange Format)
        sort_attributes references enlist_values delist_values
        read_v1 read_v0 read_file_URL_or_name);
 
- $ldif = new Mozilla::LDAP::LDIF (*FILEHANDLE, \&read_reference, $comments);
+ $ldif = Mozilla::LDAP::LDIF->new(*FILEHANDLE, \&read_reference, $comments);
  @record = get $ldif;
  @records = get $ldif ($maximum_number);
  $entry = set_Entry (\entry, \@record);
  $entry = readOneEntry $ldif;
  @entries = readEntries $ldif ($maximum_number);
 
- $ldif = new Mozilla::LDAP::LDIF (*FILEHANDLE, $options);
+ $ldif = Mozilla::LDAP::LDIF->new(*FILEHANDLE, $options);
  $success = put $ldif (@record);
  $success = put $ldif (\@record, \object ...);
  $success = writeOneEntry $ldif (\entry);
@@ -834,7 +837,7 @@ Mozilla::LDAP::LDIF - read or write LDIF (LDAP Data Interchange Format)
 
 =head1 REQUIRES
 
-MIME::Base64 (or Mozilla::LDAP::Utils), Exporter, Carp
+MIME::Base64, Exporter, Carp
 
 =head1 INSTALLATION
 
@@ -1006,7 +1009,7 @@ Return false if the file can't be read.
 
 =over 4
 
-=item B<new> Mozilla::LDAP::LDIF (*FILEHANDLE, $options)
+=item Mozilla::LDAP::LDIF->B<new>(*FILEHANDLE, $options)
 
 Create and return an object used to write LDIF to the given file.
 $options are described below.
@@ -1217,8 +1220,7 @@ For example, B<unpack_LDIF>("abc") outputs this warning, and returns ("abc", und
 
 =item Can't use MIME::Base64
 
-(F) The MIME::Base64 module isn't installed, and
-Mozilla::LDAP::Utils can't be used (as an inferior substitute).
+(F) The MIME::Base64 module isn't installed.
 To rectify this, get a copy of MIME::Base64 from
 http://www.perl.com/CPAN/modules/by-module/MIME/ and install it.
 If you have trouble, try simply putting Base64.pm in a subdirectory named MIME,
@@ -1238,14 +1240,14 @@ to pass it only a single record.
 
     use Mozilla::LDAP::LDIF qw(read_file_URL_or_name);
 
-    $in  = new Mozilla::LDAP::LDIF (*STDIN, \&read_file_URL_or_name);
-    $out = new Mozilla::LDAP::LDIF (*STDOUT, 78);
+    $in  = Mozilla::LDAP::LDIF->new(*STDIN, \&read_file_URL_or_name);
+    $out = Mozilla::LDAP::LDIF->new(*STDOUT, 78);
     @records = get $in (undef); # read to end of file (^D)
     put $out (@records);
 
     use Mozilla::LDAP::Conn();
 
-    $conn = new Mozilla::LDAP::Conn (...);
+    $conn = Mozilla::LDAP::Conn->new(...);
     while ($entry = readOneEntry $in) {
         add $conn ($entry);
     }

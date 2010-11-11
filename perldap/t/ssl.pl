@@ -1,6 +1,6 @@
-#!/usr/bin/perl5
+#!/usr/bin/env perl
 #############################################################################
-# $Id: rmentry.pl,v 1.6.2.4 2007/06/14 09:21:17 gerv%gerv.net Exp $
+# $Id: ssl.pl,v 1.1.2.2 2007/06/14 09:21:17 gerv%gerv.net Exp $
 #
 # ***** BEGIN LICENSE BLOCK *****
 # Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -24,7 +24,7 @@
 #
 # Contributor(s):
 #   Clayton Donley
-#   Leif Hedstrom <leif@perldap.org>
+#   Rich Megginson <richm@stanfordalumni.org>
 #
 # Alternatively, the contents of this file may be used under the terms of
 # either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -41,73 +41,45 @@
 # ***** END LICENSE BLOCK *****
 
 # DESCRIPTION
-#    Remove one or several LDAP objects. By default this tool is
-#    interactive, which can be disabled with the "-I" option (but
-#    please be careful...).
+#    Test most (all?) of the LDAP::Mozilla::Conn methods. This code
+#    needs to be rewritten to use the standard test harness in Perl...
 
 use Getopt::Std;			# To parse command line arguments.
 use Mozilla::LDAP::Conn;		# Main "OO" layer for LDAP
 use Mozilla::LDAP::Utils;		# LULU, utilities.
+use Mozilla::LDAP::API;
+
+use strict;
+no strict "vars";
+
+
+# Uncomment for somewhat more verbose messages from core modules
+#$LDAP_DEBUG = 1;
+
+
+#################################################################################
+# Configurations, modify these as needed.
+#
+$BASE	= "dc=example,dc=com";
+$PEOPLE	= "ou=people";
+$UID	= "scarter";
 
 
 #################################################################################
 # Constants, shouldn't have to edit these...
 #
-$APPNAM	= "rmentry";
-$USAGE	= "$APPNAM [-nvI] -b base -h host -p port -D bind -w pswd" .
-          "-P cert -V ver filter ...";
-
-@ATTRIBUTES = ("uid");
+$APPNAM	= "ssl.pl";
+$USAGE	= "$APPNAM -b base -h host -D bind -w pswd -P cert -N certname -W keypassword -Z";
 
 
 #################################################################################
 # Check arguments, and configure some parameters accordingly..
 #
-if (!getopts('nvIb:h:p:D:w:P:V:'))
+if (!getopts('b:h:D:p:s:w:P:N:W:Z'))
 {
-  print "usage: $APPNAM $USAGE\n";
-  exit;
+   print "usage: $APPNAM $USAGE\n";
+   exit;
 }
-%ld = Mozilla::LDAP::Utils::ldapArgs();
+%ld = Mozilla::LDAP::Utils::ldapArgs(undef, $BASE);
+$BASE = $ld{"base"};
 Mozilla::LDAP::Utils::userCredentials(\%ld) unless $opt_n;
-
-
-#################################################################################
-# Do the search, and process all the entries.
-#
-$conn = Mozilla::LDAP::Conn->new(\%ld);
-die "Could't connect to LDAP server $ld{host}" unless $conn;
-
-$key = "Y" if $opt_I;
-foreach $search (@ARGV)
-{
-  $entry = $conn->search($ld{root}, $ld{scope}, $search, 0, @ATTRIBUTES);
-  $conn->printError() if $conn->getErrorCode();
-
-  while ($entry)
-    {
-      if (! $opt_I)
-	{
-	  print "Delete $entry->{dn} [N]? ";
-	  $key = Mozilla::LDAP::Utils::answer("N") unless $opt_I;
-	}
-
-      if ($key eq "Y")
-	{
-	  if (! $opt_n)
-	    {
-	      $conn->delete($entry);
-	      $conn->printError() if $conn->getErrorCode();
-	    }
-	  print "Deleted $entry->{dn}\n" if $opt_v;
-	}
-
-      $entry = $conn->nextEntry();
-    }
-}
-
-
-#################################################################################
-# Close the connection.
-#
-$conn->close if $conn;

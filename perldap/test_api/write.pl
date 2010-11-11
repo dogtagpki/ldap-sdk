@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #############################################################################
-# $Id: write.pl,v 1.6 2007/06/19 11:27:06 gerv%gerv.net Exp $
+# $Id: write.pl,v 1.5.2.1 2007/06/14 09:21:18 gerv%gerv.net Exp $
 #
 # ***** BEGIN LICENSE BLOCK *****
 # Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -15,7 +15,7 @@
 # for the specific language governing rights and limitations under the
 # License.
 #
-# The Original Code is PerlDAP. 
+# The Original Code is PerlDAP.
 #
 # The Initial Developer of the Original Code is
 # Netscape Communications Corporation.

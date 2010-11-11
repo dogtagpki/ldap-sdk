@@ -1,6 +1,6 @@
 #!/usr/bin/perl5
 #############################################################################
-# $Id: psoftsync.pl,v 1.7 2007/06/19 11:27:05 gerv%gerv.net Exp $
+# $Id: psoftsync.pl,v 1.6.2.4 2007/06/14 09:21:17 gerv%gerv.net Exp $
 #
 # ***** BEGIN LICENSE BLOCK *****
 # Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -15,15 +15,16 @@
 # for the specific language governing rights and limitations under the
 # License.
 #
-# The Original Code is PerLDAP.
+# The Original Code is PerLDAP. 
 #
 # The Initial Developer of the Original Code is
-# Netscape Communications Corp. 
+# Netscape Communications Corporation.
 # Portions created by the Initial Developer are Copyright (C) 2001
 # the Initial Developer. All Rights Reserved.
 #
 # Contributor(s):
 #   Clayton Donley
+#   Leif Hedstrom <leif@perldap.org>
 #
 # Alternatively, the contents of this file may be used under the terms of
 # either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -134,7 +135,7 @@ $MAILTO = "leif\@netscape.com";
 # Constants, shouldn't have to edit these...
 #
 $APPNAM	= "psoftsync";
-$USAGE	= "$APPNAM [-nvW] -b base -h host -D bind -w passwd -P cert PS_file";
+$USAGE	= "$APPNAM [-nvW] -b base -h host -D bind -w passwd -P cert -V ver PS_file";
 
 @ATTRIBUTES = uniq(@ORDER);
 push(@ATTRIBUTES, "objectclass");
@@ -180,7 +181,7 @@ sub readDump
       next unless /$DELIMITER/;
 
       @info = split(/\s*%%\s*/);
-      $entry = new PsoftEntry($info[$[]);
+      $entry = PsoftEntry->new($info[$[]);
       foreach $attr (@ORDER)
 	{
 	  $val = shift(@info);
@@ -250,7 +251,7 @@ sub delAttr {				# delAttr(ENTRY, ATTR)
 #############################################################################
 # Check arguments, and configure some parameters accordingly..
 #
-if (!getopts('nvMWb:h:D:p:s:w:P:'))
+if (!getopts('nvMWb:h:D:p:s:w:P:V:'))
 {
   print "usage: $APPNAM $USAGE\n";
   exit;
@@ -258,7 +259,7 @@ if (!getopts('nvMWb:h:D:p:s:w:P:'))
 %ld = Mozilla::LDAP::Utils::ldapArgs();
 Mozilla::LDAP::Utils::userCredentials(\%ld) unless $opt_n;
 
-$out = new Mail();
+$out = Mail->new();
 if ($opt_M)
 {
   $out->set("to", $MAILTO);
@@ -276,7 +277,7 @@ else
 # which also binds to the LDAP server.
 #
 %psoft = readDump(@ARGV[$[]);
-$conn = new Mozilla::LDAP::Conn(\%ld);
+$conn = Mozilla::LDAP::Conn->new(\%ld);
 die "Could't connect to LDAP server $ld{host}" unless $conn;
 
 

@@ -1,5 +1,5 @@
 #############################################################################
-# $Id: typemap,v 1.5.2.6 2007/06/14 09:21:15 gerv%gerv.net Exp $
+# $Id: Makefile.PL.rpm,v 1.1.2.3 2007/06/14 09:21:15 gerv%gerv.net Exp $
 #
 # ***** BEGIN LICENSE BLOCK *****
 # Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -24,7 +24,6 @@
 # Contributor(s):
 #   Clayton Donley
 #   Leif Hedstrom <leif@perldap.org>
-#   Kevin McCarthy
 #
 # Alternatively, the contents of this file may be used under the terms of
 # either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -41,62 +40,64 @@
 # ***** END LICENSE BLOCK *****
 
 # DESCRIPTION
-#    Typemap to declare XSUB data types.
+#    The Makefile "source".
+#    This has been heavily modified to simply use pkg-config
+#    to get the components necessary to build.
 
-const int		T_IV
-char *			T_PV
-const char *		T_PV
-char **			T_charptrptr
-void *			T_PTR
-LDAP *			T_PTR
-LDAPMessage *		T_PTR
-LDAPMessage **		T_PTR
-BerElement *		T_PTR
-LDAPControl *		T_PTR
-LDAPVersion *		T_PTR
-struct berval 		T_berval
-struct berval *		T_bervalptr
-struct berval **	T_bervalptrptr
-FriendlyMap *		T_PTR
-LDAPsortkey **		T_PTR
-LDAPVirtualList *	T_PTR
-LDAPURLDesc *		T_PTR
-LDAPControl **		T_PTR
-LDAPFiltDesc *		T_PTR
-LDAPFiltInfo *		T_PTR
-LDAPMemCache *		T_PTR
-LDAPMemCache **		T_PTR
-struct ldap_thread_fns *	T_PTR
-LDAPMod **		T_PTR
-LDAP_CMP_CALLBACK *	T_PTR
-LDAP_REBINDPROC_CALLBACK *	T_PTR
-struct timeval		T_timeval
-my_chgtype_t    T_IV
-my_chgnum_t     T_IV
-my_result_t     T_IV
-my_vlvint_t     T_IV
+require 5.005;
 
-#########
-INPUT
-T_timeval
-	$var.tv_sec = (long)atof((char *)SvPV($arg,PL_na));
-	$var.tv_usec = 0
-T_berval
-	$var.bv_val = (char *)SvPV($arg,PL_na);
-	$var.bv_len = PL_na
-T_charptrptr
-        $var = (char **)avref2charptrptr($arg)
-T_bervalptr
-    $var = NULL
-T_bervalptrptr
-	$var = (struct berval **)avref2berptrptr($arg)
-OUTPUT
-T_charptrptr
-	$arg = charptrptr2avref($var);
-T_bervalptr
-    if ($var) {
-        sv_setpvn($arg,$var->bv_val,$var->bv_len);
-        ber_bvfree($var);
-    }
-T_bervalptrptr
-	$arg = berptrptr2avref((struct berval **)$var);
+use ExtUtils::MakeMaker;
+use ExtUtils::Liblist;
+use Config;
+use Carp;
+
+# name of package to use for pkg-config
+$ldappkgname = $ENV{"LDAPPKGNAME"} || "mozldap6";
+
+print "\nPerLDAP - Perl 5 Module for LDAP\n";
+print     "================================\n";
+$cflags = `pkg-config --cflags $ldappkgname`;
+chomp($cflags);
+print "Using CFLAGS = $cflags\n";
+print     "================================\n";
+$libs = `pkg-config --libs $ldappkgname`;
+chomp($libs);
+print "Using LIBS = $libs\n";
+
+#
+# Ok, let's do it!
+#
+print "\n######### before WriteMakefile #############\n";
+WriteMakefile(
+              'ABSTRACT'	=> 'Perl methods for LDAP C API calls',
+              'AUTHOR'		=> 'Leif Hedstrom <leif@ogre.com>',
+	      'NAME'		=> 'Mozilla::LDAP::API',
+	      'DISTNAME'	=> 'PerLDAP',
+
+	      'VERSION_FROM'	=> 'API.pm',
+	      'INC'		=> $cflags,
+	      'LIBS'		=> [$libs],
+	      'MYEXTLIB'	=> $my_extlib,
+	      'DEFINE'		=> "-DUSE_SSL -DPRLDAP",
+	      'XSOPT'		=> "-nolinenumbers",
+	      @extras
+);
+
+print "\n######### after WriteMakefile #############\n";
+
+#
+# Generate a "make HTML" target
+#
+sub MY::postamble
+{
+  '
+.SUFFIXES: .pm .html
+.PHONY: html
+
+.pm.html:
+	pod2html --netscape $< > $@
+
+html:	Entry.html Conn.html Utils.html API.html LDIF.html $(FIRST_MAKEFILE)
+	@rm -f pod2html-itemcache pod2html-dircache
+'
+}

@@ -1,6 +1,6 @@
 #!/usr/bin/perl5
 #############################################################################
-# $Id: qsearch.pl,v 1.10 2007/06/19 11:27:05 gerv%gerv.net Exp $
+# $Id: qsearch.pl,v 1.9.2.5 2007/06/14 09:21:17 gerv%gerv.net Exp $
 #
 # ***** BEGIN LICENSE BLOCK *****
 # Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -15,15 +15,16 @@
 # for the specific language governing rights and limitations under the
 # License.
 #
-# The Original Code is PerLDAP.
+# The Original Code is PerLDAP. 
 #
 # The Initial Developer of the Original Code is
-# Netscape Communications Corp.
+# Netscape Communications Corporation.
 # Portions created by the Initial Developer are Copyright (C) 2001
 # the Initial Developer. All Rights Reserved.
 #
 # Contributor(s):
 #   Clayton Donley
+#   Leif Hedstrom <leif@perldap.org>
 #
 # Alternatively, the contents of this file may be used under the terms of
 # either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -54,13 +55,13 @@ no strict "vars";
 # Constants, shouldn't have to edit these...
 #
 $APPNAM	= "qsearch";
-$USAGE	= "$APPNAM -b base -h host -D bind -w pswd -P cert filter [attr...]";
+$USAGE	= "$APPNAM -b base -h host -D bind -w pswd -P cert -V ver filter [attr...]";
 
 
 #################################################################################
 # Check arguments, and configure some parameters accordingly..
 #
-if (!getopts('b:h:D:p:s:w:P:'))
+if (!getopts('b:h:D:p:s:w:P:V:'))
 {
    print "usage: $APPNAM $USAGE\n";
    exit;
@@ -71,7 +72,7 @@ if (!getopts('b:h:D:p:s:w:P:'))
 #################################################################################
 # Now do all the searches, one by one.
 #
-$conn = new Mozilla::LDAP::Conn(\%ld);
+$conn = Mozilla::LDAP::Conn->new(\%ld);
 die "Could't connect to LDAP server $ld{host}" unless $conn;
 
 foreach (@ARGV)
@@ -98,13 +99,12 @@ foreach $search (@srch)
     }
 
   print "Searched for `$search':\n\n";
-  $conn->printError() if $conn->getErrorCode();
-
   while ($entry)
     {
       $entry->printLDIF();
       $entry = $conn->nextEntry;
     }
+  $conn->printError() if $conn->getErrorCode();
   print "\n";
 }
 

@@ -1,6 +1,6 @@
 #!/usr/bin/perl5
 #############################################################################
-# $Id: modattr.pl,v 1.10 2007/06/19 11:27:05 gerv%gerv.net Exp $
+# $Id: modattr.pl,v 1.9.2.4 2007/06/14 09:21:17 gerv%gerv.net Exp $
 #
 # ***** BEGIN LICENSE BLOCK *****
 # Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -18,12 +18,13 @@
 # The Original Code is PerLDAP.
 #
 # The Initial Developer of the Original Code is
-# Netscape Communications Corp.
+# Netscape Communications Corporation.
 # Portions created by the Initial Developer are Copyright (C) 2001
 # the Initial Developer. All Rights Reserved.
 #
 # Contributor(s):
 #   Clayton Donley
+#   Leif Hedstrom <leif@perldap.org>
 #
 # Alternatively, the contents of this file may be used under the terms of
 # either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -56,26 +57,27 @@ no strict "vars";
 # Constants, shouldn't have to edit these...
 #
 $APPNAM	= "modattr";
-$USAGE	= "$APPNAM [-dnvW] -b base -h host -D bind -w pswd -P cert attr=value filter";
+$USAGE	= "$APPNAM [-dnvW] -b base -h host -D bind -w pswd -P cert -V ver attr=value filter";
 
 
 #############################################################################
 # Check arguments, and configure some parameters accordingly..
 #
-if (!getopts('adnvWb:h:D:p:s:w:P:'))
+if (!getopts('adnvWb:h:D:p:s:w:P:V:i:'))
 {
   print "usage: $APPNAM $USAGE\n";
   exit;
 }
 %ld = Mozilla::LDAP::Utils::ldapArgs();
 Mozilla::LDAP::Utils::userCredentials(\%ld) unless $opt_n;
+$nocase = (defined($opt_i) && $opt_i) ? 1 : 0;
 
 
 #############################################################################
 # Let's process the changes requested, and commit them unless the "-n"
 # option was given.
 #
-$conn = new Mozilla::LDAP::Conn(\%ld);
+$conn = Mozilla::LDAP::Conn->new(\%ld);
 die "Could't connect to LDAP server $ld{host}" unless $conn;
 
 $conn->setDefaultRebindProc($ld{bind}, $ld{pswd});
@@ -125,7 +127,7 @@ while ($entry)
 	}
       elsif ($opt_a)
 	{
-	  $changed = $entry->addValue($attr, $value);
+	  $changed = $entry->addValue($attr, $value, 0, 0, $nocase);
 	  if ($changed && $opt_v)
 	    {
 	      print "Added attribute to ", $entry->getDN(), "\n" if $opt_v;
@@ -140,8 +142,9 @@ while ($entry)
     }
   if ($changed && ! $opt_n)
     {
-      $conn->update($entry);
-      $conn->printError() if $conn->getErrorCode();
+      if (!$conn->update($entry)) {
+        $conn->printError();
+      }
     }
 
   $entry = $conn->nextEntry();
