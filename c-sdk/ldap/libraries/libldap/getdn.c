@@ -309,11 +309,13 @@ ldap_explode( const char *dn, const int notypes, const int nametype )
 				    	SAFEMEMCPY( rdns[ count-1 ], rdnstart,
 					    len );
 					if ( !endquote ) {
-						/* trim trailing spaces */
+                                                /* trim trailing spaces unless
+                                                 * they are properly escaped */
 						while ( len > 0 &&
 						    ldap_utf8isspace(
-						    &rdns[count-1][len-1] )) {
-							--len;
+                                                    &rdns[count-1][len-1] ) &&
+                                                    ((len == 1) || (rdns[count-1][len-2] != '\\'))) {
+                                                         --len;
 						}
 					}
 					rdns[ count-1 ][ len ] = '\0';
