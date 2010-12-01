@@ -60,8 +60,8 @@ USE_IPV6=
 USE_MDUPDATE=
 _OPTIMIZE_FLAGS=-O
 _DEBUG_FLAGS=-g
-MOZ_DEBUG=1
-MOZ_OPTIMIZE=
+MOZ_DEBUG=
+MOZ_OPTIMIZE=1
 MFLAGS=
 OBJDIR=.
 OBJDIR_NAME=.
@@ -165,17 +165,16 @@ AC_ARG_ENABLE(optimize,
     fi ])
 
 AC_ARG_ENABLE(debug,
-    [  --disable-debug         Do not compile in debugging symbols
-  --enable-debug(=val)    Enable debugging (debug flags val)],
-    [	if test "$enableval" = "no"; then
-    	    MOZ_DEBUG=
-        else
+    [  --enable-debug(=val)    Enable debugging (debug flags val)],
+    [ if test "$enableval" != "no"; then
             MOZ_DEBUG=1
             if test -n "$enableval" && test "$enableval" != "yes"; then
     	        _DEBUG_FLAGS=`echo $enableval | sed -e 's|\\\ | |g'`
                 _SAVE_DEBUG_FLAGS=$_DEBUG_FLAGS
             fi
-	    fi])
+      else
+            MOZ_DEBUG=
+    fi])
 
 AC_ARG_ENABLE(win32-target,
     [  --enable-win32-target=\$t
