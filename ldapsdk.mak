@@ -173,14 +173,6 @@ ERR_MESSAGE=$(ERR_MESSAGE)^
 Environment variable MOZ_SRC isn't set.
 !endif
 
-#//------------------------------------------------------------------------
-# Verify that MOZ_BITS is set
-#//------------------------------------------------------------------------
-!if !defined(MOZ_BITS)
-ERR_MESSAGE=$(ERR_MESSAGE)^
-Environment variable MOZ_BITS isn't set.
-!endif
-
 !if !defined(MOZ_TOOLS)
 ERR_MESSAGE=$(ERR_MESSAGE)^
 Environment variable MOZ_TOOLS isn't set.
@@ -209,7 +201,6 @@ nmake -f ldapsdk.mak [MOZ_BRANCH=<cvs_branch_name>] ^
 ^
 Environment variables:^
 ^
-MOZ_BITS    set to either 32 or 16 ^
 MOZ_SRC     set to the directory above ns or "$(MAKEDIR)\.."^
 MOZ_TOOLS   set to the directory containing the java compiler see ^
 		http://warp/tools/nt^
@@ -218,4 +209,3 @@ JAVA_HOME   set to the same thing as MOZ_TOOLS^
 !ERROR $(ERR_MESSAGE)
 
 !endif
-
