@@ -7,7 +7,7 @@
 
 %define major           6
 %define minor           0
-%define submin          4
+%define submin          7
 %define libsuffix       %{major}0
 
 Summary:          Mozilla LDAP C SDK
