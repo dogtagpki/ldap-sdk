@@ -83,13 +83,15 @@ extern "C" {
 #elif defined(_WIN32)
 #define LDAPTOOL_CHARSET_DEFAULT	"windows-1252"	/* Windows */
 #define LDAPTOOL_CHARSET_WINANSI	"ANSI"		/* synonym */
+#elif defined(DARWIN)
+#define LDAPTOOL_CHARSET_DEFAULT	"UTF-8"		/* Mac OS X */
 #else
 #define LDAPTOOL_CHARSET_DEFAULT	"646"		/* all others */
 #endif
 
 /* Type used for the src parameter to iconv() (the 2nd parameter) */
-#if defined(_HPUX_SOURCE) || defined(__GLIBC__)
-#define LDAPTOOL_ICONV_SRC_TYPE	char **		/* HP/UX and glibc (Linux) */
+#if defined(_HPUX_SOURCE) || defined(__GLIBC__) || defined(DARWIN)
+#define LDAPTOOL_ICONV_SRC_TYPE	char **		/* HP/UX, glibc (Linux), and Mac OS X */
 #else
 #define LDAPTOOL_ICONV_SRC_TYPE const char **	/* all others */
 #endif
