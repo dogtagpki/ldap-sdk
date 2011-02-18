@@ -21,6 +21,7 @@
  * 
  * Contributor(s): 
  * Sun Microsystems, Inc.
+ * Mark Craig
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either of the GNU General Public License Version 2 or later (the "GPL"),
@@ -45,25 +46,21 @@
 int
 main( int argc, char **argv )
 {
-    LDAPpwdpolicy   *policy;
-    int             version;
-    LDAP            *ld;
-    int             rc;
-    LDAPControl     *pwpctrl = NULL;
-    LDAPControl     *requestctrls[ 2 ];
-    int             msgid;
-    LDAPMessage     *result;
-    int             parse_rc;
-    char            *matched = NULL;
-    char            *errmsg = NULL;
-    char            **referrals;
-    LDAPControl     **resultctrls = NULL;
-
-    /* Allocate the LDAPpwdpolicy structure. */
-    if ( !( policy = (LDAPpwdpolicy*)malloc(sizeof(LDAPpwdpolicy) ) ) ) {
-        perror("malloc");
-        return ( 1 );
-    }
+    LDAPPasswordPolicyError   policy;
+    ber_int_t                 expire;
+    ber_int_t                 grace;
+    int                       version;
+    LDAP                      *ld;
+    int                       rc;
+    LDAPControl               *pwpctrl = NULL;
+    LDAPControl               *requestctrls[ 2 ];
+    int                       msgid;
+    LDAPMessage               *result;
+    int                       parse_rc;
+    char                      *matched = NULL;
+    char                      *errmsg = NULL;
+    char                      **referrals;
+    LDAPControl               **resultctrls = NULL;
 
     /* Use LDAPv3. */
     version = LDAP_VERSION3;
@@ -82,9 +79,9 @@ main( int argc, char **argv )
     }
 
     /* Create a password policy control. */
-    rc = ldap_create_pwdpolicy_control( ld, 1, &pwpctrl);
+    rc = ldap_create_passwordpolicy_control( ld, &pwpctrl);
     if ( rc != LDAP_SUCCESS ) {
-        fprintf( stderr, "ldap_create_pwdpolicy_control: %s\n",
+        fprintf( stderr, "ldap_create_passwordpolicy_control: %s\n",
                  ldap_err2string( rc ) );
         ldap_unbind( ld );
         return( 1 );
@@ -138,60 +135,19 @@ main( int argc, char **argv )
     }
 
     /* Show the password policy information. */
-    parse_rc = ldap_parse_pwdpolicy_control( ld, resultctrls, policy );
+    parse_rc = ldap_parse_passwordpolicy_control( ld, *resultctrls,
+        &expire, &grace, &policy );
     if ( parse_rc != LDAP_SUCCESS ) {
-        fprintf( stderr, "ldap_parse_pwdpolicy_control: %s\n",
+        fprintf( stderr, "ldap_parse_passwordpolicy_control: %s\n",
             ldap_err2string( rc ) );
         ldap_unbind( ld );
         return ( 1 );
     }
 
     printf( "DN: %s\n", ENTRYDN );
-    switch ( policy->pp_warning ) {
-    case LDAP_PP_WARNING_NONE:
-        printf( " No warnings\n" );
-        break;
-    case LDAP_PP_WARNING_EXP:
-        printf( " Password expires in: %d s\n", policy->pp_warning_info );
-        break;
-    case LDAP_PP_WARNING_GRACE:
-        printf( " Grace logins left: %d", policy->pp_warning_info );
-        break;
-    default: printf( " Unrecognized password policy warning\n" ); break;
-    }
-    switch ( policy->pp_error ) {
-    case LDAP_PP_ERROR_NONE:
-        printf( " No errors\n" );
-        break;
-    case LDAP_PP_ERROR_EXPIRED:
-        printf( " Password has expired, and must be reset.\n" );
-        break;
-    case LDAP_PP_ERROR_LOCKED:
-        printf( " Account is locked.\n" );
-        break;
-    case LDAP_PP_ERROR_MUSTCHANGE:
-        printf( " Password has been reset, and must be changed.\n" );
-        break;
-    case LDAP_PP_ERROR_NOTMOD:
-        printf( " This user may not change the password.\n" );
-        break;
-    case LDAP_PP_ERROR_OLDPASSWD:
-        printf( " Old password must be supplied for this operation.\n" );
-        break;
-    case LDAP_PP_ERROR_NOQUALITY:
-        printf( " Password does not pass quality check.\n" );
-        break;
-    case LDAP_PP_ERROR_TOOSHORT:
-        printf( " Password is too short.\n" );
-        break;
-    case LDAP_PP_ERROR_MINAGE:
-        printf( " Password is too new to be modified already.\n" );
-        break;
-    case LDAP_PP_ERROR_INHISTORY:
-        printf( " Password has already been used.\n" );
-        break;
-    default: printf( " Unrecognized password policy error\n" ); break;
-    }
+    printf( " Password expires in: %d s\n", (int)expire );
+    printf( " Grace logins left: %d\n", (int)grace );
+    printf(" %s\n", ldap_passwordpolicy_err2txt(policy));
 
     ldap_msgfree( result );
     ldap_control_free( pwpctrl );
