@@ -73,8 +73,8 @@ extern "C" {
 int re_init( void );
 void re_lock( void );
 int re_unlock( void );
-char * LDAP_CALL re_comp( char *pat );
-int LDAP_CALL re_exec( char *lp );
+char * LDAP_CALL re_comp( const char *pat );
+int LDAP_CALL re_exec( const char *lp );
 void LDAP_CALL re_modw( char *s );
 int LDAP_CALL re_subs( char *src, char *dst );
 #else /* NEEDPROTOS */

@@ -254,6 +254,10 @@ ifeq ($(OS_ARCH), BeOS)
 EXTRA_LIBS = -L$(dist_libdir) -l$(LBER_LIBNAME) -lbe
 endif
 
+ifeq ($(OS_ARCH), FreeBSD)
+EXTRA_LIBS = -L$(dist_libdir) -l$(LBER_LIBNAME)
+endif
+
 ifeq ($(OS_ARCH), NetBSD)
 EXTRA_LIBS = -L$(dist_libdir) -l$(LBER_LIBNAME)
 endif

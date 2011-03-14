@@ -267,7 +267,7 @@ chset(REGEXCHAR c)
  
 char *     
 LDAP_CALL
-re_comp( char *pat )
+re_comp( const char *pat )
 {
 	register REGEXCHAR *p;          /* pattern pointer   */
 	register REGEXCHAR *mp=nfa;     /* nfa pointer       */
@@ -513,7 +513,7 @@ static REGEXCHAR *pmatch();
 
 int
 LDAP_CALL
-re_exec( char *lp )
+re_exec( const char *lp )
 {
 	register REGEXCHAR c;
 	register REGEXCHAR *ep = 0;
