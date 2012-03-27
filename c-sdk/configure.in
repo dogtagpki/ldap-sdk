@@ -860,10 +860,6 @@ OS_2)
     OS_ARCH=OS2
     OS_TARGET=OS2
     ;;
-WINCE)
-    OS_ARCH=WINCE
-    OS_TARGET=WINCE
-    ;;
 esac
 
 #
