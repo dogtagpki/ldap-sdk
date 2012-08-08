@@ -2782,15 +2782,6 @@ test -n "$HOST_CC" || HOST_CC=""""
     CFLAGS=$_SAVE_CFLAGS
     LDFLAGS=$_SAVE_LDFLAGS
 
-    case "$build:$target" in 
-      powerpc-apple-darwin8*:i?86-apple-darwin*)
-                                                _SAVE_CFLAGS=$CFLAGS 
-        _SAVE_CXXFLAGS=$CXXLAGS
-        CFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk $CFLAGS"
-        CXXFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk $CXXFLAGS"
-        ;;        
-    esac            
-
     for ac_prog in $CC "${target_alias}-gcc" "${target}-gcc"
 do
 # Extract the first word of "$ac_prog", so it can be a program name with args.
@@ -3229,13 +3220,6 @@ else
 fi
 
 
-    case "$build:$target" in
-      powerpc-apple-darwin8*:i?86-apple-darwin*)
-                                CFLAGS=$_SAVE_CFLAGS
-        CXXFLAGS=$_SAVE_CXXFLAGS
-        ;;
-    esac
-
     for ac_prog in $RANLIB "${target_alias}-ranlib" "${target}-ranlib"
 do
 # Extract the first word of "$ac_prog", so it can be a program name with args.
@@ -3458,12 +3442,6 @@ if test "`echo | $AS -v 2>&1 | grep -c GNU`" != "0"; then
     GNU_AS=1
 fi
 rm -f a.out
-
-case "$build:$target" in
-    i?86-apple-darwin*:powerpc-apple-darwin*)
-                                cross_compiling=yes
-        ;;
-esac
 
 if test "$cross_compiling"  = "yes"; then
     CROSS_COMPILE=1
