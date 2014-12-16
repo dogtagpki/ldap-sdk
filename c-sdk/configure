@@ -3687,7 +3687,7 @@ esac
 
 if test -n "$MOZILLA_CLIENT" && test "$OS_ARCH" = "WINNT"; then
     OS_TARGET=WIN95
-    if test -n "$MOZ_DEBUG"; then
+    if test -n "$MOZ_DEBUG" -a -z "$USE_DEBUG_RTL"; then
         USE_DEBUG_RTL=1
     fi
 fi
