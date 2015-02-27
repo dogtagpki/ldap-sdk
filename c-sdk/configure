@@ -4243,8 +4243,10 @@ EOF
 #define DRAGONFLY 1
 EOF
 
+    LD='$(CC)'
+    MKSHLIB='$(CC) $(DSO_LDOPTS) -o $@'
     DSO_CFLAGS=-fPIC
-    DSO_LDOPTS='-shared'
+    DSO_LDOPTS='-shared -Wl,-soname,$(notdir $@)'
 	;;
 
 *-freebsd*)
@@ -4263,6 +4265,7 @@ EOF
 #define HAVE_BSD_FLOCK 1
 EOF
 
+    LD='$(CC)'
     CFLAGS="$CFLAGS $(DSO_CFLAGS) -ansi -Wall"
     MOZ_OBJFORMAT=`test -x /usr/bin/objformat && /usr/bin/objformat || echo elf`
     if test "$MOZ_OBJFORMAT" = "elf"; then
@@ -4270,8 +4273,9 @@ EOF
     else
         DLL_SUFFIX=so.1.0
     fi
+    MKSHLIB='$(CC) $(DSO_LDOPTS) -o $@'
     DSO_CFLAGS=-fPIC
-    DSO_LDOPTS=-Bshareable
+    DSO_LDOPTS='-shared -Wl,-soname,$(notdir $@)'
     ;;
 
 *-hpux*)
@@ -6514,8 +6518,15 @@ echo "configure:6510: checking whether ${CC-cc} accepts -pthread" >&5
    if test $? -eq 0; then
 	if test -z "`egrep -i '(unrecognize|unknown)' conftest.out | grep pthread`" && test -z "`egrep -i '(error|incorrect)' conftest.out`" ; then
 	    ac_cv_have_dash_pthread=yes
-	    CFLAGS="$CFLAGS -pthread"
-	    CXXFLAGS="$CXXFLAGS -pthread"
+        case "$target_os" in
+        dragonfly*|freebsd*)
+# Freebsd doesn't use -pthread for compiles, it uses them for linking
+            ;;
+        *)
+            CFLAGS="$CFLAGS -pthread"
+            CXXFLAGS="$CXXFLAGS -pthread"
+            ;;
+        esac
 	fi
     fi
     rm -f conftest*
@@ -6544,7 +6555,22 @@ echo "configure:6526: checking whether ${CC-cc} accepts -pthreads" >&5
             _PTHREAD_LDFLAGS=
         fi
 	    ;;
-    *-freebsd*|*-openbsd*|*-bsdi*|*-netbsd*)
+    *-dragonfly*|*-freebsd*)
+        cat >> confdefs.h <<\EOF
+#define _REENTRANT 1
+EOF
+
+        cat >> confdefs.h <<\EOF
+#define _THREAD_SAFE 1
+EOF
+
+                if test "$ac_cv_have_dash_pthread" = "yes"; then
+            _PTHREAD_LDFLAGS="-pthread"
+        else
+            _PTHREAD_LDFLAGS="-lc_r"
+        fi
+        ;;
+    *-openbsd*|*-bsdi*|*-netbsd*)
 	    cat >> confdefs.h <<\EOF
 #define _THREAD_SAFE 1
 EOF

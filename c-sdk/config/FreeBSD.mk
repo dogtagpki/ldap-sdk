@@ -79,8 +79,8 @@ DLL_SUFFIX		= so.1.0
 endif
 
 DSO_CFLAGS		= -fPIC
-DSO_LDOPTS		= -Bshareable
+DSO_LDOPTS		= -shared -Wl,-soname,$(notdir $@)
 
-MKSHLIB			= $(LD) $(DSO_LDOPTS)
+MKSHLIB			= $(CC) $(DSO_LDOPTS)
 
 G++INCLUDES		= -I/usr/include/g++

@@ -1227,8 +1227,10 @@ tools are selected during the Xcode/Developer Tools installation.])
     fi
     AC_DEFINE(XP_UNIX)
     AC_DEFINE(DRAGONFLY)
+    LD='$(CC)'
+    MKSHLIB='$(CC) $(DSO_LDOPTS) -o $@'
     DSO_CFLAGS=-fPIC
-    DSO_LDOPTS='-shared'
+    DSO_LDOPTS='-shared -Wl,-soname,$(notdir $@)'
 	;;
 
 *-freebsd*)
@@ -1238,6 +1240,7 @@ tools are selected during the Xcode/Developer Tools installation.])
     AC_DEFINE(XP_UNIX)
     AC_DEFINE(FREEBSD)
     AC_DEFINE(HAVE_BSD_FLOCK)
+    LD='$(CC)'
     CFLAGS="$CFLAGS $(DSO_CFLAGS) -ansi -Wall"
     MOZ_OBJFORMAT=`test -x /usr/bin/objformat && /usr/bin/objformat || echo elf`
     if test "$MOZ_OBJFORMAT" = "elf"; then
@@ -1245,8 +1248,9 @@ tools are selected during the Xcode/Developer Tools installation.])
     else
         DLL_SUFFIX=so.1.0
     fi
+    MKSHLIB='$(CC) $(DSO_LDOPTS) -o $@'
     DSO_CFLAGS=-fPIC
-    DSO_LDOPTS=-Bshareable
+    DSO_LDOPTS='-shared -Wl,-soname,$(notdir $@)'
     ;;
 
 *-hpux*)
@@ -2331,8 +2335,15 @@ if test -n "$USE_PTHREADS"; then
    if test $? -eq 0; then
 	if test -z "`egrep -i '(unrecognize|unknown)' conftest.out | grep pthread`" && test -z "`egrep -i '(error|incorrect)' conftest.out`" ; then
 	    ac_cv_have_dash_pthread=yes
-	    CFLAGS="$CFLAGS -pthread"
-	    CXXFLAGS="$CXXFLAGS -pthread"
+        case "$target_os" in
+        dragonfly*|freebsd*)
+# Freebsd doesn't use -pthread for compiles, it uses them for linking
+            ;;
+        *)
+            CFLAGS="$CFLAGS -pthread"
+            CXXFLAGS="$CXXFLAGS -pthread"
+            ;;
+        esac
 	fi
     fi
     rm -f conftest*
@@ -2363,7 +2374,17 @@ if test -n "$USE_PTHREADS"; then
             _PTHREAD_LDFLAGS=
         fi
 	    ;;
-    *-freebsd*|*-openbsd*|*-bsdi*|*-netbsd*)
+    *-dragonfly*|*-freebsd*)
+        AC_DEFINE(_REENTRANT)
+        AC_DEFINE(_THREAD_SAFE)
+        dnl -pthread links in -lc_r, so don't specify it explicitly.
+        if test "$ac_cv_have_dash_pthread" = "yes"; then
+            _PTHREAD_LDFLAGS="-pthread"
+        else
+            _PTHREAD_LDFLAGS="-lc_r"
+        fi
+        ;;
+    *-openbsd*|*-bsdi*|*-netbsd*)
 	    AC_DEFINE(_THREAD_SAFE)
 	    dnl -pthread links in -lc_r, so don't specify it explicitly.
 	    if test "$ac_cv_have_dash_pthread" = "yes"; then
