@@ -879,12 +879,14 @@ public class LDAPConnection
      * @param host host name of the LDAP server to which you want to connect.
      * This value can also be a space-delimited list of hostnames or
      * hostnames and port numbers (using the syntax
-     * <I>hostname:portnumber</I>). For example, you can specify
-     * the following values for the <CODE>host</CODE> argument:<BR>
+     * <I>hostname:portnumber</I>). For IPv6 enclose the address in square brackets.
+     * For example, you can specify the following values for the 
+     * <CODE>host</CODE> argument:<BR>
      *<PRE>
      *   myhost
      *   myhost hishost:389 herhost:5000 whathost
      *   myhost:686 myhost:389 hishost:5000 whathost:1024
+     *   [::1]:389 [2620:52:0:102f:5054:1ff:fe2c:e12d]:636
      *</PRE>
      * If multiple servers are specified in the <CODE>host</CODE> list, the connection
      *  setup policy specified with the <CODE>ConnSetupDelay</CODE> property controls
@@ -934,13 +936,32 @@ public class LDAPConnection
         int i = 0;
         while( st.hasMoreTokens() ) {
             String s = st.nextToken();
-            int colon = s.indexOf( ':' );
-            if ( colon > 0 ) {
-                hostList[i] = s.substring( 0, colon );
-                portList[i] = Integer.parseInt( s.substring( colon+1 ) );
+            int colon;
+            
+            if ( s.startsWith( "[" ) ) {
+                // We have an ipv6 address
+                int end = s.indexOf( ']' );
+                if ( end == -1 ) {
+                    throw new LDAPException ( "invalid URL for IPv6 address",
+                        LDAPException.PARAM_ERROR );
+                }
+                String remainder = s.substring( end+1 );
+                hostList[i] = s.substring( 0, end+1 );
+                colon = remainder.indexOf( ':' );
+                if ( colon >= 0 ){
+                    portList[i] = Integer.parseInt( remainder.substring( colon+1 ) );
+                } else {
+                    portList[i] = defaultPort;
+                }
             } else {
-                hostList[i] = s;
-                portList[i] = defaultPort;
+                colon = s.indexOf( ':' );
+                if ( colon > 0 ) {
+                    hostList[i] = s.substring( 0, colon );
+                    portList[i] = Integer.parseInt( s.substring( colon+1 ) );
+                } else {
+                    hostList[i] = s;
+                    portList[i] = defaultPort;
+                }
             }
             i++;
         }
