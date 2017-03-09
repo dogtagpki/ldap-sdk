@@ -544,6 +544,10 @@ public abstract class LDAPSchemaElement implements java.io.Serializable {
         for( int i = 0; i < names.length; i++ ) {
             String[] vals = getQualifier( names[i] );
             if ( (vals != null) && (vals.length > 0) ) {
+                // need a space between elements
+                if (i > 0) {
+                    s += ' ';
+                }
                 s += names[i] + ' ' + vals[0];
             }
         }
