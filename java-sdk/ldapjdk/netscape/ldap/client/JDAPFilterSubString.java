@@ -39,11 +39,10 @@ package netscape.ldap.client;
 
 import java.util.*;
 import netscape.ldap.ber.stream.*;
-import java.io.*;
 
 /**
  * This class implements the filter substring.
- * See RFC 1777.
+ * See RFC 1777 and 2254.
  * <pre>
  * [4] SEQUENCE {
  *   type AttributeType,
@@ -52,7 +51,12 @@ import java.io.*;
  *     any [1] LDAPString,
  *     final [2] LDAPString
  *   }
- *     }
+ * }
+ *
+ * substring  = attr "=" [initial] any [final]
+ * initial    = value
+ * any        = "*" *(value "*")
+ * final      = value
  * </pre>
  *
  * @version 1.0
@@ -62,9 +66,9 @@ public class JDAPFilterSubString extends JDAPFilter {
      * Internal variables
      */
     private String m_type = null;
-    private Vector m_initial = new Vector();
-    private Vector m_any = new Vector();
-    private Vector m_final = new Vector();
+    private Vector<String> m_initial = new Vector<>();
+    private Vector<String> m_any = new Vector<>();
+    private Vector<String> m_final = new Vector<>();
 
     /**
      * Constructs the filter.
@@ -76,6 +80,23 @@ public class JDAPFilterSubString extends JDAPFilter {
     }
 
     /**
+     * Get attribute type.
+     * @return attribute type
+     */
+    public String getType() {
+    	return m_type;
+    }
+
+    /**
+     * Get initial substring.
+     * @return initial substring.
+     */
+    public String getInitialSubstring() {
+    	// RFC 2254: there is only one optional initial substring
+    	return m_initial.isEmpty() ? null : m_initial.get(0);
+    }
+
+    /**
      * Adds initial substring.
      * @param s initial substring
      */
@@ -84,11 +105,28 @@ public class JDAPFilterSubString extends JDAPFilter {
     }
 
     /**
+     * Get any substrings.
+     * @return any substrings.
+     */
+    public Collection<String> getAnySubstrings() {
+    	return m_any;
+    }
+
+    /**
      * Adds any substring.
      * @param s any substring
      */
     public void addAny(String s) {
         m_any.addElement(s);
+    }
+
+    /**
+     * Get final substring.
+     * @return final substring.
+     */
+    public String getFinalSubstring() {
+    	// RFC 2254: there is only one optional final substring
+    	return m_final.isEmpty() ? null : m_final.get(0);
     }
 
     /**

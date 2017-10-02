@@ -18,3 +18,7 @@ config\nsinstall$
 
 sdkver.h
 dirver.h
+
+# Ignore Eclipse build directory
+syntax: glob
+bin/**

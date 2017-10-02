@@ -51,7 +51,7 @@ public abstract class JDAPFilterSet extends JDAPFilter {
      * Internal variables
      */
     private int m_tag;
-    private Vector m_set = new Vector();
+    private Vector<JDAPFilter> m_set = new Vector<>();
 
     /**
      * Constructs the filter set.
@@ -61,6 +61,14 @@ public abstract class JDAPFilterSet extends JDAPFilter {
         super();
         m_tag = tag;
     }
+
+    /**
+     * Gets the filter set.
+     * @return filter set
+     */
+     public Collection<JDAPFilter> getFilters() {
+    	 return m_set;
+     }
 
     /**
      * Adds filter into the filter set.

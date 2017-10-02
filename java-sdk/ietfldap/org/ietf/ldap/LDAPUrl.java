@@ -383,7 +383,7 @@ public class LDAPUrl implements java.io.Serializable {
 
             try {
                 // then try Sun JSSESocketFactory
-                _factory = new JSSESocketFactory(null);
+                _factory = new JSSESocketFactory((String[])null);
             }
             catch (Throwable e) {
             }

@@ -37,8 +37,6 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.client;
 
-import java.util.*;
-import java.io.*;
 import netscape.ldap.ber.stream.*;
 
 /**

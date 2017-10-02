@@ -37,9 +37,7 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.client;
 
-import java.util.*;
 import netscape.ldap.ber.stream.*;
-import java.io.*;
 
 /**
  * This class implements the filter not.
@@ -66,6 +64,14 @@ public class JDAPFilterNot extends JDAPFilter {
     }
 
     /**
+     * Gets original filter.
+     * @return original filter
+     */
+    public JDAPFilter getFilter() {
+    	return m_filter;
+    }
+
+    /**
      * Gets ber representation of the filter.
      * @return ber representation
      */
@@ -76,7 +82,7 @@ public class JDAPFilterNot extends JDAPFilter {
     }
 
     /**
-     * Gets string reprensetation of the filter.
+     * Gets string representation of the filter.
      * @return string representation
      */
     public String toString() {

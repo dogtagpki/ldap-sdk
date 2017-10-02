@@ -37,9 +37,7 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.client;
 
-import java.util.*;
 import netscape.ldap.ber.stream.*;
-import java.io.*;
 
 /**
  * This class implements the filter present.
@@ -63,6 +61,14 @@ public class JDAPFilterPresent extends JDAPFilter {
     public JDAPFilterPresent(String type) {
         super();
         m_type = type;
+    }
+
+    /**
+     * Gets attribute type.
+     * @return attribute type
+     */
+    public String getType() {
+    	return m_type;
     }
 
     /**

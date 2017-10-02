@@ -37,9 +37,7 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.client;
 
-import java.util.*;
 import netscape.ldap.ber.stream.*;
-import java.io.*;
 
 /**
  * This class implements the filter And.
@@ -59,7 +57,7 @@ public class JDAPFilterOr extends JDAPFilterSet {
     }
 
     /**
-     * Gets string reprensetation of the filter.
+     * Gets string representation of the filter.
      * @return string representation
      */
     public String toString() {
