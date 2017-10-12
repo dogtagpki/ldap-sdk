@@ -1,0 +1,22 @@
+# .gitignore - List of filenames git should ignore
+
+# Filenames that should be ignored wherever they appear
+.pyc
+TAGS
+Makefile
+now
+
+
+# User files that may appear at the root
+**/config/.cache
+**/config/.log
+**/config/.status
+**/config/autoconf.mk
+**/config/nsinstall
+.fast-update
+
+sdkver.h
+dirver.h
+
+# Ignore Eclipse build directory
+bin
