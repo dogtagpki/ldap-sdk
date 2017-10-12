@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e2105a3f_75da9bba",
+        "filename": ".gitignore",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1010221
+      },
+      "writtenOn": "2017-10-12T19:01:44Z",
+      "side": 1,
+      "message": "Probably not needed.",
+      "revId": "449ced1210ed8a88b9cc355002b7fd8e9c2742b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "34bce86b_f776f509",
+        "filename": ".gitignore",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1010221
+      },
+      "writtenOn": "2017-10-12T19:01:44Z",
+      "side": 1,
+      "message": "Probably should be just \".pyc\".",
+      "revId": "449ced1210ed8a88b9cc355002b7fd8e9c2742b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c11c4fa2_936164bd",
+        "filename": ".gitignore",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1010221
+      },
+      "writtenOn": "2017-10-12T19:01:44Z",
+      "side": 1,
+      "message": "Probably should be just \"TAGS\".",
+      "revId": "449ced1210ed8a88b9cc355002b7fd8e9c2742b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2eca1c28_7b9e6d98",
+        "filename": ".gitignore",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1010221
+      },
+      "writtenOn": "2017-10-12T19:01:44Z",
+      "side": 1,
+      "message": "Probably the \"$\" is not needed.",
+      "revId": "449ced1210ed8a88b9cc355002b7fd8e9c2742b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "91d3e917_aafd7daa",
+        "filename": ".gitignore",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1010221
+      },
+      "writtenOn": "2017-10-12T19:01:44Z",
+      "side": 1,
+      "message": "Probably the \"$\" is not needed.",
+      "revId": "449ced1210ed8a88b9cc355002b7fd8e9c2742b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "85748ee2_59a02409",
+        "filename": ".gitignore",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1010221
+      },
+      "writtenOn": "2017-10-12T19:01:44Z",
+      "side": 1,
+      "message": "Probably should be:\n\n  **/config/.cache\n\ni.e. use forward slash and no \"$\".\n\nSame thing for the lines below.",
+      "revId": "449ced1210ed8a88b9cc355002b7fd8e9c2742b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "56a12d9b_66bc2dd0",
+        "filename": ".gitignore",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1010221
+      },
+      "writtenOn": "2017-10-12T19:01:44Z",
+      "side": 1,
+      "message": "Probably not needed.",
+      "revId": "449ced1210ed8a88b9cc355002b7fd8e9c2742b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "81ff76cf_45c8958d",
+        "filename": ".gitignore",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1010221
+      },
+      "writtenOn": "2017-10-12T19:01:44Z",
+      "side": 1,
+      "message": "Probably should be just \"bin\".",
+      "revId": "449ced1210ed8a88b9cc355002b7fd8e9c2742b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
