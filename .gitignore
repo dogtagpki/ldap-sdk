@@ -20,3 +20,4 @@ dirver.h
 
 # Ignore Eclipse build directory
 bin
+/build/
