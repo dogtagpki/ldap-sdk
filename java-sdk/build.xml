@@ -63,6 +63,7 @@
     <property name="src"                 value="."/>
     <property name="build"               value="build"/>
     <property name="dist"                value="dist"/>
+    <property name="jss.lib"             value="/usr/lib/java/jss4.jar"/>
 
     <!-- the following is to setup the correct info for sun jsse which
         is jdk dependent -->
@@ -230,7 +231,8 @@
                  author="true"
                  version="true"
                  use="true"
-                 classpath="${basedir}/ldapjdk:${basedir}/ldapjdk/lib/jss32_stub.jar:${basedir}/ldapbeans" >
+                 classpath="${basedir}/ldapjdk:${jss.lib}:${basedir}/ldapjdk/lib/jss32_stub.jar:${basedir}/ldapbeans"
+                 additionalparam="-Xdoclint:none">
         </javadoc>
 
         <javadoc packagenames="com.netscape.jndi.ldap.controls.*"
@@ -239,7 +241,8 @@
                 classpath="${jndi.dist}:${basedir}/ldapsp:${basedir}/ldapsp/lib/jndi.jar"
                 author="true"
                 version="true"
-                use="true">
+                use="true"
+                additionalparam="-Xdoclint:none">
         </javadoc>
       </target>
 
