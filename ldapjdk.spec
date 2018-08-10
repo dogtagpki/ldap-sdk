@@ -45,14 +45,14 @@ BuildRequires:	  jpackage-utils >= 0:1.5
 %else
 BuildRequires:    javapackages-local
 %endif
-BuildRequires:    jss >= 4.5.0-0.6
+BuildRequires:    jss >= 4.5.0-1
 
 ################################################################################
 # Runtime Dependencies
 ################################################################################
 
 Requires:         jpackage-utils >= 0:1.5
-Requires:         jss >= 4.5.0-0.6
+Requires:         jss >= 4.5.0-1
 
 
 %description
