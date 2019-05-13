@@ -23,6 +23,7 @@ install:
       -i
       registry.fedoraproject.org/fedora:$FEDORA
       "/usr/sbin/init"
+  - docker exec container /root/ldapjdk/travis/container-init.sh
   - docker exec container dnf install -y dnf-plugins-core rpm-build
   - docker exec container dnf copr -y enable @pki/master
   - docker exec container dnf builddep -y --spec /root/ldapjdk/ldapjdk.spec
@@ -32,6 +33,7 @@ install:
 
 script:
   - docker exec container /root/ldapjdk/travis/ds-create.sh
+  - docker exec container /root/ldapjdk/travis/tools-test.sh
   - docker exec container /root/ldapjdk/travis/ds-remove.sh
 
 after_script:

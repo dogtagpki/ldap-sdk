@@ -6,6 +6,7 @@
 	<classpathentry kind="src" path="java-sdk/ldapfilter"/>
 	<classpathentry kind="src" path="java-sdk/ldapjdk"/>
 	<classpathentry kind="src" path="java-sdk/ldapsp"/>
+	<classpathentry kind="src" path="java-sdk/tools"/>
 	<classpathentry kind="lib" path="/usr/lib/java/jss4.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
