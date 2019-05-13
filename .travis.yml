@@ -13,15 +13,27 @@ env:
 install:
   - docker pull registry.fedoraproject.org/fedora:$FEDORA
   - docker run
-      --name=container
+      --name container
+      --hostname server.example.com
+      --tmpfs /tmp
+      --tmpfs /run
+      --volume /sys/fs/cgroup:/sys/fs/cgroup:ro
+      --volume $(pwd):/root/ldapjdk
       --detach
       -i
-      -v $(pwd):/root/ldapjdk
       registry.fedoraproject.org/fedora:$FEDORA
+      "/usr/sbin/init"
   - docker exec container dnf install -y dnf-plugins-core rpm-build
   - docker exec container dnf copr -y enable @pki/master
   - docker exec container dnf builddep -y --spec /root/ldapjdk/ldapjdk.spec
   - docker exec container /root/ldapjdk/build.sh --with-timestamp --with-commit-id rpm
+  - docker exec container rpm -Uvh /root/build/ldapjdk/RPMS/*
+  - docker exec container dnf install -y 389-ds-base 389-ds-base-legacy-tools
 
 script:
-  - docker exec container rpm -Uvh /root/build/ldapjdk/RPMS/*
+  - docker exec container /root/ldapjdk/travis/ds-create.sh
+  - docker exec container /root/ldapjdk/travis/ds-remove.sh
+
+after_script:
+  - docker kill container
+  - docker rm container
