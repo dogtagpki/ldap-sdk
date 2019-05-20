@@ -91,7 +91,7 @@ class LDAPConnThread extends Thread {
     transient private OutputStream _serverOutput;
     transient private Hashtable<Integer, LDAPMessageQueue> _requests;
     transient private Hashtable<Integer, Vector<Object>> _messages = null;
-    transient private Vector _registered;
+    transient private Vector<LDAPConnection> _registered;
     transient private boolean _disconnected = false;
     transient private LDAPCache _cache = null;
     transient private boolean _doRun = true;
@@ -123,7 +123,7 @@ class LDAPConnThread extends Thread {
         super( "LDAPConnThread " + connMgr.getHost() +
                ":" + connMgr.getPort() );
         _requests = new Hashtable<>();
-        _registered = new Vector ();
+        _registered = new Vector<>();
         _connMgr = connMgr;
         _socket = connMgr.getSocket();
         setCache( cache );
@@ -393,12 +393,12 @@ class LDAPConnThread extends Thread {
              */
 
             if ( _registered != null ) {
-                Vector registerCopy = (Vector)_registered.clone();
+                Vector<LDAPConnection> registerCopy = (Vector<LDAPConnection>)_registered.clone();
 
-                Enumeration cancelled = registerCopy.elements();
+                Enumeration<LDAPConnection> cancelled = registerCopy.elements();
 
                 while ( cancelled.hasMoreElements() ) {
-                    LDAPConnection c = (LDAPConnection)cancelled.nextElement();
+                    LDAPConnection c = cancelled.nextElement();
                     c.deregisterConnection();
                 }
             }
