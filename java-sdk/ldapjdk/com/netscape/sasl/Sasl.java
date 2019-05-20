@@ -38,15 +38,15 @@
 package com.netscape.sasl;
 
 import java.util.Hashtable;
-import javax.security.auth.callback.CallbackHandler;
 import java.util.StringTokenizer;
-import java.io.*;
+
+import javax.security.auth.callback.CallbackHandler;
 
 /**
  * A static class for creating SASL clients and servers.
  *<p>
  * This class defines the policy of how to locate, load, and instantiate
- * SASL clients and servers. 
+ * SASL clients and servers.
  * Currently, only the client methods are available.
  *<p>
  * For example, an application or library gets a SASL client by doing
@@ -90,7 +90,7 @@ public class Sasl {
     static final boolean debug = false;
 
     // Cannot create one of these
-    private Sasl() { 
+    private Sasl() {
     }
 
     /**
@@ -105,12 +105,12 @@ public class Sasl {
      * Creates a SaslClient using the parameters supplied.
      * The algorithm for selection is as follows:
      *<ol>
-     *<li>If a factory has been installed via <tt>setSaslClientFactory()</tt>, 
+     *<li>If a factory has been installed via <tt>setSaslClientFactory()</tt>,
      * try it first. If non-null answer produced, return it.
      *<li>The <tt>javax.security.sasl.client.pkgs</tt> property contains
      * a '|'-separated list of package names. Each package contains a
      * class named <tt>ClientFactory</tt>.  Load each factory
-     * and try to create a <tt>SaslClient</tt>. 
+     * and try to create a <tt>SaslClient</tt>.
      * Repeat this for
      * each package on the list until a non-null answer is produced.
      * If non-null answer produced, return it.
@@ -123,7 +123,7 @@ public class Sasl {
      * IANA-registered name of a SASL mechanism. (e.g. "GSSAPI", "CRAM-MD5").
      * @param authorizationId The possibly null authorization ID to use. When
      * the SASL authentication completes successfully, the entity named
-     * by authorizationId is granted access. 
+     * by authorizationId is granted access.
      * @param protocol The non-null string name of the protocol for which
      * the authentication is being performed (e.g., "ldap").
      * @param serverName The non-null string name of the server to which
@@ -147,7 +147,7 @@ public class Sasl {
         String authorizationId,
         String protocol,
         String serverName,
-        Hashtable props, 
+        Hashtable props,
         CallbackHandler cbh) throws SaslException {
 
         if (debug) {
@@ -158,7 +158,7 @@ public class Sasl {
         // If factory has been set, try it first
         if (clientFactory != null) {
             mech = clientFactory.createSaslClient(
-                mechanisms, authorizationId, 
+                mechanisms, authorizationId,
                 protocol, serverName, props, cbh);
         }
 
@@ -192,7 +192,7 @@ public class Sasl {
                                               String authorizationId,
                                               String protocol,
                                               String serverName,
-                                              Hashtable props, 
+                                              Hashtable props,
                                               CallbackHandler cbh)
         throws SaslException {
 
@@ -207,7 +207,7 @@ public class Sasl {
             if (debug) {
                 System.out.println("Sasl.loadFromPkgList: " + clsName);
             }
-            Class cls = null;
+            Class<?> cls = null;
             try {
                 cls = Class.forName(clsName);
             } catch (Exception e) {
@@ -223,7 +223,7 @@ public class Sasl {
                     throw new SaslException(
                         "Cannot access constructor of " + clsName);
                 }
-                mech = fac.createSaslClient(mechanisms, authorizationId, 
+                mech = fac.createSaslClient(mechanisms, authorizationId,
                                             protocol, serverName, props,
                                             cbh);
             }
@@ -234,7 +234,7 @@ public class Sasl {
     /**
      * Sets the default <tt>SaslClientFactory</tt> to use.
      * This method sets <tt>fac</tt> to be the default factory.
-     * It can only be called with a non-null value once per VM. 
+     * It can only be called with a non-null value once per VM.
      * If a factory has been set already, this method throws
      * <tt>IllegalStateException</tt>.
      * @param fac The possibly null factory to set. If null, doesn't

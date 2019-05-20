@@ -37,14 +37,15 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.beans;
 
-import netscape.ldap.*;
-import java.util.StringTokenizer;
-
 // This class has a bound property
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
+
+import netscape.ldap.LDAPConnection;
+import netscape.ldap.LDAPException;
+import netscape.ldap.LDAPRebind;
+import netscape.ldap.LDAPRebindAuth;
 
 /**
  * This is a base class that is extended by various specialized LDAP
@@ -314,7 +315,7 @@ public class LDAPBasePropertySupport implements Serializable {
             /* Running as applet. Is PrivilegeManager around? */
             String mgr = "netscape.security.PrivilegeManager";
             try {
-                Class c = Class.forName( mgr );
+                Class<?> c = Class.forName( mgr );
                 java.lang.reflect.Method[] m = c.getMethods();
                 if ( m != null ) {
                     for( int i = 0; i < m.length; i++ ) {
@@ -353,7 +354,7 @@ public class LDAPBasePropertySupport implements Serializable {
             public LDAPRebindAuth getRebindAuthentication(
                 String host,
                 int port ) {
-                    return new LDAPRebindAuth( 
+                    return new LDAPRebindAuth(
                         m_conn.getAuthenticationDN(),
                         m_conn.getAuthenticationPassword() );
                 }

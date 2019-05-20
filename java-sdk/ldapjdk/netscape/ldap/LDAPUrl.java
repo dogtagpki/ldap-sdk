@@ -37,9 +37,11 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap;
 
-import java.util.*;
-import java.io.*;
 import java.net.MalformedURLException;
+import java.util.Enumeration;
+import java.util.NoSuchElementException;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
 /**
  * Represents an LDAP URL. The complete specification for LDAP URLs is in
@@ -107,13 +109,13 @@ public class LDAPUrl implements java.io.Serializable {
     private String m_filter;
     private String m_URL;
     private boolean m_secure;
-    
+
     private static LDAPSocketFactory m_factory;
 
     /**
      * The default port number for secure LDAP connections.
      * @see netscape.ldap.LDAPUrl#LDAPUrl(java.lang.String, int, java.lang.String, java.lang.String[], int, java.lang.String, boolean)
-     */    
+     */
     public static final int DEFAULT_SECURE_PORT = 636;
 
     /**
@@ -170,7 +172,7 @@ public class LDAPUrl implements java.io.Serializable {
         catch (NoSuchElementException e) {
             throw new MalformedURLException ();
         }
-            
+
         // host-port
         if (currentToken.equals ("/")) {
             m_hostName = null;
@@ -194,7 +196,7 @@ public class LDAPUrl implements java.io.Serializable {
         } else {
             m_hostName = currentToken;
         }
-        
+
         if (usingDefaultHostPort == false) {
             // Set the port
             if (urlParser.countTokens() == 0) {
@@ -237,12 +239,12 @@ public class LDAPUrl implements java.io.Serializable {
         }
         else if (m_DN.equals("/")) {
             throw new MalformedURLException ();
-        }            
-            
+        }
+
         // attribute
         if (!urlParser.hasMoreTokens ()) {
             return;
-        }        
+        }
         str = readNextConstruct(urlParser);
         if (!str.equals("?")) {
             StringTokenizer attributeParser = new
@@ -281,8 +283,8 @@ public class LDAPUrl implements java.io.Serializable {
         if (urlParser.hasMoreTokens()) {
             throw new MalformedURLException();
         }
-    }    
-    
+    }
+
     private void checkBalancedParentheses(String filter) throws MalformedURLException {
         int parenCnt =0;
         StringTokenizer filterParser = new StringTokenizer (filter, "()", true);
@@ -297,12 +299,12 @@ public class LDAPUrl implements java.io.Serializable {
                 }
             }
         }
-        
+
         if (parenCnt != 0) {
             throw new MalformedURLException("Unbalanced filter parentheses");
         }
     }
-        
+
     /**
      * Constructs with the specified host, port, and DN.  This form is used to
      * create URL references to a particular object in the directory.
@@ -342,7 +344,7 @@ public class LDAPUrl implements java.io.Serializable {
      * @param DN distinguished name of the object
      * @param attributes list of the attributes to return. Use null for "all
      * attributes."
-     * @param scope depth of the search (in DN namespace). Use one of the LDAPv2 scopes: 
+     * @param scope depth of the search (in DN namespace). Use one of the LDAPv2 scopes:
      * SCOPE_BASE, SCOPE_ONE, or SCOPE_SUB.
      * @param filter LDAP filter string (as defined in RFC 1558). Use null for
      * no filter (this effectively makes the URL reference a single object).
@@ -362,7 +364,7 @@ public class LDAPUrl implements java.io.Serializable {
      * @param DN distinguished name of the object
      * @param attributes list of the attributes to return. Use null for "all
      * attributes."
-     * @param scope depth of the search (in DN namespace). Use one of the LDAPv2 scopes: 
+     * @param scope depth of the search (in DN namespace). Use one of the LDAPv2 scopes:
      * SCOPE_BASE, SCOPE_ONE, or SCOPE_SUB.
      * @param filter LDAP filter string (as defined in RFC 1558). Use null for
      * no filter (this effectively makes the URL reference a single object).
@@ -591,7 +593,7 @@ public class LDAPUrl implements java.io.Serializable {
             // the default one.
             try {
                 //  First try Mozilla JSSSocketFactory
-                Class c = Class.forName("netscape.ldap.factory.JSSSocketFactory");
+                Class<?> c = Class.forName("netscape.ldap.factory.JSSSocketFactory");
                 m_factory = (LDAPSocketFactory) c.newInstance();
             }
             catch (Throwable e) {
@@ -603,7 +605,7 @@ public class LDAPUrl implements java.io.Serializable {
 
             try {
                 // then try Sun JSSESocketFactory
-                Class c = Class.forName("netscape.ldap.factory.JSSESocketFactory");
+                Class<?> c = Class.forName("netscape.ldap.factory.JSSESocketFactory");
                 m_factory = (LDAPSocketFactory) c.newInstance();
             }
             catch (Throwable e) {
@@ -623,7 +625,7 @@ public class LDAPUrl implements java.io.Serializable {
     public static void setSocketFactory(LDAPSocketFactory factory) {
         m_factory = factory;
     }
-            
+
     /**
      * Reads next construct from the given string parser.
      * @param parser the string parser
@@ -647,7 +649,7 @@ public class LDAPUrl implements java.io.Serializable {
                         throw new MalformedURLException();
                     }
                 }
-                
+
                 return tkn;
             }
         } catch (NoSuchElementException e) {

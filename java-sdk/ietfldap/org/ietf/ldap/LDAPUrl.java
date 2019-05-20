@@ -37,10 +37,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap;
 
-import java.util.*;
-import java.io.*;
 import java.net.MalformedURLException;
-import org.ietf.ldap.factory.*;
+import java.util.Enumeration;
+import java.util.NoSuchElementException;
+import java.util.StringTokenizer;
+import java.util.Vector;
+
+import org.ietf.ldap.factory.JSSESocketFactory;
 
 /**
  * Represents an LDAP URL. The complete specification for LDAP URLs is in
@@ -109,14 +112,14 @@ public class LDAPUrl implements java.io.Serializable {
     private String _URL;
     private boolean _secure;
     private String[] _extensions;
-    
+
     private static LDAPSocketFactory _factory;
 
     /**
      * The default port number for secure LDAP connections.
      * @see org.ietf.ldap.LDAPUrl#LDAPUrl(String, int, String, String[], int,
      * String, String[])
-     */    
+     */
     public static final int DEFAULT_SECURE_PORT = 636;
 
     /**
@@ -159,14 +162,14 @@ public class LDAPUrl implements java.io.Serializable {
      * @param DN distinguished name of the object
      * @param attributes list of the attributes to return. Use null for "all
      * attributes."
-     * @param scope depth of the search (in DN namespace). Use one of the LDAPConnection scopes: 
+     * @param scope depth of the search (in DN namespace). Use one of the LDAPConnection scopes:
      * SCOPE_BASE, SCOPE_ONE, or SCOPE_SUB.
      * @param filter LDAP filter string (as defined in RFC 1558). Use null for
      * no filter (this effectively makes the URL reference a single object).
-     * @param extensions LDAP URL extensions specified; may be null or 
-     * empty. Each extension is a type=value expression. 
-     * The =value part MAY be omitted. The expression 
-     * may be prefixed with '!' if it is mandatory for 
+     * @param extensions LDAP URL extensions specified; may be null or
+     * empty. Each extension is a type=value expression.
+     * The =value part MAY be omitted. The expression
+     * may be prefixed with '!' if it is mandatory for
      * evaluation of the URL.
      */
     public LDAPUrl( String host,
@@ -371,7 +374,7 @@ public class LDAPUrl implements java.io.Serializable {
             // the default one.
             try {
                 //  First try iPlanet JSSSocketFactory
-                Class c = Class.forName("org.ietf.ldap.factory.JSSSocketFactory");
+                Class<?> c = Class.forName("org.ietf.ldap.factory.JSSSocketFactory");
                 _factory = (LDAPSocketFactory) c.newInstance();
             }
             catch (Throwable e) {
@@ -461,13 +464,13 @@ public class LDAPUrl implements java.io.Serializable {
             if (!currentToken.equals("/")) {
                 throw new MalformedURLException ();
             }
-        
+
             currentToken = urlParser.nextToken();
         }
         catch (NoSuchElementException e) {
             throw new MalformedURLException ();
         }
-            
+
         // host-port
         if (currentToken.equals ("/")) {
             _hostName = null;
@@ -493,7 +496,7 @@ public class LDAPUrl implements java.io.Serializable {
                 } catch (NoSuchElementException ex) {
                     throw new MalformedURLException ("No port number");
                 }
-                    
+
                 if (urlParser.countTokens() == 0) {
                     return;
                 }
@@ -520,12 +523,12 @@ public class LDAPUrl implements java.io.Serializable {
         }
         else if (_DN.equals("/")) {
             throw new MalformedURLException ();
-        }            
-            
+        }
+
         // attribute
         if (!urlParser.hasMoreTokens ()) {
             return;
-        }        
+        }
         str = readNextConstruct(urlParser);
         if (!str.equals("?")) {
             StringTokenizer attributeParser = new
@@ -564,8 +567,8 @@ public class LDAPUrl implements java.io.Serializable {
         if (urlParser.hasMoreTokens()) {
             throw new MalformedURLException();
         }
-    }    
-    
+    }
+
     private void checkBalancedParentheses( String filter )
         throws MalformedURLException {
         int parenCnt =0;
@@ -583,12 +586,12 @@ public class LDAPUrl implements java.io.Serializable {
                 }
             }
         }
-        
+
         if (parenCnt != 0) {
             throw new MalformedURLException("Unbalanced filter parentheses");
         }
     }
-        
+
     /**
      * Initializes URL object.
      */
@@ -687,7 +690,7 @@ public class LDAPUrl implements java.io.Serializable {
                         throw new MalformedURLException();
                     }
                 }
-                
+
                 return tkn;
             }
         } catch (NoSuchElementException e) {

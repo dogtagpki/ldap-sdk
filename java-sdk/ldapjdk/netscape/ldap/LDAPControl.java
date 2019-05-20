@@ -37,13 +37,25 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap;
 
-import java.io.*;
-import java.util.*;
-import java.lang.reflect.*;
-import netscape.ldap.ber.stream.*;
-import netscape.ldap.client.*;
-import netscape.ldap.util.*;
-import netscape.ldap.controls.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Hashtable;
+
+import netscape.ldap.ber.stream.BERBoolean;
+import netscape.ldap.ber.stream.BERElement;
+import netscape.ldap.ber.stream.BEROctetString;
+import netscape.ldap.ber.stream.BERSequence;
+import netscape.ldap.ber.stream.BERTag;
+import netscape.ldap.client.JDAPBERTagDecoder;
+import netscape.ldap.controls.LDAPEntryChangeControl;
+import netscape.ldap.controls.LDAPPasswordExpiredControl;
+import netscape.ldap.controls.LDAPPasswordExpiringControl;
+import netscape.ldap.controls.LDAPSortControl;
+import netscape.ldap.controls.LDAPVirtualListResponse;
+import netscape.ldap.util.LDIF;
 
 /**
  * Represents arbitrary control data that can be used with a
@@ -212,7 +224,7 @@ public class LDAPControl implements Cloneable, java.io.Serializable {
         m_critical = critical;
         m_value = vals;
     }
-    
+
     /**
      * Gets the object ID (OID) of the control.
      * @return object ID (OID) of the control.
@@ -253,12 +265,12 @@ public class LDAPControl implements Cloneable, java.io.Serializable {
         }
         return seq;
     }
-    
-    /** 
-     * Associates a class with an oid. This class must be an extension of 
+
+    /**
+     * Associates a class with an oid. This class must be an extension of
      * <CODE>LDAPControl</CODE>, and should implement the <CODE>LDAPControl(
-     * String oid, boolean critical, byte[] value)</CODE> constructor to 
-     * instantiate the control. 
+     * String oid, boolean critical, byte[] value)</CODE> constructor to
+     * instantiate the control.
      * @param oid the string representation of the oid
      * @param controlClass the class that instantatiates the control associated
      * with oid
@@ -267,7 +279,7 @@ public class LDAPControl implements Cloneable, java.io.Serializable {
      * implement the <CODE>LDAPControl(String oid, boolean critical, byte[] value)
      * </CODE> constructor.
      */
-    public static void register(String oid, Class controlClass) throws 
+    public static void register(String oid, Class<?> controlClass) throws
         LDAPException {
 
         if (controlClass == null) {
@@ -275,22 +287,22 @@ public class LDAPControl implements Cloneable, java.io.Serializable {
         }
 
 	// 1. make sure controlClass is a subclass of LDAPControl
-	Class superClass = controlClass;
+	Class<?> superClass = controlClass;
 	while (superClass != LDAPControl.class && superClass != null) {
 	    superClass = superClass.getSuperclass();
 	}
 
-	if (superClass == null) 
+	if (superClass == null)
 	    throw new LDAPException("controlClass must be a subclass of " +
 				    "LDAPControl", LDAPException.PARAM_ERROR);
 
 	// 2. make sure controlClass has the proper constructor
-	Class[] cparams = { String.class, boolean.class, byte[].class };
+	Class<?>[] cparams = { String.class, boolean.class, byte[].class };
 	try {
 	    controlClass.getConstructor(cparams);
 	} catch (NoSuchMethodException e) {
 	    throw new LDAPException("controlClass does not implement the " +
-				    "correct contstructor", 
+				    "correct contstructor",
 				    LDAPException.PARAM_ERROR);
 	}
 
@@ -311,36 +323,36 @@ public class LDAPControl implements Cloneable, java.io.Serializable {
      * @see netscape.ldap.LDAPControl#register
      *
      */
-    protected static Class lookupControlClass(String oid) {
+    protected static Class<?> lookupControlClass(String oid) {
         if (m_controlClassHash == null) {
 	    return null;
         }
-      
-	return (Class)m_controlClassHash.get(oid);
+
+	return (Class<?>)m_controlClassHash.get(oid);
     }
-    
+
     /**
      * Returns a <CODE>LDAPControl</CODE> object instantiated by the Class
      * associated by <CODE>LDAPControl.register</CODE> to the oid. If
-     * no Class is found for the given control, or an exception occurs when 
+     * no Class is found for the given control, or an exception occurs when
      * attempting to instantiate the control, a basic <CODE>LDAPControl</CODE>
-     * is instantiated using the parameters. 
+     * is instantiated using the parameters.
      * @param oid the oid of the control to instantiate
      * @param critical <CODE>true</CODE> if this is a critical control
      * @param value the byte value for the control
      * @return a newly instantiated <CODE>LDAPControl</CODE>.
      * @see netscape.ldap.LDAPControl#register
-     */ 
+     */
   protected static LDAPControl createControl(String oid, boolean critical,
                                              byte[] value) {
-        
-	Class controlClass = lookupControlClass(oid);
-	
+
+	Class<?> controlClass = lookupControlClass(oid);
+
 	if (controlClass == null) {
 	    return new LDAPControl(oid, critical, value);
 	}
 
-	Class[] cparams = { String.class, boolean.class, byte[].class };
+	Class<?>[] cparams = { String.class, boolean.class, byte[].class };
 	Constructor creator = null;
 	try {
 	    creator = controlClass.getConstructor(cparams);
@@ -351,7 +363,7 @@ public class LDAPControl implements Cloneable, java.io.Serializable {
 			       oid);
 	    return new LDAPControl(oid, critical, value);
 	}
-	
+
 	Object[] oparams = { oid, new Boolean(critical), value } ;
 	LDAPControl returnControl = null;
 	try {
@@ -364,7 +376,7 @@ public class LDAPControl implements Cloneable, java.io.Serializable {
 	    } else {
 	        eString = e.toString();
 	    }
-	
+
 	    System.err.println("Caught " + eString + " while attempting to" +
 			       " instantiate a control of type " +
 			       oid);
@@ -377,17 +389,17 @@ public class LDAPControl implements Cloneable, java.io.Serializable {
     /**
      * Returns a <CODE>LDAPControl</CODE> object instantiated by the Class
      * associated by <CODE>LDAPControl.register</CODE> to the oid. If
-     * no Class is found for the given control, or an exception occurs when 
+     * no Class is found for the given control, or an exception occurs when
      * attempting to instantiate the control, a basic <CODE>LDAPControl</CODE>
      * is instantiated using the parameters.
      * @param el the <CODE>BERElement</CODE> containing the control
      * @return a newly instantiated <CODE>LDAPControl</CODE>.
      * @see netscape.ldap.LPAPControl#register
-     * 
+     *
      * Note:
      * This code was extracted from <CODE>JDAPControl(BERElement el)</CODE>
      * constructor.
-     */ 
+     */
   static LDAPControl parseControl(BERElement el) {
         BERSequence s = (BERSequence)el;
         String oid = null;
@@ -396,30 +408,30 @@ public class LDAPControl implements Cloneable, java.io.Serializable {
         try{
             oid = new String(((BEROctetString)s.elementAt(0)).getValue(), "UTF8");
         } catch(Throwable x) {}
-        
+
         Object obj = s.elementAt(1);
         if (obj instanceof BERBoolean) {
             critical = ((BERBoolean)obj).getValue();
-        }            
+        }
         else {
             value = ((BEROctetString)obj).getValue();
-        }            
+        }
 
         if (s.size() >= 3) {
             value = ((BEROctetString)s.elementAt(2)).getValue();
         }
-        
+
         return createControl(oid, critical, value);
   }
-      
+
 
   /**
-     * Instantiates all of the controls contained within the LDAP message 
+     * Instantiates all of the controls contained within the LDAP message
      * fragment specified by data and returns them in an <CODE>LDAPControl</CODE>
-     * array. This fragment can be either the entire LDAP message or just the 
+     * array. This fragment can be either the entire LDAP message or just the
      * control section of the message.
      * <P>
-     * If an exception occurs when instantiating a control, that control is 
+     * If an exception occurs when instantiating a control, that control is
      * returned as a basic <CODE>LDAPControl</CODE>.
      * @param data the LDAP message fragment in raw BER format
      * @return an <CODE>LDAPControl</CODE> array containing all of the controls
@@ -429,10 +441,10 @@ public class LDAPControl implements Cloneable, java.io.Serializable {
      * @see netscape.ldap.LDAPControl#register
      */
     public static LDAPControl[] newInstance(byte[] data) throws IOException {
-        
+
         int[] bread = { 0 };
-	
-  	BERElement el = BERElement.getElement(new JDAPBERTagDecoder(), 
+
+  	BERElement el = BERElement.getElement(new JDAPBERTagDecoder(),
                                           new ByteArrayInputStream(data),
                                           bread);
 
@@ -442,7 +454,7 @@ public class LDAPControl implements Cloneable, java.io.Serializable {
 	    LDAPMessage msg = LDAPMessage.parseMessage(el);
 	    return msg.getControls();
 	} catch (IOException e) {
-  	    // that didn't work; let's see if its just the controls 
+  	    // that didn't work; let's see if its just the controls
 	    BERTag tag = (BERTag)el;
 	    if ( tag.getTag() == (BERTag.CONSTRUCTED|BERTag.CONTEXT|0) ) {
 	        BERSequence controls = (BERSequence)tag.getValue();
@@ -452,9 +464,9 @@ public class LDAPControl implements Cloneable, java.io.Serializable {
 		}
 	    }
 	}
-	
+
 	return jc;
-	    
+
     }
 
     /**

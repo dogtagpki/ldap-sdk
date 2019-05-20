@@ -37,13 +37,11 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.beans;
 
-import java.beans.SimpleBeanInfo;
 import java.beans.BeanDescriptor;
-import java.beans.EventSetDescriptor;
-import java.beans.MethodDescriptor;
-import java.beans.PropertyDescriptor;
-import java.beans.ParameterDescriptor;
 import java.beans.BeanInfo;
+import java.beans.EventSetDescriptor;
+import java.beans.PropertyDescriptor;
+import java.beans.SimpleBeanInfo;
 
 /**
  * BeanInfo for LDAPSimpleAuth
@@ -129,7 +127,7 @@ public class LDAPSimpleAuthBeanInfo extends SimpleBeanInfo {
         return _beanDescriptor;
     }
 
-    private static Class beanClass;
+    private static Class<?> beanClass;
     private BeanDescriptor _beanDescriptor;
     private EventSetDescriptor[] _eventSetDescriptor;
     private PropertyDescriptor[] _propertyDescriptor;

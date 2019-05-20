@@ -64,7 +64,7 @@ class LDAPCheckComm {
         } else if (sec.toString().startsWith("netscape.security.AppletSecurity")) {
             /* Running as applet. Is PrivilegeManager around? */
             try {
-                Class c = Class.forName(classPackage);
+                Class<?> c = Class.forName(classPackage);
                 java.lang.reflect.Method[] m = c.getMethods();
                 for( int i = 0; i < m.length; i++ ) {
                     if ( m[i].getName().equals(name) ) {

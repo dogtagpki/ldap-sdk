@@ -37,8 +37,7 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap;
 
-import java.io.*;
-import java.net.*;
+import java.net.Socket;
 
 /**
  * Creates an SSL socket connection to an LDAP Server.  This class
@@ -207,7 +206,7 @@ public class LDAPSSLSocketFactory
      * @see netscape.ldap.LDAPSSLSocketFactory#makeSocket
      * @exception LDAPException Since this method is not yet implemented,
      * calling this method throws an exception.
-     * Note: <CODE>enableClientAuth(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)</CODE> is deprecated. 
+     * Note: <CODE>enableClientAuth(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)</CODE> is deprecated.
      * This method is replaced by any one of the following constructors:
      * <p>
      * <CODE>LDAPSSLSocketFactory(boolean)</CODE>
@@ -290,11 +289,11 @@ public class LDAPSSLSocketFactory
 
             /* Instantiate the SSLSocketFactory implementation, and
                find the right constructor */
-            Class c = Class.forName(m_packageName);
+            Class<?> c = Class.forName(m_packageName);
             java.lang.reflect.Constructor[] m = c.getConstructors();
             for (int i = 0; i < m.length; i++) {
                 /* Check if the signature is right: String, int */
-                Class[] params = m[i].getParameterTypes();
+                Class<?>[] params = m[i].getParameterTypes();
                 if ( (m_cipherSuites == null) && (params.length == 2) &&
                      (params[0].getName().equals("java.lang.String")) &&
                      (params[1].getName().equals("int")) ) {

@@ -37,8 +37,11 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap;
 
-import java.io.*;
-import java.net.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.util.Hashtable;
 
 /**
@@ -110,7 +113,7 @@ public class LDAPSSLSocketWrapFactory
 
     /**
      * Returns <code>true</code> if client authentication is to be used.
-     * @return <code>true</code> if client authentication is enabled; 
+     * @return <code>true</code> if client authentication is enabled;
      * <code>false</code>if client authentication is disabled.
      */
     public boolean isClientAuth() {
@@ -175,12 +178,12 @@ class LDAPSSLSocket extends Socket {
         try {
             // instantiate the SSLSocketFactory implementation, and
             // find the right constructor
-            Class c = Class.forName(m_packageName);
+            Class<?> c = Class.forName(m_packageName);
             java.lang.reflect.Constructor[] m = c.getConstructors();
 
             for (int i = 0; i < m.length; i++) {
                 /* Check if the signature is right: String, int */
-                Class[] params = m[i].getParameterTypes();
+                Class<?>[] params = m[i].getParameterTypes();
 
                 if ((params.length == 2) &&
                     (params[0].getName().equals("java.lang.String")) &&
@@ -188,7 +191,7 @@ class LDAPSSLSocket extends Socket {
                     Object[] args = new Object[2];
                     args[0] = host;
                     args[1] = new Integer(port);
-                    m_socket = (Object)(m[i].newInstance(args));
+                    m_socket = (m[i].newInstance(args));
                     return;
                 }
             }
@@ -214,12 +217,12 @@ class LDAPSSLSocket extends Socket {
         try {
             // instantiate the SSLSocketFactory implementation, and
             // find the right constructor
-            Class c = Class.forName(m_packageName);
+            Class<?> c = Class.forName(m_packageName);
             java.lang.reflect.Constructor[] m = c.getConstructors();
 
             for (int i = 0; i < m.length; i++) {
                 /* Check if the signature is right: String, int */
-                Class[] params = m[i].getParameterTypes();
+                Class<?>[] params = m[i].getParameterTypes();
                 if (cipherSuites == null)
                     throw new LDAPException("Cipher Suites is required");
 
@@ -231,7 +234,7 @@ class LDAPSSLSocket extends Socket {
                     args[0] = host;
                     args[1] = new Integer(port);
                     args[2] = cipherSuites;
-                    m_socket = (Object)(m[i].newInstance(args));
+                    m_socket = (m[i].newInstance(args));
                     return;
                 }
             }
@@ -342,7 +345,7 @@ class LDAPSSLSocket extends Socket {
               != null)
                 return method;
 
-            Class c = Class.forName(m_packageName);
+            Class<?> c = Class.forName(m_packageName);
             java.lang.reflect.Method[] m = c.getMethods();
             for (int i = 0; i < m.length; i++ ) {
                 if (m[i].getName().equals(name)) {

@@ -37,7 +37,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Method;
 import java.util.Hashtable;
 
 /**
@@ -87,10 +87,10 @@ class DynamicInvoker {
                 return method;
             }
 
-            Class c = Class.forName( packageName );
+            Class<?> c = Class.forName( packageName );
             Method[] m = c.getMethods();
             for ( int i = 0; i < m.length; i++ ) {
-                Class[] params = m[i].getParameterTypes();
+                Class<?>[] params = m[i].getParameterTypes();
                 if ( m[i].getName().equals(methodName) &&
                      signatureCorrect( params, args ) ) {
                     m_methodLookup.put( key, m[i] );
@@ -106,7 +106,7 @@ class DynamicInvoker {
         }
     }
 
-    static private boolean signatureCorrect( Class params[],
+    static private boolean signatureCorrect( Class<?> params[],
                                              String args[] ) {
         if ( args == null ) {
             return true;
