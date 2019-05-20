@@ -423,7 +423,7 @@ public class LDAPSchema implements java.io.Serializable {
      * Gets an enumeration ofthe object class definitions in this schema.
      * @return an enumeration of object class definitions.
      */
-    public Enumeration getObjectClasses() {
+    public Enumeration<LDAPObjectClassSchema> getObjectClasses() {
         return objectClasses.elements();
     }
 
@@ -482,7 +482,7 @@ public class LDAPSchema implements java.io.Serializable {
      * the object class definition, or <CODE>null</CODE> if not found.
      */
     public LDAPObjectClassSchema getObjectClass( String name ) {
-        return (LDAPObjectClassSchema)objectClasses.get( name.toLowerCase() );
+        return objectClasses.get( name.toLowerCase() );
     }
 
     /**
@@ -562,7 +562,7 @@ public class LDAPSchema implements java.io.Serializable {
      * Get an enumeration of the names of the object classes in this schema.
      * @return an enumeration of object class names (all lower-case).
      */
-    public Enumeration getObjectClassNames() {
+    public Enumeration<String> getObjectClassNames() {
         return objectClasses.keys();
     }
 
@@ -818,13 +818,13 @@ public class LDAPSchema implements java.io.Serializable {
      */
     public String toString() {
         String s = "Object classes:\n";
-        Enumeration en = getObjectClasses();
-        while( en.hasMoreElements() ) {
-            s += en.nextElement().toString();
+        Enumeration<LDAPObjectClassSchema> en1 = getObjectClasses();
+        while( en1.hasMoreElements() ) {
+            s += en1.nextElement().toString();
             s += '\n';
         }
         s += "Attributes:\n";
-        en = getAttributes();
+        Enumeration en = getAttributes();
         while( en.hasMoreElements() ) {
             s += en.nextElement().toString();
             s += '\n';
@@ -943,7 +943,7 @@ public class LDAPSchema implements java.io.Serializable {
         }
     }
 
-    private Hashtable objectClasses = new Hashtable();
+    private Hashtable<String, LDAPObjectClassSchema> objectClasses = new Hashtable<>();
     private Hashtable attributes = new Hashtable();
     private Hashtable matchingRules = new Hashtable();
     private Hashtable syntaxes = new Hashtable();

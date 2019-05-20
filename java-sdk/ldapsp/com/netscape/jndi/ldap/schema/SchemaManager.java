@@ -37,12 +37,19 @@
  * ***** END LICENSE BLOCK ***** */
 package com.netscape.jndi.ldap.schema;
 
-import javax.naming.*;
-import javax.naming.directory.*;
-import javax.naming.ldap.*;
-import netscape.ldap.*;
-import java.util.*;
-import com.netscape.jndi.ldap.common.*;
+import java.util.Enumeration;
+
+import javax.naming.NameNotFoundException;
+import javax.naming.NamingException;
+
+import com.netscape.jndi.ldap.common.ExceptionMapper;
+
+import netscape.ldap.LDAPAttributeSchema;
+import netscape.ldap.LDAPConnection;
+import netscape.ldap.LDAPException;
+import netscape.ldap.LDAPMatchingRuleSchema;
+import netscape.ldap.LDAPObjectClassSchema;
+import netscape.ldap.LDAPSchema;
 
 /**
  * A wrapper calss for LDAPSchema. It main purpose is to manage loading of schema
@@ -55,28 +62,28 @@ class SchemaManager {
      * LdapJDK main schema object
      */
     private LDAPSchema m_schema;
-    
+
     /**
      * LDAP Connection object
      */
     private LDAPConnection m_ld;
-    
+
     /**
      * Flag whether schema needs to be loaded by calling fetchSchema()
      */
     private boolean m_isLoaded;
-    
+
     /**
      * Flag whether schema objects have been modified in the Directory (add, remove)
      * but the change has not been propagated to the cached m_schema object
      */
     private boolean m_isObjectClassDirty, m_isAttributeDirty, m_isMatchingRuleDirty;
-    
+
     /**
      * Must constract with LDAP Connection
      */
     private SchemaManager() {}
-    
+
     /**
      * Connstructor
      */
@@ -85,7 +92,7 @@ class SchemaManager {
         m_isLoaded = false;
         m_isObjectClassDirty = m_isAttributeDirty = m_isMatchingRuleDirty = false;
     }
-    
+
     /**
      * Load the schema
      */
@@ -99,21 +106,21 @@ class SchemaManager {
         catch (LDAPException e) {
             throw ExceptionMapper.getNamingException(e);
         }
-    }    
-    
+    }
+
     LDAPObjectClassSchema getObjectClass(String name) throws NamingException {
         if (!m_isLoaded || m_isObjectClassDirty) {
             load();
         }
         return m_schema.getObjectClass(name);
-    }    
+    }
 
     LDAPAttributeSchema getAttribute(String name) throws NamingException {
         if (!m_isLoaded || m_isAttributeDirty) {
             load();
         }
         return m_schema.getAttribute(name);
-    }    
+    }
 
     LDAPMatchingRuleSchema getMatchingRule(String name) throws NamingException {
         if (!m_isLoaded || m_isMatchingRuleDirty) {
@@ -123,19 +130,19 @@ class SchemaManager {
     }
 
 
-    Enumeration getObjectClassNames() throws NamingException {
+    Enumeration<String> getObjectClassNames() throws NamingException {
         if (!m_isLoaded || m_isObjectClassDirty) {
             load();
         }
         return m_schema.getObjectClassNames();
-    }    
+    }
 
     Enumeration getAttributeNames() throws NamingException {
         if (!m_isLoaded || m_isAttributeDirty) {
             load();
         }
         return m_schema.getAttributeNames();
-    }    
+    }
 
     Enumeration getMatchingRuleNames() throws NamingException {
         if (!m_isLoaded || m_isMatchingRuleDirty) {
@@ -144,19 +151,19 @@ class SchemaManager {
         return m_schema.getMatchingRuleNames();
     }
 
-    Enumeration getObjectClasses() throws NamingException {
+    Enumeration<LDAPObjectClassSchema> getObjectClasses() throws NamingException {
         if (!m_isLoaded || m_isObjectClassDirty) {
             load();
         }
         return m_schema.getObjectClasses();
-    }    
+    }
 
     Enumeration getAttributes() throws NamingException {
         if (!m_isLoaded || m_isAttributeDirty) {
             load();
         }
         return m_schema.getAttributes();
-    }    
+    }
 
     Enumeration getMatchingRules() throws NamingException {
         if (!m_isLoaded || m_isMatchingRuleDirty) {
@@ -173,7 +180,7 @@ class SchemaManager {
         catch (LDAPException e) {
             throw ExceptionMapper.getNamingException(e);
         }
-    }    
+    }
 
     void createAttribute(LDAPAttributeSchema attr) throws NamingException {
         try {
@@ -183,7 +190,7 @@ class SchemaManager {
         catch (LDAPException e) {
             throw ExceptionMapper.getNamingException(e);
         }
-    }    
+    }
 
      void createMatchingRule(LDAPMatchingRuleSchema mrule) throws NamingException {
         try {
@@ -197,11 +204,11 @@ class SchemaManager {
 
      void removeObjectClass(String name) throws NamingException {
          LDAPObjectClassSchema objclass = getObjectClass(name);
-         
+
         if (objclass == null) {
             throw new NameNotFoundException(name);
         }
-        
+
         try {
             objclass.remove(m_ld);
             m_isObjectClassDirty = true;
@@ -209,11 +216,11 @@ class SchemaManager {
         catch (LDAPException e) {
             throw ExceptionMapper.getNamingException(e);
         }
-    }    
+    }
 
     void removeAttribute(String name) throws NamingException {
          LDAPAttributeSchema attr = getAttribute(name);
-         
+
         if (attr == null) {
             throw new NameNotFoundException(name);
         }
@@ -225,11 +232,11 @@ class SchemaManager {
         catch (LDAPException e) {
             throw ExceptionMapper.getNamingException(e);
         }
-    }    
+    }
 
      void removeMatchingRule(String name) throws NamingException {
          LDAPMatchingRuleSchema mrule = getMatchingRule(name);
-         
+
         if (mrule == null) {
             throw new NameNotFoundException(name);
         }
@@ -251,7 +258,7 @@ class SchemaManager {
         catch (LDAPException e) {
             throw ExceptionMapper.getNamingException(e);
         }
-    }    
+    }
 
     void modifyAttribute(LDAPAttributeSchema attr, LDAPAttributeSchema modAttr) throws NamingException {
         try {
@@ -261,7 +268,7 @@ class SchemaManager {
         catch (LDAPException e) {
             throw ExceptionMapper.getNamingException(e);
         }
-    }    
+    }
 
      void modifyMatchingRule(LDAPMatchingRuleSchema mrule, LDAPMatchingRuleSchema modMRule) throws NamingException {
         try {
