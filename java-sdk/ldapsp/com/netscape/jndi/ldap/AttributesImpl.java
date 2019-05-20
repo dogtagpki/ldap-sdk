@@ -38,12 +38,22 @@
  * ***** END LICENSE BLOCK ***** */
 package com.netscape.jndi.ldap;
 
-import javax.naming.*;
-import javax.naming.directory.*;
+import java.util.Enumeration;
+import java.util.TreeSet;
+import java.util.Vector;
 
-import netscape.ldap.*;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.BasicAttribute;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.ModificationItem;
 
-import java.util.*;
+import netscape.ldap.LDAPAttribute;
+import netscape.ldap.LDAPAttributeSet;
+import netscape.ldap.LDAPModification;
+import netscape.ldap.LDAPModificationSet;
 
 /**
  * Wrapper for LDAPAttributeSet which implements JNDI Attribute interface
@@ -52,7 +62,7 @@ class AttributesImpl implements Attributes {
 
     // TODO Create JndiAttribute class so that getAttributeDefinition and
     // getAttributeSyntaxDefinition can be implemented
-   
+
     LDAPAttributeSet m_attrSet;
 
     /**
@@ -63,21 +73,21 @@ class AttributesImpl implements Attributes {
       "usercertificate",  "cacertificate", "certificaterevocationlist",
       "authorityrevocationlist", "crosscertificatepair", "personalsignature",
       "x500uniqueidentifier", "javaserializeddata"};
-    
+
     /**
      * A list of user defined binary attributes specified with the environment
      * property java.naming.ldap.attributes.binary
      */
     static String[] m_userBinaryAttrs = null;
-    
+
     public AttributesImpl(LDAPAttributeSet attrSet, String[] userBinaryAttrs) {
         m_attrSet = attrSet;
         m_userBinaryAttrs = userBinaryAttrs;
-    }    
-    
+    }
+
     public Object clone() {
         return new AttributesImpl((LDAPAttributeSet)m_attrSet.clone(), m_userBinaryAttrs);
-    }    
+    }
 
     public Attribute get(String attrID) {
         LDAPAttribute attr = m_attrSet.getAttribute(attrID);
@@ -100,7 +110,7 @@ class AttributesImpl implements Attributes {
         LDAPAttribute attr = m_attrSet.getAttribute(attrID);
         if (val == null) { // no Value
             m_attrSet.add(new LDAPAttribute(attrID));
-        }    
+        }
         else if (val instanceof byte[]) {
             m_attrSet.add(new LDAPAttribute(attrID, (byte[])val));
         }
@@ -127,42 +137,42 @@ class AttributesImpl implements Attributes {
         Attribute attr = get(attrID);
         m_attrSet.remove(attrID);
         return attr;
-    }    
-    
+    }
+
     public int size() {
         return m_attrSet.size();
     }
 
-    
+
     /**
      * Check if an attribute is a binary one
      */
     static boolean isBinaryAttribute(String attrID) {
-        
+
          // attr name contains ";binary"
         if (attrID.indexOf(";binary") >=0) {
             return true;
         }
-        
+
         attrID = attrID.toLowerCase();
-                
+
         // check the predefined binary attr table
         for (int i=0; i < m_binaryAttrs.length; i++) {
             if (m_binaryAttrs[i].equals(attrID)) {
                 return true;
             }
         }
-        
+
         // check user specified binary attrs with
         for (int i=0; m_userBinaryAttrs != null && i < m_userBinaryAttrs.length; i++) {
             if (m_userBinaryAttrs[i].equals(attrID)) {
                 return true;
             }
         }
-        
+
         return false;
     }
-    
+
     /**
      * Convert a JNDI Attributes object into a LDAPAttributeSet
      */
@@ -172,35 +182,35 @@ class AttributesImpl implements Attributes {
             attrs.add(jndiAttrToLdapAttr((Attribute) itr.nextElement()));
         }
         return attrs;
-    }    
-        
+    }
+
     /**
      * Convert a JNDI Attribute to a LDAPAttribute
      */
     static LDAPAttribute jndiAttrToLdapAttr(Attribute jndiAttr) throws NamingException{
         LDAPAttribute attr = new LDAPAttribute(jndiAttr.getID());
-        
+
         for (NamingEnumeration vals = jndiAttr.getAll(); vals.hasMoreElements();) {
             Object val = vals.nextElement();
             if (val == null) {
                 ;  // no value
-            }    
+            }
             else if (val instanceof byte[]) {
                 attr.addValue((byte[])val);
             }
             else {
                 attr.addValue(val.toString());
-            }    
+            }
         }
         return attr;
     }
-    
+
     /**
      * Convert a LDAPAttribute to a JNDI Attribute
      */
     static Attribute ldapAttrToJndiAttr(LDAPAttribute attr) {
         BasicAttribute jndiAttr = new BasicAttribute(attr.getName());
-        Enumeration itrVals = null;
+        Enumeration<?> itrVals = null;
         if (isBinaryAttribute(attr.getName())) {
             itrVals = attr.getByteValues();
         }
@@ -211,14 +221,14 @@ class AttributesImpl implements Attributes {
 	 * If number of value over threshold, use TreeSet to quickly
 	 * eliminate value duplication. Locally extends JNDI attribute
 	 * to pass TreeSet directly to Vector of JNDI attribute.
-	 */    
+	 */
 	if (attr.size() < 50 ) {
           if (itrVals != null) {
               while ( itrVals.hasMoreElements() ) {
                   jndiAttr.add(itrVals.nextElement());
               }
-          }    
-	} 
+          }
+	}
 	else {
 	  /* A local class to allow constructing a JNDI attribute
 	   * from a TreeSet.
@@ -234,7 +244,7 @@ class AttributesImpl implements Attributes {
               while ( itrVals.hasMoreElements() ) {
                   valSet.add(itrVals.nextElement());
               }
-          }    
+          }
           jndiAttr = new BigAttribute(attr.getName(), valSet);
 	}
         return jndiAttr;
@@ -253,7 +263,7 @@ class AttributesImpl implements Attributes {
             }
             else if (modop == DirContext.REPLACE_ATTRIBUTE) {
                 mods.add(LDAPModification.REPLACE, attr);
-            }    
+            }
             else if (modop == DirContext.REMOVE_ATTRIBUTE) {
                 mods.add(LDAPModification.DELETE, attr);
             }
@@ -263,7 +273,7 @@ class AttributesImpl implements Attributes {
             }
         }
         return mods;
-    }    
+    }
 
     /**
      * Create a LDAPModificationSet from a JNDI mod operation and JNDI Attributes
@@ -277,7 +287,7 @@ class AttributesImpl implements Attributes {
             }
             else if (modop == DirContext.REPLACE_ATTRIBUTE) {
                 mods.add(LDAPModification.REPLACE, attr);
-            }    
+            }
             else if (modop == DirContext.REMOVE_ATTRIBUTE) {
                 mods.add(LDAPModification.DELETE, attr);
             }
@@ -294,12 +304,12 @@ class AttributesImpl implements Attributes {
  * into a JNDI Attribute accessed through the NamingEnumeration
  */
 class AttributeEnum implements NamingEnumeration {
-    
+
     Enumeration _attrEnum;
-    
+
     public AttributeEnum(Enumeration attrEnum) {
         _attrEnum = attrEnum;
-    }    
+    }
 
     public Object next() throws NamingException{
         LDAPAttribute attr = (LDAPAttribute) _attrEnum.nextElement();
@@ -330,10 +340,10 @@ class AttributeEnum implements NamingEnumeration {
 class AttributeIDEnum implements NamingEnumeration {
 
     Enumeration _attrEnum;
-    
+
     public AttributeIDEnum(Enumeration attrEnum) {
         _attrEnum = attrEnum;
-    }    
+    }
 
     public Object next() throws NamingException{
         LDAPAttribute attr = (LDAPAttribute) _attrEnum.nextElement();
@@ -355,4 +365,4 @@ class AttributeIDEnum implements NamingEnumeration {
 
     public void close() {
     }
-}    
+}

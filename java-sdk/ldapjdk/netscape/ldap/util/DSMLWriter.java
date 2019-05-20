@@ -37,9 +37,15 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.util;
 
-import java.util.*;
-import netscape.ldap.*;
-import java.io.*;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.Enumeration;
+
+import netscape.ldap.LDAPAttribute;
+import netscape.ldap.LDAPAttributeSchema;
+import netscape.ldap.LDAPEntry;
+import netscape.ldap.LDAPObjectClassSchema;
+import netscape.ldap.LDAPSchema;
 
 /**
  * Class for outputting LDAP entries to a stream as DSML.
@@ -181,10 +187,10 @@ public class DSMLWriter extends LDAPWriter {
 		// Object classes are treated differently in DSML. Also, they
 		// are always String-valued
 		if ( attrName.equalsIgnoreCase( "objectclass" ) ) {
-			Enumeration enumVals = attr.getStringValues();
+			Enumeration<String> enumVals = attr.getStringValues();
 			if ( enumVals != null ) {
 				while ( enumVals.hasMoreElements() ) {
-					String s = (String)enumVals.nextElement();
+					String s = enumVals.nextElement();
 					printString( "    <dsml:objectclass>" + s +
 								 "</dsml:objectclass>" );
 				}
@@ -261,13 +267,13 @@ public class DSMLWriter extends LDAPWriter {
 	    for ( int i = 0; i < l; i++ ) {
 	        char c = text[i];
 	        switch (c) {
-	        case '<' : 
+	        case '<' :
 	            m_pw.print( "&lt;" );
 	            break;
-	        case '&' : 
+	        case '&' :
 	            m_pw.print( "&amp;" );
 	            break;
-	        default : 
+	        default :
 	            m_pw.print( c );
 	        }
 	    }

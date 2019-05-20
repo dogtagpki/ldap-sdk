@@ -37,12 +37,19 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.beans;
 
-import netscape.ldap.*;
-import netscape.ldap.util.*;
-import java.util.Enumeration;
-import java.util.StringTokenizer;
+import java.awt.event.ActionEvent;
 import java.io.Serializable;
-import java.awt.event.*;
+import java.util.Enumeration;
+
+import netscape.ldap.LDAPAttribute;
+import netscape.ldap.LDAPAttributeSet;
+import netscape.ldap.LDAPConnection;
+import netscape.ldap.LDAPEntry;
+import netscape.ldap.LDAPException;
+import netscape.ldap.LDAPReferralException;
+import netscape.ldap.LDAPSearchResults;
+import netscape.ldap.LDAPUrl;
+import netscape.ldap.util.DN;
 
 /**
  * Invisible Bean that just takes a host and port, optional
@@ -190,7 +197,7 @@ public class LDAPIsMember extends LDAPBasePropertySupport
             LDAPEntry currEntry = null;
             while ( results.hasMoreElements() ) {
                 try {
-                    currEntry = (LDAPEntry)results.next();
+                    currEntry = results.next();
                     if (numDataEntries == 0)
                         entry = currEntry;
                     if (++numDataEntries > 1) {
@@ -231,17 +238,17 @@ public class LDAPIsMember extends LDAPBasePropertySupport
                        DN is found via a URL search.
                        This is transparent to the caller of the bean.
                     */
-                    Enumeration valuesenum = attr.getStringValues();
+                    Enumeration<String> valuesenum = attr.getStringValues();
                     if (valuesenum != null) {
                         while (valuesenum.hasMoreElements()) {
-                            String val = (String)valuesenum.nextElement();
+                            String val = valuesenum.nextElement();
                             if (urlHandler) {
                                 if ( URLMatch(m_ldc, val, normMember) ) {
                                     isMember = true;
                                     setErrorCode( OK );
                                     break;
                                 }
-                            } 
+                            }
                             printDebug( "\t\t" + val );
                             String normFound = normalizeDN( val );
                             if ( normMember.equals( normFound ) ) {
@@ -357,7 +364,7 @@ public class LDAPIsMember extends LDAPBasePropertySupport
      * Return true if normMember is result of url search.
      * Urls from dynamic groups do not typically contain
      * the host and port so we need to fix them before
-     * constructing an LDAP URL.  
+     * constructing an LDAP URL.
      * current ldap:///.... make ldap://host:port/...
      **/
      private boolean URLMatch(LDAPConnection ld, String URL,
@@ -366,7 +373,7 @@ public class LDAPIsMember extends LDAPBasePropertySupport
         boolean isMember = false;
         int loc = URL.indexOf(":///");
         if ( loc > 0) {
-            cURL = URL.substring(0,loc) + "://" + ld.getHost() + 
+            cURL = URL.substring(0,loc) + "://" + ld.getHost() +
                 ":" + ld.getPort() + URL.substring(loc+3);
         }
         printDebug("URLMatch: url = " + cURL +
@@ -379,13 +386,13 @@ public class LDAPIsMember extends LDAPBasePropertySupport
             printDebug("bad URL");
             return isMember;
         }
-        
+
         try {
             LDAPSearchResults results = ld.search(ldapurl);
             String entry = "";
             while ( results.hasMoreElements() && !isMember ) {
                 try {
-                    entry = ((LDAPEntry)results.next()).getDN();
+                    entry = results.next().getDN();
                     String normEntry = normalizeDN( entry );
                     if (normEntry.equals(normMemberDN)) {
                         isMember = true;
@@ -409,7 +416,7 @@ public class LDAPIsMember extends LDAPBasePropertySupport
             printDebug("Failed search for url " + ldapurl.getUrl());
             setErrorCode(NO_SUCH_OBJECT);
         }
-        
+
         return isMember;
      }
 

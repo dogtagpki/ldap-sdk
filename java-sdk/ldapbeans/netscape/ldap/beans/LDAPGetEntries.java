@@ -37,12 +37,16 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.beans;
 
-import netscape.ldap.*;
-import netscape.ldap.beans.LDAPBasePropertySupport;
+import java.awt.event.ActionEvent;
+import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.Vector;
-import java.io.Serializable;
-import java.awt.event.*;
+
+import netscape.ldap.LDAPAttribute;
+import netscape.ldap.LDAPConnection;
+import netscape.ldap.LDAPEntry;
+import netscape.ldap.LDAPException;
+import netscape.ldap.LDAPSearchResults;
 
 
 /**
@@ -293,9 +297,9 @@ public class LDAPGetEntries extends LDAPBasePropertySupport implements Serializa
                     } else {
                         LDAPAttribute attr = entry.getAttribute( _attribute );
                         if ( attr != null ) {
-                            Enumeration vals = attr.getStringValues();
+                            Enumeration<String> vals = attr.getStringValues();
                             if ( (vals != null) && (vals.hasMoreElements()) ) {
-                                value = (String)vals.nextElement();
+                                value = vals.nextElement();
                             }
                         }
                     }
@@ -347,7 +351,7 @@ public class LDAPGetEntries extends LDAPBasePropertySupport implements Serializa
                 break;
             }
         }
-            
+
         if ( scopeIndex < 0 ) {
             System.out.println( "Usage: LDAPGetEntries host port base" +
                                 " scope filter" );

@@ -37,8 +37,10 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap;
 
-import java.util.*;
-import java.text.*;
+import java.text.Collator;
+import java.util.Enumeration;
+import java.util.Locale;
+import java.util.NoSuchElementException;
 
 /**
  * Compares LDAP entries based on one or more attribute values.
@@ -103,8 +105,8 @@ public class LDAPCompareAttrNames
      * <P>
      *
      * Use an array of strings to specify the set of attributes
-     * to use for sorting.  If the values of the first attribute 
-     * (the name specified in <CODE>attribute[0]</CODE>) are equal, 
+     * to use for sorting.  If the values of the first attribute
+     * (the name specified in <CODE>attribute[0]</CODE>) are equal,
      * then the values of the next attribute are compared.
      * <P>
      *
@@ -131,7 +133,7 @@ public class LDAPCompareAttrNames
      * <P>
      *
      * Use an array of strings to specify the set of attributes
-     * to use for sorting.  If the values of the first attribute 
+     * to use for sorting.  If the values of the first attribute
      * (the name specified in <CODE>attribute[0]</CODE>)
      * are equal, then the values of the next attribute are compared.
      * <P>
@@ -293,8 +295,7 @@ public class LDAPCompareAttrNames
                     (LDAPAttribute)(lessAttrSet.nextElement());
                 if (!attrName.equalsIgnoreCase (currAttr.getName()))
                     continue;
-                lessValue =
-                    (String)(currAttr.getStringValues().nextElement());
+                lessValue = currAttr.getStringValues().nextElement();
                 break;
             }
 
@@ -303,8 +304,7 @@ public class LDAPCompareAttrNames
                     (LDAPAttribute)(greaterAttrSet.nextElement());
                 if (!attrName.equalsIgnoreCase (currAttr.getName()))
                     continue;
-                greaterValue =
-                    (String)(currAttr.getStringValues().nextElement());
+                greaterValue = currAttr.getStringValues().nextElement();
                 break;
             }
         }

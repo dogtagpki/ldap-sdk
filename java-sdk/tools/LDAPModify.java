@@ -40,11 +40,34 @@
  *
  */
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import netscape.ldap.*;
-import netscape.ldap.util.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Enumeration;
+import java.util.Vector;
+
+import netscape.ldap.LDAPAttribute;
+import netscape.ldap.LDAPAttributeSet;
+import netscape.ldap.LDAPConnection;
+import netscape.ldap.LDAPConstraints;
+import netscape.ldap.LDAPControl;
+import netscape.ldap.LDAPEntry;
+import netscape.ldap.LDAPException;
+import netscape.ldap.LDAPModification;
+import netscape.ldap.LDAPModificationSet;
+import netscape.ldap.LDAPSearchConstraints;
+import netscape.ldap.util.GetOpt;
+import netscape.ldap.util.LDIF;
+import netscape.ldap.util.LDIFAddContent;
+import netscape.ldap.util.LDIFAttributeContent;
+import netscape.ldap.util.LDIFContent;
+import netscape.ldap.util.LDIFDeleteContent;
+import netscape.ldap.util.LDIFModDNContent;
+import netscape.ldap.util.LDIFModifyContent;
+import netscape.ldap.util.LDIFRecord;
 
 /**
  * Executes modify, delete, add, and modRDN.
@@ -106,7 +129,7 @@ public class LDAPModify extends LDAPTool { /* LDAPModify */
 
         /* perform an LDAP bind operation */
         try {
-            if (!m_justShow) 
+            if (!m_justShow)
                 m_client.authenticate( m_version, m_binddn, m_passwd );
         } catch (Exception e) {
             System.err.println( e.toString() );
@@ -217,12 +240,12 @@ public class LDAPModify extends LDAPTool { /* LDAPModify */
 
         /* -f input file */
         if(options.hasOption('f')) { /* Is input file */
-            m_file = (String)options.getOptionParam('f');
+            m_file = options.getOptionParam('f');
         } /* End Is input file */
 
         /* -e rejects file */
         if(options.hasOption('e')) { /* rejects file */
-            m_rejectsFile = (String)options.getOptionParam('e');
+            m_rejectsFile = options.getOptionParam('e');
         } /* End rejects file */
 
     } /* extract parameters */
@@ -387,7 +410,7 @@ public class LDAPModify extends LDAPTool { /* LDAPModify */
                             for( int a = 0; a < set.size(); a++ ) {
                                 System.out.println("\t"+set.elementAt(a) );
                             }
-                        } 
+                        }
                         if (!m_justShow) {
                             m_client.add( newEntry, cons );
                         }
@@ -396,7 +419,7 @@ public class LDAPModify extends LDAPTool { /* LDAPModify */
                         if (!m_justShow)
                             m_client.delete( rec.getDN(), cons );
                     } else if ( doModDN) {
-                        System.out.println( "\nmodifying RDN of entry " + 
+                        System.out.println( "\nmodifying RDN of entry " +
                             rec.getDN()+" and/or moving it beneath a new parent");
                         if ( m_verbose ) {
                             System.out.println( "\t"+content.toString());
@@ -404,7 +427,7 @@ public class LDAPModify extends LDAPTool { /* LDAPModify */
                         if (!m_justShow) {
                             LDIFModDNContent moddnContent = (LDIFModDNContent)content;
                             m_client.rename( rec.getDN(), moddnContent.getRDN(),
-                                moddnContent.getNewParent(), 
+                                moddnContent.getNewParent(),
                                 moddnContent.getDeleteOldRDN(), cons );
                             System.out.println( "rename completed");
                         }
@@ -444,7 +467,7 @@ public class LDAPModify extends LDAPTool { /* LDAPModify */
                     } else if ( doDelete ) {
                         reject.println( "Delete " + rec.getDN() );
                     } else if (doModDN) {
-                        reject.println( "ModDN "+ 
+                        reject.println( "ModDN "+
                                     ((LDIFModDNContent)content).toString() );
                     }
                     reject.flush();
@@ -465,10 +488,10 @@ public class LDAPModify extends LDAPTool { /* LDAPModify */
             new LDAPAttribute( attr.getName() );
 
         /* Check each value and see if it is a file name */
-        Enumeration e = attr.getStringValues();
+        Enumeration<String> e = attr.getStringValues();
         if (e != null) {
           while ( e.hasMoreElements() ) {
-            String val = (String)e.nextElement();
+            String val = e.nextElement();
             if ( (val != null) && (val.length() > 1)) {
                 try {
                     File file = new File( val );

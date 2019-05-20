@@ -37,13 +37,18 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.beans;
 
-import netscape.ldap.*;
-import netscape.ldap.beans.LDAPBasePropertySupport;
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.Vector;
-import java.io.Serializable;
-import java.beans.*;
-import java.awt.event.*;
+
+import netscape.ldap.LDAPAttribute;
+import netscape.ldap.LDAPAttributeSet;
+import netscape.ldap.LDAPConnection;
+import netscape.ldap.LDAPEntry;
+import netscape.ldap.LDAPException;
+import netscape.ldap.LDAPSearchResults;
 
 
 /**
@@ -122,7 +127,7 @@ public class LDAPGetProperty extends LDAPBasePropertySupport implements
     }
 
     public void setDNs(PropertyChangeEvent evt) {
-        Object obj = (Object)evt.getNewValue();
+        Object obj = evt.getNewValue();
         if ((obj != null) && (obj instanceof String[])) {
             String[] strings = (String[])obj;
             if (strings.length == 0)
@@ -261,12 +266,12 @@ public class LDAPGetProperty extends LDAPBasePropertySupport implements
                             (LDAPAttribute)attrsenum.nextElement();
                         printDebug( attr.getName() + " = " );
                         // Get the values as strings
-                        Enumeration valuesenum = attr.getStringValues();
+                        Enumeration<String> valuesenum = attr.getStringValues();
                         if (valuesenum != null) {
                           // Create a string array for the results
                             Vector v = new Vector();
                             while (valuesenum.hasMoreElements()) {
-                                String val = (String)valuesenum.nextElement();
+                                String val = valuesenum.nextElement();
                                 v.addElement( val );
                                 printDebug( "\t\t" + val );
                             }

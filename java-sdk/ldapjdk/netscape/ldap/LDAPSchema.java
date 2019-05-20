@@ -37,7 +37,8 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap;
 
-import java.util.*;
+import java.util.Enumeration;
+import java.util.Hashtable;
 
 /**
  * This object represents the schema of an LDAP v3 server.
@@ -638,12 +639,12 @@ public class LDAPSchema implements java.io.Serializable {
     protected void initialize( LDAPEntry entry ) {
         /* Get all object class definitions */
         LDAPAttribute attr = entry.getAttribute( "objectclasses" );
-        Enumeration en;
+        Enumeration<String> en;
         if ( attr != null ) {
             en = attr.getStringValues();
             while( en.hasMoreElements() ) {
                 LDAPObjectClassSchema sch =
-                    new LDAPObjectClassSchema( (String)en.nextElement() );
+                    new LDAPObjectClassSchema( en.nextElement() );
                 addObjectClass( sch );
             }
         }
@@ -654,7 +655,7 @@ public class LDAPSchema implements java.io.Serializable {
             en = attr.getStringValues();
             while( en.hasMoreElements() ) {
                 LDAPAttributeSchema sch =
-                    new LDAPAttributeSchema( (String)en.nextElement() );
+                    new LDAPAttributeSchema( en.nextElement() );
                 addAttribute( sch );
             }
         }
@@ -665,7 +666,7 @@ public class LDAPSchema implements java.io.Serializable {
             en = attr.getStringValues();
             while( en.hasMoreElements() ) {
                 LDAPSyntaxSchema sch =
-                    new LDAPSyntaxSchema( (String)en.nextElement() );
+                    new LDAPSyntaxSchema( en.nextElement() );
                 addSyntax( sch );
             }
         }
@@ -677,7 +678,7 @@ public class LDAPSchema implements java.io.Serializable {
             while( en.hasMoreElements() ) {
                 LDAPDITStructureRuleSchema sch =
                     new LDAPDITStructureRuleSchema(
-                        (String)en.nextElement() );
+                        en.nextElement() );
                 addDITStructureRule( sch );
             }
         }
@@ -689,7 +690,7 @@ public class LDAPSchema implements java.io.Serializable {
             while( en.hasMoreElements() ) {
                 LDAPDITContentRuleSchema sch =
                     new LDAPDITContentRuleSchema(
-                        (String)en.nextElement() );
+                        en.nextElement() );
                 addDITContentRule( sch );
             }
         }
@@ -701,7 +702,7 @@ public class LDAPSchema implements java.io.Serializable {
             while( en.hasMoreElements() ) {
                 LDAPNameFormSchema sch =
                     new LDAPNameFormSchema(
-                        (String)en.nextElement() );
+                        en.nextElement() );
                 addNameForm( sch );
             }
         }
@@ -713,7 +714,7 @@ public class LDAPSchema implements java.io.Serializable {
         if ( attr != null ) {
             en = attr.getStringValues();
             while( en.hasMoreElements() ) {
-                String use = (String)en.nextElement();
+                String use = en.nextElement();
                 LDAPMatchingRuleSchema sch =
                     new LDAPMatchingRuleSchema( null, use );
                 h.put( sch.getOID(), use );
@@ -724,7 +725,7 @@ public class LDAPSchema implements java.io.Serializable {
         if ( attr != null ) {
             en = attr.getStringValues();
             while( en.hasMoreElements() ) {
-                String raw = (String)en.nextElement();
+                String raw = en.nextElement();
                 LDAPMatchingRuleSchema sch =
                     new LDAPMatchingRuleSchema( raw, null );
                 String use = (String)h.get( sch.getOID() );
@@ -769,9 +770,9 @@ public class LDAPSchema implements java.io.Serializable {
         /* Get all attribute definitions, and check the first one */
         LDAPAttribute attr = entry.getAttribute( "attributetypes" );
         if ( attr != null ) {
-            Enumeration en = attr.getStringValues();
+            Enumeration<String> en = attr.getStringValues();
             if( en.hasMoreElements() ) {
-                compliant = !isSyntaxQuoted( (String)en.nextElement() );
+                compliant = !isSyntaxQuoted( en.nextElement() );
             }
         }
         ld.setProperty( ld.SCHEMA_BUG_PROPERTY, compliant ? "standard" :
@@ -862,9 +863,9 @@ public class LDAPSchema implements java.io.Serializable {
         LDAPAttribute attr = entry.getAttribute( attrs[0] );
         String entryName = "cn=schema";
         if ( attr != null ) {
-            Enumeration en = attr.getStringValues();
+            Enumeration<String> en = attr.getStringValues();
             if ( en.hasMoreElements() ) {
-                entryName = (String)en.nextElement();
+                entryName = en.nextElement();
             }
         }
         return entryName;
@@ -886,7 +887,7 @@ public class LDAPSchema implements java.io.Serializable {
     private static LDAPEntry readSchema( LDAPConnection ld, String dn )
                                          throws LDAPException {
         return readSchema( ld, dn, new String[] { "*", "ldapSyntaxes",
-                        "matchingRules", "attributeTypes", "objectClasses" } );        
+                        "matchingRules", "attributeTypes", "objectClasses" } );
     }
 
     /**
