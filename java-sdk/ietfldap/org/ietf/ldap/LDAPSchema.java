@@ -38,7 +38,11 @@
 package org.ietf.ldap;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Enumeration;
+import java.util.Hashtable;
 
 /**
  * This object represents the schema of an LDAP v3 server.
@@ -208,8 +212,8 @@ public class LDAPSchema implements Serializable {
     }
 
     /**
-     * Adds a schema element definition to the schema object. If the schema 
-     * object already contains an element with the same class and OID as el, 
+     * Adds a schema element definition to the schema object. If the schema
+     * object already contains an element with the same class and OID as el,
      * IllegalArgumentException is thrown. Changes are applied to a directory
      * by calling saveSchema.
      *
@@ -220,8 +224,8 @@ public class LDAPSchema implements Serializable {
     }
 
     /**
-     * Adds a schema element definition to the schema object. If the schema 
-     * object already contains an element with the same class and OID as el, 
+     * Adds a schema element definition to the schema object. If the schema
+     * object already contains an element with the same class and OID as el,
      * IllegalArgumentException is thrown. Changes are applied to a directory
      * by calling saveSchema.
      *
@@ -1056,7 +1060,7 @@ public class LDAPSchema implements Serializable {
                                          String dn )
         throws LDAPException {
         return readSchema( ld, dn, new String[] { "*", "ldapSyntaxes",
-                        "matchingRules", "attributeTypes", "objectClasses" } );        
+                        "matchingRules", "attributeTypes", "objectClasses" } );
     }
 
     /**

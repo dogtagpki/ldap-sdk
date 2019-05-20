@@ -77,7 +77,7 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
      * Internal variables
      */
     protected ArrayList<LDAPMessage> _messageQueue = new ArrayList<>(1);
-    private /*RequestEntry*/ ArrayList _requestList  = new ArrayList(1);
+    private ArrayList<RequestEntry> _requestList  = new ArrayList<>(1);
     private LDAPException _exception; /* For network errors */
     private boolean _asynchOp;
 
@@ -112,7 +112,7 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
     synchronized public int[] getMessageIDs() {
         int[] ids = new int[_requestList.size()];
         for ( int i = 0; i < ids.length; i++ ) {
-            RequestEntry entry = (RequestEntry)_requestList.get(i);
+            RequestEntry entry = _requestList.get(i);
             ids[i] = entry.id;
         }
         return ids;
@@ -256,9 +256,9 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
                 if ( mq.getException() != null ) {
                     _exception = mq.getException();
                 }
-				ArrayList list2 = mq.getAllRequests();
+				ArrayList<RequestEntry> list2 = mq.getAllRequests();
                 for( int i = 0; i < list2.size(); i++ ) {
-                    RequestEntry entry = (RequestEntry)list2.get( i );
+                    RequestEntry entry = list2.get( i );
                     _requestList.add( entry );
                     // Notify LDAPConnThread to redirect mq2 designated
 					// responses to this mq
@@ -285,7 +285,7 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
             if ( i > 0 ) {
                 sb.append( "," );
             }
-            sb.append( ((RequestEntry)_requestList.get(i)).id );
+            sb.append( _requestList.get(i).id );
         }
         sb.append( "} messageCount=" + _messageQueue.size() );
 
@@ -377,7 +377,7 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
         long minTimeToComplete = Long.MAX_VALUE;
         long now = System.currentTimeMillis();
         for ( int i = 0; i < _requestList.size(); i++ ) {
-            RequestEntry entry = (RequestEntry)_requestList.get( i );
+            RequestEntry entry = _requestList.get( i );
 
             // time limit exceeded ?
             if ( entry.timeToComplete <= now ) {
@@ -450,9 +450,9 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
 	 *
      * @return vector of requests
      */
-    synchronized ArrayList getAllRequests() {
-        ArrayList result = _requestList;
-        _requestList = new ArrayList(1);
+    synchronized ArrayList<RequestEntry> getAllRequests() {
+        ArrayList<RequestEntry> result = _requestList;
+        _requestList = new ArrayList<>(1);
         return result;
     }
 
@@ -581,7 +581,7 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
      */
     synchronized RequestEntry getRequestEntry( int id ) {
         for ( int i = 0; i < _requestList.size(); i++ ) {
-            RequestEntry entry = (RequestEntry)_requestList.get( i );
+            RequestEntry entry = _requestList.get( i );
             if ( id == entry.id ) {
                 return entry;
             }
@@ -600,8 +600,7 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
         if ( reqCnt == 0 ) {
             return -1;
         } else {
-            RequestEntry entry =
-				(RequestEntry)_requestList.get( reqCnt-1 );
+            RequestEntry entry = _requestList.get( reqCnt-1 );
             return entry.id;
         }
     }
@@ -644,7 +643,7 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
      */
     synchronized boolean removeRequest( int id ) {
         for ( int i = 0; i < _requestList.size(); i++ ) {
-            RequestEntry entry = (RequestEntry)_requestList.get( i );
+            RequestEntry entry = _requestList.get( i );
             if ( id == entry.id ) {
                 _requestList.remove( i );
                 removeAllMessages( id );
@@ -664,7 +663,7 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
     synchronized int removeAllRequests( LDAPConnThread connThread ) {
         int removeCount = 0;
         for ( int i = (_requestList.size()-1); i >= 0; i-- ) {
-            RequestEntry entry = (RequestEntry)_requestList.get( i );
+            RequestEntry entry = _requestList.get( i );
             if ( connThread == entry.connThread ) {
                 _requestList.remove( i );
                 removeCount++;
