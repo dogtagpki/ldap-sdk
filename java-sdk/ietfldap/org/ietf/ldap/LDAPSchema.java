@@ -1006,9 +1006,9 @@ public class LDAPSchema implements Serializable {
         if ( names1.length == 1 ) {
             return ( names1[0].equalsIgnoreCase( names2[0] ) );
         }
-        Comparator comp = new Comparator() {
-            public int compare( Object o1, Object o2 ) {
-                return ((String)o1).compareToIgnoreCase( (String)o2 );
+        Comparator<String> comp = new Comparator<String>() {
+            public int compare( String o1, String o2 ) {
+                return o1.compareToIgnoreCase( o2 );
             }
             public boolean equals( Object obj ) {
                 return false;

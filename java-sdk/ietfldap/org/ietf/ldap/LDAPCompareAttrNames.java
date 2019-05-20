@@ -56,8 +56,8 @@ import java.util.Locale;
  * @see LDAPSearchResults#sort
  */
 
-public class LDAPCompareAttrNames
-             implements Comparator, Serializable {
+public class LDAPCompareAttrNames<E>
+             implements Comparator<E>, Serializable {
 
     static final long serialVersionUID = -2567450425231175944L;
     private String _attrs[];
@@ -285,9 +285,9 @@ public class LDAPCompareAttrNames
      */
     int attrGreater( LDAPEntry entry1, LDAPEntry entry2,
                      int attrPos ) {
-        Iterator attrSet1 =
+        Iterator<LDAPAttribute> attrSet1 =
             entry1.getAttributeSet().iterator();
-        Iterator attrSet2 =
+        Iterator<LDAPAttribute> attrSet2 =
             entry2.getAttributeSet().iterator();
 
         String value1 = null;
@@ -296,7 +296,7 @@ public class LDAPCompareAttrNames
         boolean ascending = _ascending[attrPos];
 
         while ( attrSet2.hasNext() ) {
-            LDAPAttribute currAttr = (LDAPAttribute)(attrSet2.next());
+            LDAPAttribute currAttr = attrSet2.next();
             if ( !attrName.equalsIgnoreCase (currAttr.getName()) ) {
                 continue;
             }
@@ -305,7 +305,7 @@ public class LDAPCompareAttrNames
         }
 
         while ( attrSet1.hasNext() ) {
-            LDAPAttribute currAttr = (LDAPAttribute)(attrSet1.next());
+            LDAPAttribute currAttr = attrSet1.next();
             if ( !attrName.equalsIgnoreCase(currAttr.getName()) ) {
                 continue;
             }

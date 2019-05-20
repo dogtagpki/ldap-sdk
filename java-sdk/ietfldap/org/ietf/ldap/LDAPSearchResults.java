@@ -37,10 +37,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap;
 
-import java.util.*;
-import org.ietf.ldap.client.*;
-import org.ietf.ldap.client.opers.*;
-import java.io.*;
+import java.io.Serializable;
+import java.util.Comparator;
+import java.util.Vector;
 
 /**
  * The results of an LDAP search operation, represented as an enumeration.
@@ -161,16 +160,16 @@ public class LDAPSearchResults implements Serializable {
         }
 
         int count = entries.size();
-        
+
         for ( int i = 0; i < referralResults.size(); i++ ) {
             LDAPSearchResults res =
                 (LDAPSearchResults)referralResults.elementAt(i);
             count += res.getCount();
-        } 
+        }
 
         if ( exceptions != null ) {
             count += exceptions.size();
-        } 
+        }
 
         return count;
     }
@@ -210,7 +209,7 @@ public class LDAPSearchResults implements Serializable {
             fetchResult();
         }
 
-        if ((entries.size() == 0) && 
+        if ((entries.size() == 0) &&
           ((exceptions == null) || (exceptions.size() == 0))) {
             while (referralResults.size() > 0) {
                 LDAPSearchResults res =
@@ -222,13 +221,13 @@ public class LDAPSearchResults implements Serializable {
             }
         }
 
-        return ((entries.size() > 0) || 
+        return ((entries.size() > 0) ||
           ((exceptions != null) && (exceptions.size() > 0)));
     }
 
     /**
      * Returns the next LDAP entry from the search results
-     * and throws an exception if the next result is a referral, or 
+     * and throws an exception if the next result is a referral, or
      * if a sizelimit or timelimit error occurred.
      * <P>
      *
@@ -249,16 +248,16 @@ public class LDAPSearchResults implements Serializable {
      *     }
      *     continue;
      *   } catch ( LDAPException e ) {
-     *     // Your code for handling errors on limits exceeded 
-     *     continue; 
-     *   } 
+     *     // Your code for handling errors on limits exceeded
+     *     continue;
+     *   }
      *   ...
      * }
      * </PRE>
      * @return the next LDAP entry in the search results.
      * @exception LDAPReferralException A referral (thrown
-     * if the next result is a referral), or LDAPException 
-     * if a limit on the number of entries or the time was 
+     * if the next result is a referral), or LDAPException
+     * if a limit on the number of entries or the time was
      * exceeded.
      * @see org.ietf.ldap.LDAPSearchResults#hasMore()
      */
@@ -307,7 +306,7 @@ public class LDAPSearchResults implements Serializable {
      * @param compare comparator used to determine the sort order of the results
      * @see LDAPCompareAttrNames
      */
-    public synchronized void sort(Comparator compare) {
+    public synchronized void sort(Comparator<LDAPEntry> compare) {
 
         // if automatic referral, then add to the entries, otherwise, dont do it
         // since the elements in referralResults are LDAPReferralException.
@@ -317,9 +316,9 @@ public class LDAPSearchResults implements Serializable {
                 if ((obj=nextReferralElement()) != null) {
                     if (obj instanceof LDAPException) {
                         add((LDAPException)obj); // put it back
-                    }                    
+                    }
                     else {
-                        entries.addElement(obj);                      
+                        entries.addElement(obj);
                     }
                 }
             }
@@ -357,11 +356,11 @@ public class LDAPSearchResults implements Serializable {
             if ( urls != null ) {
                 if (exceptions == null) {
                     exceptions = new Vector();
-                }                    
+                }
                 exceptions.addElement(
                     new LDAPReferralException(null, 0, urls) );
             }
-        }            
+        }
     }
 
     /**
@@ -416,7 +415,7 @@ public class LDAPSearchResults implements Serializable {
     /**
      * Basic quicksort algorithm.
      */
-    void quicksort ( LDAPEntry[] toSort, Comparator compare,
+    void quicksort ( LDAPEntry[] toSort, Comparator<LDAPEntry> compare,
                      int low, int high ) {
         if (low >= high) {
             return;
@@ -454,7 +453,7 @@ public class LDAPSearchResults implements Serializable {
     void setMsgID( int msgID ) {
         this.msgID = msgID;
     }
-    
+
     /**
      * Returns the next result from a search.  You can use this method
      * in conjunction with the <CODE>hasMore</CODE> method to
@@ -468,20 +467,20 @@ public class LDAPSearchResults implements Serializable {
      *                         LDAPConnection.SCOPE_BASE, MY_FILTER,
      *                         null, false );
      * while ( res.hasMore() ) {
-     *   Object o = res.next(); 
-     *   if ( o instanceof LDAPEntry ) { 
-     *     LDAPEntry findEntry = (LDAPEntry)o; 
-     *     ... 
-     *   } else if ( o instanceof LDAPReferralException ) { 
-     *     LDAPReferralException e = (LDAPReferralException)o; 
-     *     String refUrls[] = e.getReferrals(); 
-     *     ... 
-     *   } else if ( o instanceof LDAPException ) { 
-     *     LDAPException e = (LDAPException)o; 
-     *     ... 
-     *   } 
-     * } 
-     * </PRE> 
+     *   Object o = res.next();
+     *   if ( o instanceof LDAPEntry ) {
+     *     LDAPEntry findEntry = (LDAPEntry)o;
+     *     ...
+     *   } else if ( o instanceof LDAPReferralException ) {
+     *     LDAPReferralException e = (LDAPReferralException)o;
+     *     String refUrls[] = e.getReferrals();
+     *     ...
+     *   } else if ( o instanceof LDAPException ) {
+     *     LDAPException e = (LDAPException)o;
+     *     ...
+     *   }
+     * }
+     * </PRE>
      * @return the next element in the search results.
      * @see org.ietf.ldap.LDAPSearchResults#hasMore()
      */
@@ -508,7 +507,7 @@ public class LDAPSearchResults implements Serializable {
     Object nextReferralElement() {
         LDAPSearchResults res =
           (LDAPSearchResults)referralResults.elementAt(0);
-        if ((!res.persistentSearch && res.hasMore()) || 
+        if ((!res.persistentSearch && res.hasMore()) ||
           (res.persistentSearch)) {
             Object obj = res.nextElement();
             if (obj != null) {
@@ -558,12 +557,12 @@ public class LDAPSearchResults implements Serializable {
                     searchComplete = true;
                     return;
                 }
-                    
+
 
                 if (msg == null) { // Request abandoned
                     searchComplete = true;
-                    currConn.releaseSearchListener(resultSource); 
-                    return; 
+                    currConn.releaseSearchListener(resultSource);
+                    return;
 
                 } else if (msg instanceof LDAPResponse) {
                     try {
