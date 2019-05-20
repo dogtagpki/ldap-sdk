@@ -260,10 +260,10 @@ public class LDAPGetProperty extends LDAPBasePropertySupport implements
                     setErrorCode( OK );
                 } else {
                     LDAPAttributeSet attrset = entry.getAttributeSet();
-                    Enumeration attrsenum = attrset.getAttributes();
+                    Enumeration<LDAPAttribute> attrsenum = attrset.getAttributes();
                     if (attrsenum.hasMoreElements()) {
                         LDAPAttribute attr =
-                            (LDAPAttribute)attrsenum.nextElement();
+                            attrsenum.nextElement();
                         printDebug( attr.getName() + " = " );
                         // Get the values as strings
                         Enumeration<String> valuesenum = attr.getStringValues();

@@ -225,10 +225,10 @@ public class LDAPIsMember extends LDAPBasePropertySupport
                 String normMember = normalizeDN( member );
                 // Good - exactly one entry found; get the attributes
                 LDAPAttributeSet attrset = entry.getAttributeSet();
-                Enumeration attrsenum = attrset.getAttributes();
+                Enumeration<LDAPAttribute> attrsenum = attrset.getAttributes();
                 while ( attrsenum.hasMoreElements() && !isMember ) {
                     LDAPAttribute attr =
-                        (LDAPAttribute)attrsenum.nextElement();
+                        attrsenum.nextElement();
                     printDebug( attr.getName() + " = " );
                     boolean urlHandler =
                         attr.getName().equalsIgnoreCase("memberurl");

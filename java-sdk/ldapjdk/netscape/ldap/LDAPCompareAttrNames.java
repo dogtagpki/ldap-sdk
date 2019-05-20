@@ -279,9 +279,9 @@ public class LDAPCompareAttrNames
      */
     boolean attrGreater (LDAPEntry greater, LDAPEntry less,
                          int attrPos) {
-        Enumeration greaterAttrSet =
+        Enumeration<LDAPAttribute> greaterAttrSet =
             greater.getAttributeSet().getAttributes();
-        Enumeration lessAttrSet =
+        Enumeration<LDAPAttribute> lessAttrSet =
             less.getAttributeSet().getAttributes();
 
         String greaterValue = null;
@@ -292,7 +292,7 @@ public class LDAPCompareAttrNames
         try {
             while (lessAttrSet.hasMoreElements()) {
                 LDAPAttribute currAttr =
-                    (LDAPAttribute)(lessAttrSet.nextElement());
+                    (lessAttrSet.nextElement());
                 if (!attrName.equalsIgnoreCase (currAttr.getName()))
                     continue;
                 lessValue = currAttr.getStringValues().nextElement();
@@ -301,7 +301,7 @@ public class LDAPCompareAttrNames
 
             while (greaterAttrSet.hasMoreElements()) {
                 LDAPAttribute currAttr =
-                    (LDAPAttribute)(greaterAttrSet.nextElement());
+                    (greaterAttrSet.nextElement());
                 if (!attrName.equalsIgnoreCase (currAttr.getName()))
                     continue;
                 greaterValue = currAttr.getStringValues().nextElement();

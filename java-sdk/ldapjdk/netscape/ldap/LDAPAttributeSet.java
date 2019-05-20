@@ -37,9 +37,10 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap;
 
-import java.util.*;
-import netscape.ldap.client.*;
-import netscape.ldap.client.opers.*;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
 /**
  * Represents a set of attributes (for example, the set of attributes
@@ -50,7 +51,7 @@ import netscape.ldap.client.opers.*;
  */
 public class LDAPAttributeSet implements Cloneable, java.io.Serializable {
     static final long serialVersionUID = 5018474561697778100L;
-    Hashtable attrHash = null;
+    Hashtable<String, LDAPAttribute> attrHash = null;
     LDAPAttribute[] attrs = new LDAPAttribute[0];
     /* If there are less attributes than this in the set, it's not worth
      creating a Hashtable - faster and cheaper most likely to string
@@ -88,8 +89,8 @@ public class LDAPAttributeSet implements Cloneable, java.io.Serializable {
      * Returns an enumeration of the attributes in this attribute set.
      * @return enumeration of the attributes in this set.
      */
-    public Enumeration getAttributes () {
-        Vector v = new Vector();
+    public Enumeration<LDAPAttribute> getAttributes () {
+        Vector<LDAPAttribute> v = new Vector<>();
         synchronized(this) {
             for (int i=0; i<attrs.length; i++) {
                 v.addElement(attrs[i]);
@@ -124,7 +125,7 @@ public class LDAPAttributeSet implements Cloneable, java.io.Serializable {
      * </PRE>
      *
      * @param subtype semi-colon delimited list of subtypes
-     * to find within attribute names. 
+     * to find within attribute names.
      * For example:
      * <PRE>
      *     "lang-ja"        // Only Japanese language subtypes
@@ -151,9 +152,9 @@ public class LDAPAttributeSet implements Cloneable, java.io.Serializable {
             searchTypes[i] = (String)st.nextElement();
             i++;
         }
-        Enumeration attrEnum = getAttributes();
+        Enumeration<LDAPAttribute> attrEnum = getAttributes();
         while( attrEnum.hasMoreElements() ) {
-            LDAPAttribute attr = (LDAPAttribute)attrEnum.nextElement();
+            LDAPAttribute attr = attrEnum.nextElement();
             if( attr.hasSubtypes( searchTypes ) )
                 attrs.add( new LDAPAttribute( attr ) );
         }
@@ -176,7 +177,7 @@ public class LDAPAttributeSet implements Cloneable, java.io.Serializable {
     public LDAPAttribute getAttribute( String attrName ) {
         prepareHashtable();
         if (attrHash != null) {
-            return (LDAPAttribute)attrHash.get( attrName.toLowerCase() );
+            return attrHash.get( attrName.toLowerCase() );
         } else {
             for (int i = 0; i < attrs.length; i++) {
                 if (attrName.equalsIgnoreCase(attrs[i].getName())) {
@@ -192,7 +193,7 @@ public class LDAPAttributeSet implements Cloneable, java.io.Serializable {
      */
     private void prepareHashtable() {
         if ((attrHash == null) && (attrs.length >= ATTR_COUNT_REQUIRES_HASH)) {
-            attrHash = new Hashtable();
+            attrHash = new Hashtable<>();
             for (int j = 0; j < attrs.length; j++) {
                 attrHash.put( attrs[j].getName().toLowerCase(), attrs[j] );
             }
@@ -213,7 +214,7 @@ public class LDAPAttributeSet implements Cloneable, java.io.Serializable {
      * they contain the specified <CODE>lang</CODE> subtype and if
      * the set contains no attribute having only the <CODE>lang</CODE>
      * subtype.  (For example, <CODE>getAttribute( "cn", "lang-ja" )</CODE>
-     * returns <CODE>cn;lang-ja;phonetic</CODE> only if the 
+     * returns <CODE>cn;lang-ja;phonetic</CODE> only if the
      * <CODE>cn;lang-ja</CODE> attribute does not exist.)
      * <P>
      *
@@ -415,7 +416,7 @@ public class LDAPAttributeSet implements Cloneable, java.io.Serializable {
         for( int i = 0; i < attrs.length; i++ ) {
             if (i != 0) {
                 sb.append(" ");
-            }            
+            }
             sb.append(attrs[i].toString());
         }
         return sb.toString();

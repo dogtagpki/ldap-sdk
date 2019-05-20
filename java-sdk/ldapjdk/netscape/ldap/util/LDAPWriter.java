@@ -37,9 +37,14 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.util;
 
-import java.util.*;
-import netscape.ldap.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.util.Enumeration;
+
+import netscape.ldap.LDAPAttribute;
+import netscape.ldap.LDAPAttributeSet;
+import netscape.ldap.LDAPEntry;
 
 /**
  * Abstract class for outputting LDAP entries to a stream.
@@ -73,11 +78,11 @@ public abstract class LDAPWriter implements Serializable {
         printEntryStart( entry.getDN() );
 		/* Get the attributes of the entry */
 		LDAPAttributeSet attrs = entry.getAttributeSet();
-		Enumeration enumAttrs = attrs.getAttributes();
+		Enumeration<LDAPAttribute> enumAttrs = attrs.getAttributes();
 		/* Loop on attributes */
 		while ( enumAttrs.hasMoreElements() ) {
 			LDAPAttribute anAttr =
-				(LDAPAttribute)enumAttrs.nextElement();
+				enumAttrs.nextElement();
             printAttribute( anAttr );
 		}
         printEntryEnd( entry.getDN() );
@@ -118,7 +123,7 @@ public abstract class LDAPWriter implements Serializable {
 		String s = "";
 		ByteBuf inBuf = new ByteBuf( b, 0, b.length );
 		ByteBuf encodedBuf = new ByteBuf();
-		// Translate to base 64 
+		// Translate to base 64
 		m_encoder.translate( inBuf, encodedBuf );
 		int nBytes = encodedBuf.length();
 		if ( nBytes > 0 ) {
