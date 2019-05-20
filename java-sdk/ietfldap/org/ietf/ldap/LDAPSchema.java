@@ -687,7 +687,7 @@ public class LDAPSchema implements Serializable {
 
         // Get array of changes to be made
         LDAPModification[] mods =
-            (LDAPModification[])_changeList.toArray( new LDAPModification[0] );
+            _changeList.toArray( new LDAPModification[0] );
         if ( mods.length < 1 ) {
             return;
         }
@@ -1114,5 +1114,5 @@ public class LDAPSchema implements Serializable {
     private Hashtable _contentRules = new Hashtable();
     private Hashtable _nameForms = new Hashtable();
     private Hashtable _IDToElement = new Hashtable();
-    private ArrayList _changeList = new ArrayList();
+    private ArrayList<LDAPModification> _changeList = new ArrayList<>();
 }
