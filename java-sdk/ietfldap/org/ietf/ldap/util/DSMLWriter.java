@@ -86,9 +86,9 @@ public class DSMLWriter extends LDAPWriter {
      * schema schema elements
      */
     protected void printObjectClassSchema( LDAPSchema schema ) {
-        Enumeration en = schema.getObjectClassSchemas();
+        Enumeration<LDAPObjectClassSchema> en = schema.getObjectClassSchemas();
         while( en.hasMoreElements() ) {
-            LDAPObjectClassSchema s = (LDAPObjectClassSchema)en.nextElement();
+            LDAPObjectClassSchema s = en.nextElement();
             printString( "    <dsml:class" );
             printString( "      id=\"" + s.getNames()[0] + "\"" );
             printString( "      oid=\"" + s.getID() + "\"" );
