@@ -38,10 +38,11 @@
 package org.ietf.ldap;
 
 import java.io.Serializable;
-import java.util.*;
-
-import org.ietf.ldap.client.*;
-import org.ietf.ldap.client.opers.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 /**
  * Represents a set of attributes (for example, the set of attributes
@@ -50,9 +51,9 @@ import org.ietf.ldap.client.opers.*;
  * @version 1.0
  * @see org.ietf.ldap.LDAPAttribute
  */
-public class LDAPAttributeSet implements Cloneable, Serializable, Set {
+public class LDAPAttributeSet implements Cloneable, Serializable, Set<LDAPAttribute> {
     static final long serialVersionUID = 5018474561697778100L;
-    HashMap _attrHash = null;
+    HashMap<String, LDAPAttribute> _attrHash = null;
     LDAPAttribute[] _attrs = new LDAPAttribute[0];
     /* If there are less attributes than this in the set, it's not worth
      creating a Hashtable - faster and cheaper most likely to do string
@@ -101,12 +102,12 @@ public class LDAPAttributeSet implements Cloneable, Serializable, Set {
      * @param attr attribute to add to this set
      * @return true if this set changed as a result of the call
      */
-    public synchronized boolean add( Object attr ) {
+    public synchronized boolean add( LDAPAttribute attr ) {
         if ( attr instanceof LDAPAttribute ) {
             if ( contains( attr ) ) {
                 return false;
             }
-            LDAPAttribute attrib = (LDAPAttribute)attr;
+            LDAPAttribute attrib = attr;
             LDAPAttribute[] vals = new LDAPAttribute[_attrs.length+1];
             for ( int i = 0; i < _attrs.length; i++ ) {
                 vals[i] = _attrs[i];
@@ -129,14 +130,14 @@ public class LDAPAttributeSet implements Cloneable, Serializable, Set {
      * @param attrs attributes to add to this set
      * @return true if any attribute was added
      */
-    public synchronized boolean addAll( Collection attrs ) {
+    public synchronized boolean addAll( Collection<? extends LDAPAttribute> attrs ) {
         if ( attrs == null ) {
             return false;
         }
         boolean present = true;
-        Iterator it = attrs.iterator();
+        Iterator<? extends LDAPAttribute> it = attrs.iterator();
         while( it.hasNext() ) {
-            Object attr = it.next();
+            LDAPAttribute attr = it.next();
             if ( !contains( attr ) ) {
                 present = true;
                 add( attr );
@@ -192,9 +193,9 @@ public class LDAPAttributeSet implements Cloneable, Serializable, Set {
      * @param attrs attributes whose presence in this set is to be tested
      * @return true if the attribute set contains the specified attributes
      */
-    public boolean containsAll( Collection attrs ) {
+    public boolean containsAll( Collection<?> attrs ) {
         if ( _attrHash != null ) {
-            Iterator it = attrs.iterator();
+            Iterator<?> it = attrs.iterator();
             while( it.hasNext() ) {
                 if ( !_attrHash.containsValue( it.next() ) ) {
                     return false;
@@ -256,7 +257,7 @@ public class LDAPAttributeSet implements Cloneable, Serializable, Set {
      *
      * @return an iterator over the attributes in this attribute set
      */
-    public Iterator iterator() {
+    public Iterator<LDAPAttribute> iterator() {
         return _attrHash.values().iterator();
     }
 
@@ -296,12 +297,12 @@ public class LDAPAttributeSet implements Cloneable, Serializable, Set {
      * @param attrs the attributes to remove
      * @return true if any attribute was removed
      */
-    public boolean removeAll( Collection attrs ) {
+    public boolean removeAll( Collection<?> attrs ) {
         if ( attrs == null ) {
             return false;
         }
         boolean present = true;
-        Iterator it = attrs.iterator();
+        Iterator<?> it = attrs.iterator();
         while( it.hasNext() ) {
             Object attr = it.next();
             if ( !contains( attr ) ) {
@@ -320,21 +321,21 @@ public class LDAPAttributeSet implements Cloneable, Serializable, Set {
      * @return true if the attribute set was changed as a result of the
      * operation
      */
-    public boolean retainAll( Collection attrs ) {
-        HashMap newmap = new HashMap();
-        Iterator it = attrs.iterator();
+    public boolean retainAll( Collection<?> attrs ) {
+        HashMap<String, LDAPAttribute> newmap = new HashMap<>();
+        Iterator<?> it = attrs.iterator();
         while( it.hasNext() ) {
             Object attr = it.next();
             if ( attr instanceof LDAPAttribute ) {
                 newmap.put( ((LDAPAttribute)attr).getName().toLowerCase(),
-                            attr );
+                            (LDAPAttribute)attr );
             }
         }
         if ( newmap.equals( _attrHash ) ) {
             return false;
         } else {
             _attrHash = newmap;
-            _attrs = (LDAPAttribute[])_attrHash.values().toArray(
+            _attrs = _attrHash.values().toArray(
                 new LDAPAttribute[0] );
             return true;
         }
@@ -404,7 +405,7 @@ public class LDAPAttributeSet implements Cloneable, Serializable, Set {
      * </PRE>
      *
      * @param subtype semi-colon delimited list of subtypes
-     * to find within attribute names. 
+     * to find within attribute names.
      * For example:
      * <PRE>
      *     "lang-ja"        // Only Japanese language subtypes
@@ -428,12 +429,12 @@ public class LDAPAttributeSet implements Cloneable, Serializable, Set {
         String[] searchTypes = new String[st.countTokens()];
         int i = 0;
         while( st.hasMoreTokens() ) {
-            searchTypes[i] = (String)st.nextToken();
+            searchTypes[i] = st.nextToken();
             i++;
         }
-        Iterator it = _attrHash.values().iterator();
+        Iterator<LDAPAttribute> it = _attrHash.values().iterator();
         while( it.hasNext() ) {
-            LDAPAttribute attr = (LDAPAttribute)it.next();
+            LDAPAttribute attr = it.next();
             if( attr.hasSubtypes( searchTypes ) )
                 attrs.add( new LDAPAttribute( attr ) );
         }
@@ -457,7 +458,7 @@ public class LDAPAttributeSet implements Cloneable, Serializable, Set {
         if ( attrName == null ) {
             return null;
         } else if ( _attrHash != null ) {
-            return (LDAPAttribute)_attrHash.get( attrName.toLowerCase() );
+            return _attrHash.get( attrName.toLowerCase() );
         } else {
             for ( int i = 0; i < _attrs.length; i++ ) {
                 if ( attrName.equalsIgnoreCase(_attrs[i].getName()) ) {
@@ -475,7 +476,7 @@ public class LDAPAttributeSet implements Cloneable, Serializable, Set {
         if ( (_attrHash == null) &&
              (force || (_attrs.length >= ATTR_COUNT_REQUIRES_HASH)) ) {
             if ( _attrHash == null ) {
-                _attrHash = new HashMap();
+                _attrHash = new HashMap<>();
             } else {
                 _attrHash.clear();
             }
@@ -499,7 +500,7 @@ public class LDAPAttributeSet implements Cloneable, Serializable, Set {
      * they contain the specified <CODE>lang</CODE> subtype and if
      * the set contains no attribute having only the <CODE>lang</CODE>
      * subtype.  (For example, <CODE>getAttribute( "cn", "lang-ja" )</CODE>
-     * returns <CODE>cn;lang-ja;phonetic</CODE> only if the 
+     * returns <CODE>cn;lang-ja;phonetic</CODE> only if the
      * <CODE>cn;lang-ja</CODE> attribute does not exist.)
      * <P>
      *
@@ -626,7 +627,7 @@ public class LDAPAttributeSet implements Cloneable, Serializable, Set {
         for( int i = 0; i < _attrs.length; i++ ) {
             if (i != 0) {
                 sb.append(" ");
-            }            
+            }
             sb.append(_attrs[i].toString());
         }
         return sb.toString();
