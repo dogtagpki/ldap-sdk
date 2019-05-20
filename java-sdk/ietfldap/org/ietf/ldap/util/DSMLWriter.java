@@ -201,11 +201,11 @@ public class DSMLWriter extends LDAPWriter {
 		printString( "    <dsml:attr name=\"" + attrName + "\">" );
 
 		/* Loop on values for this attribute */
-		Enumeration enumVals = attr.getByteValues();
+		Enumeration<byte[]> enumVals = attr.getByteValues();
 
 		if ( enumVals != null ) {
 			while ( enumVals.hasMoreElements() ) {
-				byte[] b = (byte[])enumVals.nextElement();
+				byte[] b = enumVals.nextElement();
 				String s;
 				if ( LDIF.isPrintable(b) ) {
 					try {
