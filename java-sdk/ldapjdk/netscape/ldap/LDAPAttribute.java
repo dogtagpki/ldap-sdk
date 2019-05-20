@@ -74,7 +74,7 @@ public class LDAPAttribute implements java.io.Serializable {
         values = new Object[attr.values.length];
         for (int i = 0; i < attr.values.length; i++) {
             values[i] = new byte[((byte[])attr.values[i]).length];
-            System.arraycopy((byte[])attr.values[i], 0, (byte[])values[i], 0,
+            System.arraycopy(attr.values[i], 0, values[i], 0,
                 ((byte[])attr.values[i]).length);
         }
     }
@@ -198,19 +198,19 @@ public class LDAPAttribute implements java.io.Serializable {
     	}
     	return s;
     }
-    
+
     /**
      * Returns an enumerator for the values of the attribute in <CODE>byte[]</CODE>
      * format.
      * @return a set of attribute values. Each element in the enumeration
      * is of type <CODE>byte[]</CODE>.
      */
-    public Enumeration getByteValues() {
-        Vector v = new Vector();
+    public Enumeration<byte[]> getByteValues() {
+        Vector<byte[]> v = new Vector<>();
         synchronized(this) {
             for (int i=0; i<values.length; i++) {
                 if ( values[i] != null ) {
-                    v.addElement(values[i]);
+                    v.addElement((byte[])values[i]);
                 } else {
                     v.addElement( new byte[0] );
                 }
@@ -231,7 +231,7 @@ public class LDAPAttribute implements java.io.Serializable {
     		try {
     			for (int i=0; i < values.length; i++) {
     				b[i] = new byte[((byte[])(values[i])).length];
-	    			System.arraycopy((byte[])values[i], 0, (byte[])b[i], 0, 
+	    			System.arraycopy(values[i], 0, b[i], 0,
     					((byte[])(values[i])).length);
     			}
     		} catch (Exception e) {

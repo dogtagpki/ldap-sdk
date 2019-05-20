@@ -140,7 +140,7 @@ public class ObjectMapper {
 
             LDAPAttribute attr = null;
             if ((attr = attrs.getAttribute(AT_SERIALDATA)) != null) {
-                byte[] serdata = (byte[])attr.getByteValues().nextElement();
+                byte[] serdata = attr.getByteValues().nextElement();
                 return deserializeObject(serdata);
             }
 
