@@ -37,9 +37,16 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap;
 
-import java.io.*;
-import java.util.*;
-import org.ietf.ldap.ber.stream.*;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.Enumeration;
+import java.util.StringTokenizer;
+import java.util.Vector;
+
+import org.ietf.ldap.ber.stream.BERElement;
+import org.ietf.ldap.ber.stream.BEROctetString;
+import org.ietf.ldap.ber.stream.BERSequence;
+import org.ietf.ldap.ber.stream.BERSet;
 
 /**
  * Represents the name and values of an attribute in an entry.
@@ -49,7 +56,7 @@ import org.ietf.ldap.ber.stream.*;
  */
 public class LDAPAttribute implements Cloneable, Serializable {
 
-    static final long serialVersionUID = -4594745735452202600L; 
+    static final long serialVersionUID = -4594745735452202600L;
     private String name = null;
     private byte[] nameBuf = null;
     /**
@@ -150,8 +157,8 @@ public class LDAPAttribute implements Cloneable, Serializable {
      * Returns an enumerator for the string values of an attribute.
      * @return enumerator for the string values.
      */
-    public Enumeration getStringValues() {
-        Vector v = new Vector();
+    public Enumeration<String> getStringValues() {
+        Vector<String> v = new Vector<>();
         synchronized(this) {
             try {
                 for (int i=0; i<values.length; i++) {
@@ -167,15 +174,15 @@ public class LDAPAttribute implements Cloneable, Serializable {
         }
         return v.elements();
     }
-	
+
     /**
-     * Returns the values of the attribute as an array of <CODE>String</CODE> 
+     * Returns the values of the attribute as an array of <CODE>String</CODE>
      * objects.
      * @return array of attribute values. Each element in the array
      * is a <CODE>String</CODE> object.
      */
     public String[] getStringValueArray() {
-    
+
     	String s[] = new String[values.length];
     	synchronized(this) {
     		try {
@@ -192,7 +199,7 @@ public class LDAPAttribute implements Cloneable, Serializable {
     	}
     	return s;
     }
-    
+
     /**
      * Returns an enumerator for the values of the attribute in <CODE>byte[]</CODE>
      * format.
@@ -233,9 +240,9 @@ public class LDAPAttribute implements Cloneable, Serializable {
     		}
     	}
     	return b;
-     
+
      }
-     
+
     /**
      * Returns the name of the attribute.
      * @return name of the attribute.
@@ -518,7 +525,7 @@ public class LDAPAttribute implements Cloneable, Serializable {
      */
     private String getParamString() {
         StringBuffer sb = new StringBuffer();
-        
+
         if ( values.length > 0 ) {
             for (int i = 0; i < values.length; i++) {
                 if (i != 0) {
@@ -535,7 +542,7 @@ public class LDAPAttribute implements Cloneable, Serializable {
                     else {
                         sb.append(sval);
                     }
-                     
+
                 } catch (Exception e) {
                     if (val != null) {
                         sb.append("<binary value, length:");

@@ -797,9 +797,9 @@ public class LDAPSchema implements Serializable {
         LDAPAttribute attr = entry.getAttribute( attrs[0] );
         String entryName = "cn=schema";
         if ( attr != null ) {
-            Enumeration en = attr.getStringValues();
+            Enumeration<String> en = attr.getStringValues();
             if ( en.hasMoreElements() ) {
-                entryName = (String)en.nextElement();
+                entryName = en.nextElement();
             }
         }
         return entryName;
@@ -813,12 +813,12 @@ public class LDAPSchema implements Serializable {
     protected void initialize( LDAPEntry entry ) {
         /* Get all object class definitions */
         LDAPAttribute attr = entry.getAttribute( "objectclasses" );
-        Enumeration en;
+        Enumeration<String> en;
         if ( attr != null ) {
             en = attr.getStringValues();
             while( en.hasMoreElements() ) {
                 LDAPObjectClassSchema sch =
-                    new LDAPObjectClassSchema( (String)en.nextElement() );
+                    new LDAPObjectClassSchema( en.nextElement() );
                 add( sch, false );
             }
         }
@@ -829,7 +829,7 @@ public class LDAPSchema implements Serializable {
             en = attr.getStringValues();
             while( en.hasMoreElements() ) {
                 LDAPAttributeSchema sch =
-                    new LDAPAttributeSchema( (String)en.nextElement() );
+                    new LDAPAttributeSchema( en.nextElement() );
                 add( sch, false );
             }
         }
@@ -840,7 +840,7 @@ public class LDAPSchema implements Serializable {
             en = attr.getStringValues();
             while( en.hasMoreElements() ) {
                 LDAPSyntaxSchema sch =
-                    new LDAPSyntaxSchema( (String)en.nextElement() );
+                    new LDAPSyntaxSchema( en.nextElement() );
                 add( sch, false );
             }
         }
@@ -852,7 +852,7 @@ public class LDAPSchema implements Serializable {
             while( en.hasMoreElements() ) {
                 LDAPDITStructureRuleSchema sch =
                     new LDAPDITStructureRuleSchema(
-                        (String)en.nextElement() );
+                        en.nextElement() );
                 add( sch, false );
             }
         }
@@ -864,7 +864,7 @@ public class LDAPSchema implements Serializable {
             while( en.hasMoreElements() ) {
                 LDAPDITContentRuleSchema sch =
                     new LDAPDITContentRuleSchema(
-                        (String)en.nextElement() );
+                        en.nextElement() );
                 add( sch, false );
             }
         }
@@ -876,7 +876,7 @@ public class LDAPSchema implements Serializable {
             while( en.hasMoreElements() ) {
                 LDAPNameFormSchema sch =
                     new LDAPNameFormSchema(
-                        (String)en.nextElement() );
+                        en.nextElement() );
                 add( sch, false );
             }
         }
@@ -888,7 +888,7 @@ public class LDAPSchema implements Serializable {
         if ( attr != null ) {
             en = attr.getStringValues();
             while( en.hasMoreElements() ) {
-                String use = (String)en.nextElement();
+                String use = en.nextElement();
                 LDAPMatchingRuleSchema sch =
                     new LDAPMatchingRuleSchema( null, use );
                 h.put( sch.getID(), use );
@@ -899,7 +899,7 @@ public class LDAPSchema implements Serializable {
         if ( attr != null ) {
             en = attr.getStringValues();
             while( en.hasMoreElements() ) {
-                String raw = (String)en.nextElement();
+                String raw = en.nextElement();
                 LDAPMatchingRuleSchema sch =
                     new LDAPMatchingRuleSchema( raw, null );
                 String use = (String)h.get( sch.getID() );
@@ -935,9 +935,9 @@ public class LDAPSchema implements Serializable {
         /* Get all attribute definitions, and check the first one */
         LDAPAttribute attr = entry.getAttribute( "attributetypes" );
         if ( attr != null ) {
-            Enumeration en = attr.getStringValues();
+            Enumeration<String> en = attr.getStringValues();
             if( en.hasMoreElements() ) {
-                compliant = !isSyntaxQuoted( (String)en.nextElement() );
+                compliant = !isSyntaxQuoted( en.nextElement() );
             }
         }
         ld.setProperty( ld.SCHEMA_BUG_PROPERTY, compliant ? "standard" :

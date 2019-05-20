@@ -1436,8 +1436,8 @@ public class LDAPConnection implements Cloneable, Serializable {
         internalBind(cons);
 
         LDAPResponseQueue myListener = getResponseListener ();
-        Enumeration en = attr.getStringValues();
-        String val = (String)en.nextElement();
+        Enumeration<String> en = attr.getStringValues();
+        String val = en.nextElement();
         JDAPAVA ass = new JDAPAVA(attr.getName(), val);
 
         LDAPMessage response;
@@ -1534,8 +1534,8 @@ public class LDAPConnection implements Cloneable, Serializable {
             listener = new LDAPResponseQueue(/*asynchOp=*/true);
         }
 
-        Enumeration en = attr.getStringValues();
-        String val = (String)en.nextElement();
+        Enumeration<String> en = attr.getStringValues();
+        String val = en.nextElement();
         JDAPAVA ava = new JDAPAVA(attr.getName(), val);
 
         sendRequest (new JDAPCompareRequest (dn, ava), listener, cons);

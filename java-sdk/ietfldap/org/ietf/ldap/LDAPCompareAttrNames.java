@@ -38,8 +38,10 @@
 package org.ietf.ldap;
 
 import java.io.Serializable;
-import java.util.*;
-import java.text.*;
+import java.text.Collator;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Locale;
 
 /**
  * Compares LDAP entries based on one or more attribute values.
@@ -103,8 +105,8 @@ public class LDAPCompareAttrNames
      * <P>
      *
      * Use an array of strings to specify the set of attributes
-     * to use for sorting.  If the values of the first attribute 
-     * (the name specified in <CODE>attribute[0]</CODE>) are equal, 
+     * to use for sorting.  If the values of the first attribute
+     * (the name specified in <CODE>attribute[0]</CODE>) are equal,
      * then the values of the next attribute are compared.
      * <P>
      *
@@ -131,7 +133,7 @@ public class LDAPCompareAttrNames
      * <P>
      *
      * Use an array of strings to specify the set of attributes
-     * to use for sorting.  If the values of the first attribute 
+     * to use for sorting.  If the values of the first attribute
      * (the name specified in <CODE>attribute[0]</CODE>)
      * are equal, then the values of the next attribute are compared.
      * <P>
@@ -183,7 +185,7 @@ public class LDAPCompareAttrNames
     public boolean equals( Object obj ) {
         return super.equals( obj );
     }
-       
+
     /**
      * Gets the locale, if any, used for collation. If the locale is null,
      * an ordinary string comparison is used for sorting.
@@ -298,7 +300,7 @@ public class LDAPCompareAttrNames
             if ( !attrName.equalsIgnoreCase (currAttr.getName()) ) {
                 continue;
             }
-            value2 = (String)(currAttr.getStringValues().nextElement());
+            value2 = currAttr.getStringValues().nextElement();
             break;
         }
 
@@ -307,7 +309,7 @@ public class LDAPCompareAttrNames
             if ( !attrName.equalsIgnoreCase(currAttr.getName()) ) {
                 continue;
             }
-            value1 = (String)(currAttr.getStringValues().nextElement());
+            value1 = currAttr.getStringValues().nextElement();
             break;
         }
 
