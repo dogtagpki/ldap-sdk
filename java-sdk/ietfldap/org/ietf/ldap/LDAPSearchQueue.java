@@ -37,13 +37,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap;
 
-import java.io.Serializable;
-import java.util.*;
-
-import org.ietf.ldap.client.*;
-
 /**
- * Manages search results, references and responses returned on one or 
+ * Manages search results, references and responses returned on one or
  * more search requests
  *
  */
@@ -54,7 +49,7 @@ public class LDAPSearchQueue extends LDAPMessageQueueImpl {
     /**
      * Constructs a search message queue
      *
-     * @param asynchOp a boolean flag indicating whether the object is used 
+     * @param asynchOp a boolean flag indicating whether the object is used
      * for asynchronous LDAP operations
      * @param cons LDAP search constraints
      * @see org.ietf.ldap.LDAPAsynchronousConnection
@@ -72,7 +67,7 @@ public class LDAPSearchQueue extends LDAPMessageQueueImpl {
      * Wakes up the LDAPConnThread if the backlog limit has been reached.
      *
      * @return a search result, search reference, search response message,
-     * or null if there are no more outstanding requests. 
+     * or null if there are no more outstanding requests.
      * @exception LDAPException Network error exception
      * @exception LDAPInterruptedException The invoking thread was interrupted
      * @see LDAPResponse
@@ -91,15 +86,15 @@ public class LDAPSearchQueue extends LDAPMessageQueueImpl {
                 connThread.resultRetrieved();
             }
         }
-        
+
         return result;
     }
 
     /**
-     * Blocks until a response is available for a particular message ID, or 
-     * until all operations associated with the message ID have completed or 
-     * been canceled, and returns the response. If there is no outstanding 
-     * operation for the message ID (or if it is zero or a negative number), 
+     * Blocks until a response is available for a particular message ID, or
+     * until all operations associated with the message ID have completed or
+     * been canceled, and returns the response. If there is no outstanding
+     * operation for the message ID (or if it is zero or a negative number),
      * IllegalArgumentException is thrown.
      *
      * @param msgid A particular message to query for responses available
@@ -122,12 +117,12 @@ public class LDAPSearchQueue extends LDAPMessageQueueImpl {
                 connThread.resultRetrieved();
             }
         }
-        
+
         return result;
     }
 
     /**
-     * Reports true if all results for a particular message ID have been 
+     * Reports true if all results for a particular message ID have been
      * received by the API implementation. That is the case if a
      * searchResultDone response has been received by the SDK. There may
      * still be messages queued in the object for retrieval by the
@@ -136,14 +131,14 @@ public class LDAPSearchQueue extends LDAPMessageQueueImpl {
      * thrown.
      *
      * @param msgid A particular message to query for completion
-     * @return true if all results for a particular message ID have been 
+     * @return true if all results for a particular message ID have been
      * received
      */
     public synchronized boolean isComplete( int msgid ) throws LDAPException {
 
         boolean OK = false;
         for ( int i = (_messageQueue.size()-1); i >= 0; i-- ) {
-            LDAPMessage msg = (LDAPMessage)_messageQueue.get(i);
+            LDAPMessage msg = _messageQueue.get(i);
             if ( msg.getMessageID() == msgid ) {
                 OK = true;
                 break;
@@ -152,10 +147,10 @@ public class LDAPSearchQueue extends LDAPMessageQueueImpl {
         if ( !OK ) {
             throw new IllegalArgumentException( "Invalid msg ID: " + msgid );
         }
-        
+
         // Search an instance of LDAPResponse
         for ( int i = _messageQueue.size()-1; i >= 0; i-- ) {
-            LDAPMessage msg = (LDAPMessage)_messageQueue.get(i);
+            LDAPMessage msg = _messageQueue.get(i);
             if ( msg instanceof LDAPResponse ) {
                 return true;
             }
@@ -189,7 +184,7 @@ public class LDAPSearchQueue extends LDAPMessageQueueImpl {
         super.reset();
         _constraints = null;
     }
-    
+
     /**
      * Sets the key of the cache entry. The queue needs to know this value
      * when the results get processed. After the results have been

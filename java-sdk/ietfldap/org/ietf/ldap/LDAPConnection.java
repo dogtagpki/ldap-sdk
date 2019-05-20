@@ -37,15 +37,36 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Serializable;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
+import java.util.StringTokenizer;
+import java.util.Vector;
+
 import javax.security.auth.callback.CallbackHandler;
 
-import org.ietf.ldap.client.*;
-import org.ietf.ldap.client.opers.*;
-import org.ietf.ldap.ber.stream.*;
-import org.ietf.ldap.util.*;
+import org.ietf.ldap.client.JDAPAVA;
+import org.ietf.ldap.client.opers.JDAPAbandonRequest;
+import org.ietf.ldap.client.opers.JDAPAddRequest;
+import org.ietf.ldap.client.opers.JDAPBindRequest;
+import org.ietf.ldap.client.opers.JDAPCompareRequest;
+import org.ietf.ldap.client.opers.JDAPDeleteRequest;
+import org.ietf.ldap.client.opers.JDAPExtendedRequest;
+import org.ietf.ldap.client.opers.JDAPExtendedResponse;
+import org.ietf.ldap.client.opers.JDAPModifyRDNRequest;
+import org.ietf.ldap.client.opers.JDAPModifyRequest;
+import org.ietf.ldap.client.opers.JDAPProtocolOp;
+import org.ietf.ldap.client.opers.JDAPResult;
+import org.ietf.ldap.client.opers.JDAPSearchRequest;
+import org.ietf.ldap.client.opers.JDAPSearchResultReference;
 
 /**
  * Represents a connection to an LDAP server. <P>
@@ -79,7 +100,7 @@ import org.ietf.ldap.util.*;
  * use the <CODE>getOption</CODE> and <CODE>setOption</CODE> methods.
  * To override these constraints for an individual operation,
  * define a new set of constraints by creating a <CODE>LDAPConstraints</CODE>
- * object and pass the object to the method for the operation. For search 
+ * object and pass the object to the method for the operation. For search
  * operations, additional constraints are defined in <CODE>LDAPSearchConstraints</CODE>
  * (a subclass of <CODE>LDAPConstraints</CODE>). To override the default search
  * constraints, create an <CODE>LDAPSearchConstraints</CODE> object and pass it
@@ -187,12 +208,12 @@ public class LDAPConnection implements Cloneable, Serializable {
     /**
      * Name of the property to enable/disable LDAP message trace. <P>
      *
-     * The property can be specified either as a system property 
+     * The property can be specified either as a system property
      * (java -D command line option),  or programmatically with the
      * <CODE>setProperty</CODE> method.
      * <P>
      * When -D command line option is used, defining the property with
-     * no value will send the trace output to the standard error. If the 
+     * no value will send the trace output to the standard error. If the
      * value is defined, it is assumed to be the name of an output file.
      * If the file name is prefixed with a '+' character, the file is
      * opened in append mode.
@@ -201,7 +222,7 @@ public class LDAPConnection implements Cloneable, Serializable {
      * the property value must be either a String (represents a file name)
      * an OutputStream or an instance of LDAPTraceWriter. To stop tracing,
      * <CODE>null</CODE> should be  passed as the property value.
-     * 
+     *
      * @see org.ietf.ldap.LDAPConnection#setProperty(java.lang.String, java.lang.Object)
      */
     public final static String TRACE_PROPERTY = "com.org.ietf.ldap.trace";
@@ -210,7 +231,7 @@ public class LDAPConnection implements Cloneable, Serializable {
      * Specifies the serial connection setup policy when a list of hosts is
      * passed to  the <CODE>connect</CODE> method.
      * @see org.ietf.ldap.LDAPConnection#setConnSetupDelay(int)
-     */    
+     */
     public final static int NODELAY_SERIAL = -1;
     /**
      * Specifies the parallel connection setup policy with no delay when a
@@ -218,7 +239,7 @@ public class LDAPConnection implements Cloneable, Serializable {
      * For each host in the list, a separate thread is created to attempt
      * to connect to the host. All threads are started simultaneously.
      * @see org.ietf.ldap.LDAPConnection#setConnSetupDelay(int)
-     */    
+     */
     public final static int NODELAY_PARALLEL = 0;
 
     /**
@@ -273,9 +294,9 @@ public class LDAPConnection implements Cloneable, Serializable {
     public static final int TIMELIMIT = 4;
 
     /**
-     * Option specifying the maximum number of milliseconds the 
+     * Option specifying the maximum number of milliseconds the
      * server should spend returning search results before aborting
-     * the search. 
+     * the search.
      * @see org.ietf.ldap.LDAPConnection#getOption
      * @see org.ietf.ldap.LDAPConnection#setOption
      */
@@ -312,10 +333,10 @@ public class LDAPConnection implements Cloneable, Serializable {
      * @see org.ietf.ldap.LDAPConnection#setOption
      */
     public static final int REFERRALS_HOP_LIMIT   = 10;
-    
+
     /**
      * Option specifying the object containing the method for
-     * authenticating to the server.  
+     * authenticating to the server.
      * @see org.ietf.ldap.LDAPConnection#getOption
      * @see org.ietf.ldap.LDAPConnection#setOption
      * @see org.ietf.ldap.LDAPBindHandler
@@ -447,8 +468,8 @@ public class LDAPConnection implements Cloneable, Serializable {
      */
     private LDAPSearchConstraints _defaultConstraints =
         new LDAPSearchConstraints();
-    
-    // A clone of constraints for the successful bind. Used by 
+
+    // A clone of constraints for the successful bind. Used by
     // "smart failover" for the automatic rebind
     private LDAPConstraints _rebindConstraints;
 
@@ -525,10 +546,10 @@ public class LDAPConnection implements Cloneable, Serializable {
         super();
         _factory = null;
 
-        _properties.put(LDAP_PROPERTY_SDK, SdkVersion); 
-        _properties.put(LDAP_PROPERTY_PROTOCOL, ProtocolVersion); 
-        _properties.put(LDAP_PROPERTY_SECURITY, SecurityVersion); 
-        _properties.put("version.major", MajorVersion); 
+        _properties.put(LDAP_PROPERTY_SDK, SdkVersion);
+        _properties.put(LDAP_PROPERTY_PROTOCOL, ProtocolVersion);
+        _properties.put(LDAP_PROPERTY_SECURITY, SecurityVersion);
+        _properties.put("version.major", MajorVersion);
         _properties.put("version.minor", MinorVersion);
     }
 
@@ -602,18 +623,18 @@ public class LDAPConnection implements Cloneable, Serializable {
     /**
      * Cancels the ldap request with the specified id and discards
      * any results already received.
-     * 
+     *
      * @param id an LDAP request id
      * @exception LDAPException Failed to send request.
      */
     public void abandon( int id ) throws LDAPException {
         abandon( id, _defaultConstraints );
     }
-    
+
     /**
      * Cancels the ldap request with the specified id and discards
      * any results already received.
-     * 
+     *
      * @param id an LDAP request id
      * @param cons preferences for the operation
      * @exception LDAPException Failed to send request.
@@ -623,7 +644,7 @@ public class LDAPConnection implements Cloneable, Serializable {
         if (!isConnected()) {
             return;
         }
-        
+
         for (int i=0; i<3; i++) {
             try {
                 /* Tell listener thread to discard results */
@@ -643,11 +664,11 @@ public class LDAPConnection implements Cloneable, Serializable {
               LDAPException.OTHER);
         }
     }
-    
+
     /**
      * Cancels all outstanding search requests associated with this
      * LDAPSearchQueue object and discards any results already received.
-     * 
+     *
      * @param searchlistener a search listener returned from a search
      * @exception LDAPException Failed to send request.
      */
@@ -655,11 +676,11 @@ public class LDAPConnection implements Cloneable, Serializable {
         throws LDAPException {
         abandon( searchlistener, _defaultConstraints );
     }
-    
+
     /**
      * Cancels all outstanding search requests associated with this
      * LDAPSearchQueue object and discards any results already received.
-     * 
+     *
      * @param searchlistener a search listener returned from a search
      * @param cons preferences for the operation
      * @exception LDAPException Failed to send request.
@@ -673,7 +694,7 @@ public class LDAPConnection implements Cloneable, Serializable {
             abandon(ids[i]);
         }
     }
-    
+
     /**
      * Adds an entry to the directory. <P>
      *
@@ -793,7 +814,7 @@ public class LDAPConnection implements Cloneable, Serializable {
         throws LDAPException{
         return add( entry, listener, _defaultConstraints );
     }
- 
+
     /**
      * Adds an entry to the directory and allows you to specify constraints
      * for this LDAP add operation by using an <CODE>LDAPConstraints</CODE>
@@ -821,7 +842,7 @@ public class LDAPConnection implements Cloneable, Serializable {
         if (cons == null) {
             cons = _defaultConstraints;
         }
-        
+
         internalBind (cons);
 
         if (listener == null) {
@@ -843,17 +864,17 @@ public class LDAPConnection implements Cloneable, Serializable {
     }
 
     /**
-     * Registers an object to be notified on arrival of an unsolicited 
+     * Registers an object to be notified on arrival of an unsolicited
      * message from a server
      *
-     * @param listener An object to be notified on arrival of an 
+     * @param listener An object to be notified on arrival of an
      * unsolicited message from a server
      */
-    public void addUnsolicitedNotificationListener( 
+    public void addUnsolicitedNotificationListener(
         LDAPUnsolicitedNotificationListener listener ) {
     }
 
-    /** 
+    /**
      * Authenticates to the LDAP server (to which you are currently
      * connected) using the specified name and password.
      * If you are not already connected to the LDAP server, this
@@ -972,9 +993,9 @@ public class LDAPConnection implements Cloneable, Serializable {
      * @param dn if non-null and non-empty, specifies that the connection and
      * all operations through it should authenticate with dn as the
      * distinguished name
-     * @param authzid If not null and not empty, an LDAP authzID [AUTH] 
-     * to be passed to the SASL layer. If null or empty, 
-     * the authzId will be treated as an empty string 
+     * @param authzid If not null and not empty, an LDAP authzID [AUTH]
+     * to be passed to the SASL layer. If null or empty,
+     * the authzId will be treated as an empty string
      * and processed as per RFC 2222 [SASL].
      * @param props Optional qualifiers for the authentication session
      * @param cbh a class which the SASL framework can call to
@@ -1001,9 +1022,9 @@ public class LDAPConnection implements Cloneable, Serializable {
      * @param dn if non-null and non-empty, specifies that the connection and
      * all operations through it should authenticate with dn as the
      * distinguished name
-     * @param authzid If not null and not empty, an LDAP authzID [AUTH] 
-     * to be passed to the SASL layer. If null or empty, 
-     * the authzId will be treated as an empty string 
+     * @param authzid If not null and not empty, an LDAP authzID [AUTH]
+     * to be passed to the SASL layer. If null or empty,
+     * the authzId will be treated as an empty string
      * and processed as per RFC 2222 [SASL].
      * @param props Optional qualifiers for the authentication session
      * @param cbh a class which the SASL framework can call to
@@ -1044,9 +1065,9 @@ public class LDAPConnection implements Cloneable, Serializable {
      * @param dn if non-null and non-empty, specifies that the connection and
      * all operations through it should authenticate with dn as the
      * distinguished name
-     * @param authzid If not null and not empty, an LDAP authzID [AUTH] 
-     * to be passed to the SASL layer. If null or empty, 
-     * the authzId will be treated as an empty string 
+     * @param authzid If not null and not empty, an LDAP authzID [AUTH]
+     * to be passed to the SASL layer. If null or empty,
+     * the authzId will be treated as an empty string
      * and processed as per RFC 2222 [SASL].
      * @param props Optional qualifiers for the authentication session
      * @param mechanisms a list of acceptable mechanisms. The first one
@@ -1078,9 +1099,9 @@ public class LDAPConnection implements Cloneable, Serializable {
      * @param dn if non-null and non-empty, specifies that the connection and
      * all operations through it should authenticate with dn as the
      * distinguished name
-     * @param authzid If not null and not empty, an LDAP authzID [AUTH] 
-     * to be passed to the SASL layer. If null or empty, 
-     * the authzId will be treated as an empty string 
+     * @param authzid If not null and not empty, an LDAP authzID [AUTH]
+     * to be passed to the SASL layer. If null or empty,
+     * the authzId will be treated as an empty string
      * and processed as per RFC 2222 [SASL].
      * @param props Optional qualifiers for the authentication session
      * @param mechanisms a list of acceptable mechanisms. The first one
@@ -1130,7 +1151,7 @@ public class LDAPConnection implements Cloneable, Serializable {
      * has been disconnected from an LDAP server, this method attempts to
      * reconnect to the server. If the object had already authenticated, the
      * old authentication is discarded.
-     * 
+     *
      * @param version required LDAP protocol version
      * @param dn if non-null and non-empty, specifies that the connection
      * and all operations through it should authenticate with dn as the
@@ -1159,7 +1180,7 @@ public class LDAPConnection implements Cloneable, Serializable {
      * has been disconnected from an LDAP server, this method attempts to
      * reconnect to the server. If the object had already authenticated, the
      * old authentication is discarded.
-     * 
+     *
      * @param dn if non-null and non-empty, specifies that the connection
      * and all operations through it should authenticate with dn as the
      * distinguished name
@@ -1189,7 +1210,7 @@ public class LDAPConnection implements Cloneable, Serializable {
      * has been disconnected from an LDAP server, this method attempts to
      * reconnect to the server. If the object had already authenticated, the
      * old authentication is discarded.
-     * 
+     *
      * @param dn if non-null and non-empty, specifies that the connection
      * and all operations through it should authenticate with dn as the
      * distinguished name
@@ -1221,7 +1242,7 @@ public class LDAPConnection implements Cloneable, Serializable {
      * has been disconnected from an LDAP server, this method attempts to
      * reconnect to the server. If the object had already authenticated, the
      * old authentication is discarded.
-     * 
+     *
      * @param version required LDAP protocol version
      * @param dn if non-null and non-empty, specifies that the connection
      * and all operations through it should authenticate with dn as the
@@ -1242,7 +1263,7 @@ public class LDAPConnection implements Cloneable, Serializable {
                                    String dn,
                                    byte[] passwd,
                                    LDAPResponseQueue listener,
-                                   LDAPConstraints cons ) 
+                                   LDAPConstraints cons )
         throws LDAPException{
         if (cons == null) {
             cons = _defaultConstraints;
@@ -1253,7 +1274,7 @@ public class LDAPConnection implements Cloneable, Serializable {
         _boundDN = dn;
         _boundPasswd = passwd;
         _protocolVersion = version;
-        
+
         if (_thread == null) {
             connect();
         }
@@ -1271,7 +1292,7 @@ public class LDAPConnection implements Cloneable, Serializable {
 
         return listener;
     }
-    
+
     /**
      * Authenticates to the LDAP server (to which the object is currently
      * connected) using the specified name and a specified SASL mechanism
@@ -1284,9 +1305,9 @@ public class LDAPConnection implements Cloneable, Serializable {
      * @param dn if non-null and non-empty, specifies that the connection and
      * all operations through it should authenticate with dn as the
      * distinguished name
-     * @param authzid If not null and not empty, an LDAP authzID [AUTH] 
-     * to be passed to the SASL layer. If null or empty, 
-     * the authzId will be treated as an empty string 
+     * @param authzid If not null and not empty, an LDAP authzID [AUTH]
+     * to be passed to the SASL layer. If null or empty,
+     * the authzId will be treated as an empty string
      * and processed as per RFC 2222 [SASL].
      * @param mechanisms a list of acceptable mechanisms. The first one
      * for which a Mechanism Driver can be instantiated is returned.
@@ -1312,7 +1333,7 @@ public class LDAPConnection implements Cloneable, Serializable {
         props.put( LDAPSaslBind.CLIENTPKGS, packageName );
         bind( dn, authzid, mechanisms, props, cbh, cons );
     }
-    
+
     /**
      * Creates and returns a copy of the object. The new
      * <CODE>LDAPConnection</CODE> object contains the same information as
@@ -1457,15 +1478,15 @@ public class LDAPConnection implements Cloneable, Serializable {
                             LDAPAttribute attr,
                             LDAPSearchConstraints cons ) throws LDAPException {
         return compare( DN, attr, (LDAPConstraints)cons );
-    }        
-    
+    }
+
     /**
-     * Compare an attribute value with one in the directory. The result can 
-     * be obtained by calling <CODE>getResultCode</CODE> on the 
+     * Compare an attribute value with one in the directory. The result can
+     * be obtained by calling <CODE>getResultCode</CODE> on the
      * <CODE>LDAPResponse</CODE> from the <CODE>LDAPResponseQueue</CODE>.
-     * The code will be <CODE>LDAPException.COMPARE_TRUE</CODE> or 
-     * <CODE>LDAPException.COMPARE_FALSE</CODE>. 
-     * 
+     * The code will be <CODE>LDAPException.COMPARE_TRUE</CODE> or
+     * <CODE>LDAPException.COMPARE_FALSE</CODE>.
+     *
      * @param dn distinguished name of the entry to compare
      * @param attr attribute with a value to compare
      * @param listener handler for messages returned from a server in response
@@ -1474,21 +1495,21 @@ public class LDAPConnection implements Cloneable, Serializable {
      * in response to this request.
      * @exception LDAPException Failed to send request.
      */
-    public LDAPResponseQueue compare( String dn, 
-                                      LDAPAttribute attr, 
+    public LDAPResponseQueue compare( String dn,
+                                      LDAPAttribute attr,
                                       LDAPResponseQueue listener )
         throws LDAPException {
 
         return compare( dn, attr, listener, _defaultConstraints );
     }
-    
+
     /**
-     * Compare an attribute value with one in the directory. The result can 
-     * be obtained by calling <CODE>getResultCode</CODE> on the 
+     * Compare an attribute value with one in the directory. The result can
+     * be obtained by calling <CODE>getResultCode</CODE> on the
      * <CODE>LDAPResponse</CODE> from the <CODE>LDAPResponseQueue</CODE>.
-     * The code will be <CODE>LDAPException.COMPARE_TRUE</CODE> or 
-     * <CODE>LDAPException.COMPARE_FALSE</CODE>. 
-     * 
+     * The code will be <CODE>LDAPException.COMPARE_TRUE</CODE> or
+     * <CODE>LDAPException.COMPARE_FALSE</CODE>.
+     *
      * @param dn distinguished name of the entry to compare
      * @param attr attribute with a value to compare
      * @param listener handler for messages returned from a server in response
@@ -1498,15 +1519,15 @@ public class LDAPConnection implements Cloneable, Serializable {
      * in response to this request.
      * @exception LDAPException Failed to send request.
      */
-    public LDAPResponseQueue compare( String dn, 
-                                      LDAPAttribute attr, 
+    public LDAPResponseQueue compare( String dn,
+                                      LDAPAttribute attr,
                                       LDAPResponseQueue listener,
                                       LDAPConstraints cons )
         throws LDAPException {
         if (cons == null) {
             cons = _defaultConstraints;
         }
-        
+
         internalBind (cons);
 
         if (listener == null) {
@@ -1516,11 +1537,11 @@ public class LDAPConnection implements Cloneable, Serializable {
         Enumeration en = attr.getStringValues();
         String val = (String)en.nextElement();
         JDAPAVA ava = new JDAPAVA(attr.getName(), val);
-        
+
         sendRequest (new JDAPCompareRequest (dn, ava), listener, cons);
         return listener;
     }
-    
+
     /**
      * Connects to the specified host and port.  If this LDAPConnection object
      * represents an open connection, the connection is closed first
@@ -1546,7 +1567,7 @@ public class LDAPConnection implements Cloneable, Serializable {
      * </PRE>
      *<P>
      * You can limit the time spent waiting for the connection to be established
-     * by calling <CODE>setConnectTimeout</CODE> before <CODE>connect</CODE>. 
+     * by calling <CODE>setConnectTimeout</CODE> before <CODE>connect</CODE>.
      * <P>
      * @param host host name of the LDAP server to which you want to connect.
      * This value can also be a space-delimited list of hostnames or
@@ -1612,7 +1633,7 @@ public class LDAPConnection implements Cloneable, Serializable {
      * </PRE>
      *<P>
      * You can limit the time spent waiting for the connection to be established
-     * by calling <CODE>setConnectTimeout</CODE> before <CODE>connect</CODE>. 
+     * by calling <CODE>setConnectTimeout</CODE> before <CODE>connect</CODE>.
      * <P>
      * @param host host name of the LDAP server to which you want to connect.
      * This value can also be a space-delimited list of hostnames or
@@ -1646,11 +1667,11 @@ public class LDAPConnection implements Cloneable, Serializable {
      * Connects to the specified host and port and uses the specified DN and
      * password to authenticate to the server.  If this LDAPConnection object
      * represents an open connection, the connection is closed first
-     * before the new connection is opened. This method allows the user to 
+     * before the new connection is opened. This method allows the user to
      * specify the preferences for the bind operation.
      *<P>
      * You can limit the time spent waiting for the connection to be established
-     * by calling <CODE>setConnectTimeout</CODE> before <CODE>connect</CODE>. 
+     * by calling <CODE>setConnectTimeout</CODE> before <CODE>connect</CODE>.
      * <P>
      * @param host host name of the LDAP server to which you want to connect.
      * This value can also be a space-delimited list of hostnames or
@@ -1682,7 +1703,7 @@ public class LDAPConnection implements Cloneable, Serializable {
     }
 
     private void connect(String host, int port, String dn, byte[] passwd,
-      LDAPConstraints cons, boolean doAuthenticate) 
+      LDAPConstraints cons, boolean doAuthenticate)
         throws LDAPException {
         if ( isConnected() ) {
             disconnect ();
@@ -1692,7 +1713,7 @@ public class LDAPConnection implements Cloneable, Serializable {
                                       LDAPException.PARAM_ERROR );
         }
 
-        /* Parse the list of hosts */    
+        /* Parse the list of hosts */
         int defaultPort = port;
         StringTokenizer st = new StringTokenizer( host );
         String hostList[] = new String[st.countTokens()];
@@ -1715,7 +1736,7 @@ public class LDAPConnection implements Cloneable, Serializable {
         _connMgr = new LDAPConnSetupMgr(hostList, portList, _factory);
         _connMgr.setConnSetupDelay(_connSetupDelay);
         _connMgr.setConnectTimeout(_connectTimeout);
-    
+
         connect();
 
         if ( doAuthenticate ) {
@@ -1832,7 +1853,7 @@ public class LDAPConnection implements Cloneable, Serializable {
         if (_connMgr == null) {
             throw new LDAPException ( "no connection parameters",
                                       LDAPException.PARAM_ERROR );
-        }        
+        }
 
         _connMgr.openConnection();
         _thread = getNewThread(_connMgr, _cache);
@@ -1868,7 +1889,7 @@ public class LDAPConnection implements Cloneable, Serializable {
      * You can also apply LDAP v3 controls to the operation.
      * <P>
      *
-     * @param DN distinguished name identifying the entry 
+     * @param DN distinguished name identifying the entry
      * to remove from the directory
      * @param cons the set of preferences to apply to this operation
      * @exception LDAPException Failed to delete the specified entry from
@@ -1895,7 +1916,7 @@ public class LDAPConnection implements Cloneable, Serializable {
 
     /**
      * Deletes the entry for the specified DN from the directory.
-     * 
+     *
      * @param dn distinguished name of the entry to delete
      * @param listener handler for messages returned from a server in response
      * to this request. If it is null, a listener object is created internally.
@@ -1908,13 +1929,13 @@ public class LDAPConnection implements Cloneable, Serializable {
     public LDAPResponseQueue delete( String dn,
                                      LDAPResponseQueue listener )
         throws LDAPException {
-        
+
         return delete( dn, listener, _defaultConstraints );
     }
 
     /**
      * Deletes the entry for the specified DN from the directory.
-     * 
+     *
      * @param dn distinguished name of the entry to delete
      * @param listener handler for messages returned from a server in response
      * to this request. If it is null, a listener object is created internally.
@@ -1938,13 +1959,13 @@ public class LDAPConnection implements Cloneable, Serializable {
         if (listener == null) {
             listener = new LDAPResponseQueue(/*asynchOp=*/true);
         }
-        
+
         sendRequest (new JDAPDeleteRequest(dn), listener, cons);
-        
+
         return listener;
 
     }
-    
+
     /**
      * Disconnects from the LDAP server. Before you can perform LDAP operations
      * again, you need to reconnect to the server by calling
@@ -1956,7 +1977,7 @@ public class LDAPConnection implements Cloneable, Serializable {
         if (!isConnected())
             throw new LDAPException ( "unable to disconnect() without connecting",
                                       LDAPException.OTHER );
-        
+
         // Clone the Connection Setup Manager if the connection is shared
         if (_thread.isRunning() && _thread.getClientCount() > 1) {
             _connMgr = (LDAPConnSetupMgr) _connMgr.clone();
@@ -2059,13 +2080,13 @@ public class LDAPConnection implements Cloneable, Serializable {
      * returned by the server.
      * @see org.ietf.ldap.LDAPExtendedOperation
      */
-    public LDAPResponseQueue extendedOperation( 
-        LDAPExtendedOperation op, 
+    public LDAPResponseQueue extendedOperation(
+        LDAPExtendedOperation op,
         LDAPResponseQueue queue )
         throws LDAPException {
         return extendedOperation( op, queue, _defaultConstraints );
     }
-    
+
     /**
      * Performs an extended operation on the directory.  Extended operations
      * are part of version 3 of the LDAP protocol.<P>
@@ -2084,8 +2105,8 @@ public class LDAPConnection implements Cloneable, Serializable {
      * returned by the server.
      * @see org.ietf.ldap.LDAPExtendedOperation
      */
-    public LDAPResponseQueue extendedOperation( 
-        LDAPExtendedOperation op, 
+    public LDAPResponseQueue extendedOperation(
+        LDAPExtendedOperation op,
         LDAPResponseQueue queue,
         LDAPConstraints cons )
         throws LDAPException {
@@ -2118,7 +2139,7 @@ public class LDAPConnection implements Cloneable, Serializable {
     byte[] getAuthenticationPassword () {
         return _boundPasswd;
     }
-    
+
 
     /**
      * Gets the authentication method used to bind:<BR>
@@ -2161,7 +2182,7 @@ public class LDAPConnection implements Cloneable, Serializable {
      * (no concurrency).<br>
      * <CODE>NODELAY_PARALLEL</CODE> The parallel connection setup policy with no delay
      *  is enabled.<br>
-     * <CODE>delay > 0</CODE> The parallel connection setup policy with the delay of 
+     * <CODE>delay > 0</CODE> The parallel connection setup policy with the delay of
      * <CODE>delay</CODE> seconds is enabled.
      * @see org.ietf.ldap.LDAPConnection#setConnSetupDelay
      */
@@ -2172,7 +2193,7 @@ public class LDAPConnection implements Cloneable, Serializable {
     /**
      * Returns the set of constraints that apply to all operations
      * performed through this connection (unless you specify a different
-     * set of constraints when calling a method). 
+     * set of constraints when calling a method).
      * <P>
      *
      * Note that if you want to get individual constraints (rather than
@@ -2181,7 +2202,7 @@ public class LDAPConnection implements Cloneable, Serializable {
      * <P>
      *
      * Typically, you might call the <CODE>getConstraints</CODE> method
-     * to create a slightly different set of constraints for a particular 
+     * to create a slightly different set of constraints for a particular
      * operation.
      * <P>
      *
@@ -2216,9 +2237,9 @@ public class LDAPConnection implements Cloneable, Serializable {
      * @see org.ietf.ldap.LDAPConnection#getOption
      */
     public LDAPConstraints getConstraints () {
-        return (LDAPConstraints)getSearchConstraints();
+        return getSearchConstraints();
     }
-   
+
     /**
      * Returns the host name of the LDAP server to which you are connected.
      * @return host name of the LDAP server.
@@ -2312,7 +2333,7 @@ public class LDAPConnection implements Cloneable, Serializable {
     }
 
     /**
-     * Returns the protocol version that the connection is bound to (which 
+     * Returns the protocol version that the connection is bound to (which
      * currently is 3). If the connection is not bound, it returns 3.
      *
      * @return the protocol version that the connection is bound to
@@ -2324,7 +2345,7 @@ public class LDAPConnection implements Cloneable, Serializable {
     /**
      * Returns an array of the latest controls (if any) from server.
      * <P>
-     * To retrieve the controls from a search result, call the 
+     * To retrieve the controls from a search result, call the
      * <CODE>getResponseControls</CODE> method from the <CODE>LDAPSearchResults
      * </CODE> object returned with the result.
      * @return an array of the controls returned by an operation, or
@@ -2354,12 +2375,12 @@ public class LDAPConnection implements Cloneable, Serializable {
               }
           }
       }
-      
+
       return controls;
     }
 
     /**
-     * Returns an array of the latest controls associated with the 
+     * Returns an array of the latest controls associated with the
      * particular request. Used internally by LDAPSearchResults to
      * get response controls returned for a search request.
      * <P>
@@ -2387,15 +2408,15 @@ public class LDAPConnection implements Cloneable, Serializable {
               }
           }
       }
-      
+
       return controls;
     }
 
     /**
-     * Returns the callback handler, if any, specified on binding with a 
+     * Returns the callback handler, if any, specified on binding with a
      * SASL mechanism
      *
-     * @return the callback handler, if any, specified on binding with a 
+     * @return the callback handler, if any, specified on binding with a
      * SASL mechanism
      */
     public CallbackHandler getSaslBindCallbackHandler() {
@@ -2403,10 +2424,10 @@ public class LDAPConnection implements Cloneable, Serializable {
     }
 
     /**
-     * Returns the properties, if any, specified on binding with a 
+     * Returns the properties, if any, specified on binding with a
      * SASL mechanism
      *
-     * @return the properties, if any, specified on binding with a 
+     * @return the properties, if any, specified on binding with a
      * SASL mechanism
      */
     public Map getSaslBindProperties() {
@@ -2417,7 +2438,7 @@ public class LDAPConnection implements Cloneable, Serializable {
      * Returns the set of search constraints that apply to all searches
      * performed through this connection (unless you specify a different
      * set of search constraints when calling the <CODE>search</CODE>
-     * method). 
+     * method).
      * <P>
      *
      * Note that if you want to get individual constraints (rather than
@@ -2456,12 +2477,12 @@ public class LDAPConnection implements Cloneable, Serializable {
      * ...
      * </PRE>
      *
-     * @return a copy of the <CODE>LDAPSearchConstraints</CODE> object 
-     * representing the set of search constraints that apply (by default) to 
+     * @return a copy of the <CODE>LDAPSearchConstraints</CODE> object
+     * representing the set of search constraints that apply (by default) to
      * all searches performed through this connection.
      * @see org.ietf.ldap.LDAPSearchConstraints
      * @see org.ietf.ldap.LDAPConnection#getOption
-     * @see org.ietf.ldap.LDAPConnection#search(java.lang.String, int, java.lang.String, java.lang.String[], boolean, org.ietf.ldap.LDAPSearchConstraints)  
+     * @see org.ietf.ldap.LDAPConnection#search(java.lang.String, int, java.lang.String, java.lang.String[], boolean, org.ietf.ldap.LDAPSearchConstraints)
      */
     public LDAPSearchConstraints getSearchConstraints () {
         return (LDAPSearchConstraints)_defaultConstraints.clone();
@@ -2511,8 +2532,8 @@ public class LDAPConnection implements Cloneable, Serializable {
     public boolean isConnected() {
         // This is the hack: If the user program calls isConnected() when
         // the thread is about to shut down, the isConnected might get called
-        // before the deregisterConnection(). We add the yield() so that 
-        // the deregisterConnection() will get called first. 
+        // before the deregisterConnection(). We add the yield() so that
+        // the deregisterConnection() will get called first.
         // This problem only exists on Solaris.
         Thread.yield();
         return (_thread != null);
@@ -2592,8 +2613,8 @@ public class LDAPConnection implements Cloneable, Serializable {
      *
      * Use an array of <CODE>LDAPModification</CODE> objects to specify the
      * changes to make.  Each change must be specified by
-     * an <CODE>LDAPModification</CODE> object, and you must specify each 
-     * attribute value to modify, add, or remove by an <CODE>LDAPAttribute</CODE> 
+     * an <CODE>LDAPModification</CODE> object, and you must specify each
+     * attribute value to modify, add, or remove by an <CODE>LDAPAttribute</CODE>
      * object. <P>
      *
      * @param DN the distinguished name of the entry to modify
@@ -2649,7 +2670,7 @@ public class LDAPConnection implements Cloneable, Serializable {
      * value, or removes an existing attribute value). <BR>
      * The LDAPModification object specifies both the change to make and
      * the LDAPAttribute value to be changed.
-     * 
+     *
      * @param dn distinguished name of the entry to modify
      * @param mod a single change to make to an entry
      * @param listener handler for messages returned from a server in response
@@ -2667,14 +2688,14 @@ public class LDAPConnection implements Cloneable, Serializable {
 
         return modify( dn, mod, listener, _defaultConstraints );
     }
-    
+
     /**
      * Makes a single change to an existing entry in the directory. For
      * example, it changes the value of an attribute, adds a new attribute
      * value, or removes an existing attribute value). <BR>
      * The LDAPModification object specifies both the change to make and
      * the LDAPAttribute value to be changed.
-     * 
+     *
      * @param dn distinguished name of the entry to modify
      * @param mod a single change to make to an entry
      * @param listener handler for messages returned from a server in response
@@ -2703,7 +2724,7 @@ public class LDAPConnection implements Cloneable, Serializable {
         }
 
         LDAPModification[] modList = { mod };
-        sendRequest (new JDAPModifyRequest (dn, modList), listener, cons);        
+        sendRequest (new JDAPModifyRequest (dn, modList), listener, cons);
 
         return listener;
     }
@@ -2940,12 +2961,12 @@ public class LDAPConnection implements Cloneable, Serializable {
             return null;
         }
         LDAPEntry entry = results.next();
-        
+
         // cleanup required for referral connections
         while( results.hasMore() ) {
             results.next();
         }
-        
+
         return entry;
     }
 
@@ -3105,13 +3126,13 @@ public class LDAPConnection implements Cloneable, Serializable {
      * Disconnect from the server and then reconnect using the current
      * credentials and authentication method
      * @exception LDAPException if not previously connected, or if
-     * there is a failure on disconnecting or on connecting 
+     * there is a failure on disconnecting or on connecting
      */
     public void reconnect() throws LDAPException {
-        
+
         disconnect();
         connect();
-        
+
         if (_saslBinder != null) {
             _saslBinder.bind(this, true);
             _authMethod = "sasl";
@@ -3121,9 +3142,9 @@ public class LDAPConnection implements Cloneable, Serializable {
     }
 
     /**
-     * Deregisters an object so that it will no longer be notified on 
-     * arrival of an unsolicited message from a server. If the object is 
-     * null or was not previously registered for unsolicited notifications, 
+     * Deregisters an object so that it will no longer be notified on
+     * arrival of an unsolicited message from a server. If the object is
+     * null or was not previously registered for unsolicited notifications,
      * the method does nothing.
      */
     public void removeUnsolicitedNotificationListener(
@@ -3303,7 +3324,7 @@ public class LDAPConnection implements Cloneable, Serializable {
 
     /**
      * Renames an existing entry in the directory.
-     * 
+     *
      * @param DN current distinguished name of the entry
      * @param newRDN new relative distinguished name for the entry
      * @param deleteOldRDN if true, the old name is not retained as an
@@ -3326,7 +3347,7 @@ public class LDAPConnection implements Cloneable, Serializable {
 
     /**
      * Renames an existing entry in the directory.
-     * 
+     *
      * @param DN current distinguished name of the entry
      * @param newRDN new relative distinguished name for the entry
      * @param deleteOldRDN if true, the old name is not retained as an attribute
@@ -3349,7 +3370,7 @@ public class LDAPConnection implements Cloneable, Serializable {
         if (cons == null) {
             cons = _defaultConstraints;
         }
-        
+
         internalBind (cons);
 
         if (listener == null) {
@@ -3358,13 +3379,13 @@ public class LDAPConnection implements Cloneable, Serializable {
 
         sendRequest (new JDAPModifyRDNRequest (DN, newRDN, deleteOldRDN),
                      listener, cons);
-        
+
         return listener;
     }
-        
+
     /**
      * Renames an existing entry in the directory.
-     * 
+     *
      * @param DN current distinguished name of the entry
      * @param newRDN new relative distinguished name for the entry
      * @param newParentDN if not null, the distinguished name for the
@@ -3392,7 +3413,7 @@ public class LDAPConnection implements Cloneable, Serializable {
 
     /**
      * Renames an existing entry in the directory.
-     * 
+     *
      * @param DN current distinguished name of the entry
      * @param newRDN new relative distinguished name for the entry
      * @param newParentDN if not null, the distinguished name for the
@@ -3418,7 +3439,7 @@ public class LDAPConnection implements Cloneable, Serializable {
         if (cons == null) {
             cons = _defaultConstraints;
         }
-        
+
         internalBind (cons);
 
         if (listener == null) {
@@ -3437,7 +3458,7 @@ public class LDAPConnection implements Cloneable, Serializable {
                                                 deleteOldRDN );
         }
         sendRequest( request, listener, cons );
-        
+
         return listener;
     }
 
@@ -3580,7 +3601,7 @@ public class LDAPConnection implements Cloneable, Serializable {
                                          LDAPException.OTHER);
             }
             connection.setSocketFactory(factory);
-        }        
+        }
         connection.connect (host, port);
 
         LDAPSearchResults results;
@@ -3773,7 +3794,7 @@ public class LDAPConnection implements Cloneable, Serializable {
         LDAPSearchQueue myListener = getSearchListener( cons );
         int deref = cons.getDereference();
 
-        JDAPSearchRequest request = null;        
+        JDAPSearchRequest request = null;
         try {
             request = new JDAPSearchRequest( base, scope, deref,
                                              cons.getMaxResults(),
@@ -3787,13 +3808,13 @@ public class LDAPConnection implements Cloneable, Serializable {
         if ( (_cache != null) && isKeyValid ) {
             myListener.setKey( key );
         }
-        
+
         try {
             sendRequest( request, myListener, cons );
         }
         catch ( LDAPException e ) {
             releaseSearchListener( myListener );
-            throw e;                    
+            throw e;
         }
 
         /* Is this a persistent search? */
@@ -3820,13 +3841,13 @@ public class LDAPConnection implements Cloneable, Serializable {
             try {
                 /* Block until all results are in */
                 LDAPMessage response = myListener.completeRequest();
-                Iterator results = myListener.getAllMessages().iterator();
+                Iterator<LDAPMessage> results = myListener.getAllMessages().iterator();
 
                 checkSearchMsg(returnValue, response, cons, base, scope,
                                filter, attrs, attrsOnly);
 
                 while ( results.hasNext() ) {
-                    LDAPMessage msg = (LDAPMessage)results.next();
+                    LDAPMessage msg = results.next();
                     checkSearchMsg( returnValue, msg, cons, base, scope,
                                     filter, attrs, attrsOnly );
                 }
@@ -3897,7 +3918,7 @@ public class LDAPConnection implements Cloneable, Serializable {
                                    boolean typesOnly,
                                    LDAPSearchQueue listener )
         throws LDAPException {
-        
+
         return search( base, scope, filter, attrs, typesOnly,
                        listener, _defaultConstraints );
     }
@@ -3948,12 +3969,12 @@ public class LDAPConnection implements Cloneable, Serializable {
         }
 
         internalBind( cons );
-        
+
         if ( listener == null ) {
             listener = new LDAPSearchQueue( /*asynchOp=*/true, cons );
         }
-        
-        JDAPSearchRequest request = null;        
+
+        JDAPSearchRequest request = null;
         try {
             request = new JDAPSearchRequest( base, scope,
                                              cons.getDereference(),
@@ -3968,9 +3989,9 @@ public class LDAPConnection implements Cloneable, Serializable {
 
         sendRequest( request, listener, cons );
         return listener;
-        
+
     }
-    
+
     /**
      *  Sets the specified <CODE>LDAPCache</CODE> object as the
      *  cache for the <CODE>LDAPConnection</CODE> object.
@@ -4009,13 +4030,13 @@ public class LDAPConnection implements Cloneable, Serializable {
             _connMgr.setConnectTimeout( _connectTimeout );
         }
     }
-        
+
     /**
      * Specifies the delay in seconds when making concurrent connection attempts to
      * multiple servers.
      * <P>Effectively, selects the connection setup policy when a list of hosts is passed
      * to the <CODE>connect</CODE> method.
-     * 
+     *
      * <br>If the serial policy is selected, the default one, an attempt is made to
      * connect to the first host in the list. The next entry in
      * the list is tried only if the attempt to connect to the current host fails.
@@ -4024,9 +4045,9 @@ public class LDAPConnection implements Cloneable, Serializable {
      * <br>If the parallel policy is selected, multiple connection attempts may run
      * concurrently on a separate thread. A new connection attempt to the next entry
      * in the list can be started with or without delay.
-     * <P>You must set the <CODE>ConnSetupDelay</CODE> before making the call to the 
+     * <P>You must set the <CODE>ConnSetupDelay</CODE> before making the call to the
      * <CODE>connect</CODE> method.
-     * 
+     *
      * @param delay the delay in seconds between connection attempts. Possible values are:<br>
      * <CODE>NODELAY_SERIAL</CODE> Use the serial connection setup policy.<br>
      * <CODE>NODELAY_PARALLEL</CODE> Use the parallel connection setup policy with no delay.
@@ -4045,7 +4066,7 @@ public class LDAPConnection implements Cloneable, Serializable {
     }
 
     /**
-     * Set the default constraint set for all operations. 
+     * Set the default constraint set for all operations.
      * @param cons <CODE>LDAPConstraints</CODE> object to use as the default
      * constraint set
      * @see org.ietf.ldap.LDAPConnection#getConstraints
@@ -4059,7 +4080,7 @@ public class LDAPConnection implements Cloneable, Serializable {
 
         LDAPControl[] tServerControls = cons.getControls();
         LDAPControl[] oServerControls = null;
-        if ( (tServerControls != null) && 
+        if ( (tServerControls != null) &&
              (tServerControls.length > 0) ) {
             oServerControls =
                 new LDAPControl[tServerControls.length];
@@ -4078,7 +4099,7 @@ public class LDAPConnection implements Cloneable, Serializable {
             _defaultConstraints.setMaxBacklog( scons.getMaxBacklog() );
         }
     }
-    
+
     /**
      * Sets the stream for reading from the listener socket if
      * there is one
@@ -4104,12 +4125,12 @@ public class LDAPConnection implements Cloneable, Serializable {
 
     /**
      * Sets a global property of the connection.
-     * The following properties are defined:<BR> 
-     * com.org.ietf.ldap.schema.quoting - "standard" or "NetscapeBug"<BR> 
-     * Note: if this property is not set, the SDK will query the server 
-     * to determine if attribute syntax values and objectclass superior 
+     * The following properties are defined:<BR>
+     * com.org.ietf.ldap.schema.quoting - "standard" or "NetscapeBug"<BR>
+     * Note: if this property is not set, the SDK will query the server
+     * to determine if attribute syntax values and objectclass superior
      * values must be quoted when adding schema.<BR>
-     * com.org.ietf.ldap.saslpackage - the default is "com.netscape.sasl"<BR> 
+     * com.org.ietf.ldap.saslpackage - the default is "com.netscape.sasl"<BR>
      * <P>
      *
      * @param name name of the property to set
@@ -4118,12 +4139,12 @@ public class LDAPConnection implements Cloneable, Serializable {
      * property.
      */
     public void setProperty( String name, Object val ) throws LDAPException {
-        if ( name.equalsIgnoreCase( SCHEMA_BUG_PROPERTY ) ) { 
-            _properties.put( SCHEMA_BUG_PROPERTY, val ); 
+        if ( name.equalsIgnoreCase( SCHEMA_BUG_PROPERTY ) ) {
+            _properties.put( SCHEMA_BUG_PROPERTY, val );
         } else if ( name.equalsIgnoreCase( SASL_PACKAGE_PROPERTY ) ) {
-            _properties.put( SASL_PACKAGE_PROPERTY, val ); 
+            _properties.put( SASL_PACKAGE_PROPERTY, val );
         } else if ( name.equalsIgnoreCase( "debug" ) ) {
-            debug = ((String)val).equalsIgnoreCase( "true" ); 
+            debug = ((String)val).equalsIgnoreCase( "true" );
 
         } else if ( name.equalsIgnoreCase( TRACE_PROPERTY ) ) {
 
@@ -4134,7 +4155,7 @@ public class LDAPConnection implements Cloneable, Serializable {
                 if ( _thread != null ) {
                     traceOutput = createTraceOutput( val );
                 }
-                _properties.put( TRACE_PROPERTY, val ); 
+                _properties.put( TRACE_PROPERTY, val );
             }
 
             if ( _thread != null ) {
@@ -4142,7 +4163,7 @@ public class LDAPConnection implements Cloneable, Serializable {
             }
 
         // This is used only by the ldapjdk test cases to simulate a
-        // server problem and to test fail-over and rebind            
+        // server problem and to test fail-over and rebind
         } else if ( name.equalsIgnoreCase( "breakConnection" ) ) {
             _connMgr.breakConnection();
 
@@ -4152,7 +4173,7 @@ public class LDAPConnection implements Cloneable, Serializable {
     }
 
     /**
-     * Set the default constraint set for all search operations. 
+     * Set the default constraint set for all search operations.
      * @param cons <CODE>LDAPSearchConstraints</CODE> object to use as the
      * default constraint set
      * @see org.ietf.ldap.LDAPConnection#getSearchConstraints
@@ -4178,22 +4199,22 @@ public class LDAPConnection implements Cloneable, Serializable {
     }
 
     /**
-     * Begin using the Transport Layer Security (TLS) protocol for session 
-     * privacy [TLS][LDAPTLS]. If the socket factory of the connection is 
-     * not capable of initiating a TLS session, an LDAPException is thrown 
-     * with the error code TLS_NOT_SUPPORTED. If the server does not support 
-     * the transition to a TLS session, an LDAPException is thrown with the 
-     * error code returned by the server. If there are outstanding LDAP 
+     * Begin using the Transport Layer Security (TLS) protocol for session
+     * privacy [TLS][LDAPTLS]. If the socket factory of the connection is
+     * not capable of initiating a TLS session, an LDAPException is thrown
+     * with the error code TLS_NOT_SUPPORTED. If the server does not support
+     * the transition to a TLS session, an LDAPException is thrown with the
+     * error code returned by the server. If there are outstanding LDAP
      * operations on the connection, an LDAPException is thrown.
      */
     public void startTLS() throws LDAPException {
     }
 
     /**
-     * Stop using the Transport Layer Security (TLS) protocol for session 
-     * privacy [LDAPTLS]. If the server does not support the termination of 
-     * a TLS session, an LDAPException is thrown with the error code 
-     * returned by the server. If there are outstanding LDAP operations on 
+     * Stop using the Transport Layer Security (TLS) protocol for session
+     * privacy [LDAPTLS]. If the server does not support the termination of
+     * a TLS session, an LDAPException is thrown with the error code
+     * returned by the server. If there are outstanding LDAP operations on
      * the connection, an LDAPException is thrown.
      */
     public void stopTLS() throws LDAPException {
@@ -4213,8 +4234,8 @@ public class LDAPConnection implements Cloneable, Serializable {
      * <P>
      *
      * <UL>
-     * <LI> If you want to set a constraint only for a particular operation, 
-     * create an <CODE>LDAPConstraints</CODE> object (or a 
+     * <LI> If you want to set a constraint only for a particular operation,
+     * create an <CODE>LDAPConstraints</CODE> object (or a
      * <CODE>LDAPSearchConstraints</CODE> object for a search or find operation)
      * with your new constraints
      * and pass it to the <CODE>LDAPConnection</CODE> method that performs the
@@ -4313,7 +4334,7 @@ public class LDAPConnection implements Cloneable, Serializable {
      * <CODE>LDAPBind</CODE>
      * interface.  You must define this class and the
      * <CODE>bind</CODE> method that will be used to authenticate
-     * to the server on referrals. Modifying this option sets the 
+     * to the server on referrals. Modifying this option sets the
      * <CODE>LDAPConnection.REFERRALS_REBIND_PROC</CODE> to null.
      * <P>By default, the value of this option is <CODE>null</CODE>.</TD></TR>
      * <TR VALIGN=BASELINE><TD>
@@ -4397,7 +4418,7 @@ public class LDAPConnection implements Cloneable, Serializable {
                                         LDAPException.PARAM_ERROR );
         }
     }
-    
+
     /**
      * Sets the value of the specified option for this
      * <CODE>LDAPConnection</CODE> object. <P>
@@ -4405,13 +4426,13 @@ public class LDAPConnection implements Cloneable, Serializable {
      * These options represent the constraints for the current
      * connection.
      * To get all constraints for the current connection, call the
-     * <CODE>getSearchConstraints</CODE> method. 
+     * <CODE>getSearchConstraints</CODE> method.
      * <P>
      *
      * By default, the option that you set applies to all subsequent
      * operations performed through the current connection. If you want to
      * set a constraint only for a particular operation, create an
-     * <CODE>LDAPConstraints</CODE> object (or a 
+     * <CODE>LDAPConstraints</CODE> object (or a
      * <CODE>LDAPSearchConstraints</CODE> object for a search or find operation)
      * with your new constraints
      * and pass it to the <CODE>LDAPConnection</CODE> method that performs the
@@ -4496,7 +4517,7 @@ public class LDAPConnection implements Cloneable, Serializable {
      * <CODE>LDAPAuthHandler</CODE>
      * interface.  You must define this class and the
      * <CODE>getAuthProvider</CODE> method that will be used to get
-     * the distinguished name and password to use for authentication. 
+     * the distinguished name and password to use for authentication.
      * Modifying this option sets the <CODE>LDAPConnection.BIND</CODE> option to null.
      * <P>By default, the value of this option is <CODE>null</CODE>.</TD></TR>
      * <TR VALIGN=BASELINE><TD>
@@ -4506,7 +4527,7 @@ public class LDAPConnection implements Cloneable, Serializable {
      * <CODE>LDAPBind</CODE>
      * interface.  You must define this class and the
      * <CODE>bind</CODE> method that will be used to autheniticate
-     * to the server on referrals. Modifying this option sets the 
+     * to the server on referrals. Modifying this option sets the
      * <CODE>LDAPConnection.REFERRALS_REBIND_PROC</CODE> to null.
      * <P>By default, the value of this option is <CODE>null</CODE>.</TD></TR>
      * <TR VALIGN=BASELINE><TD>
@@ -4640,7 +4661,7 @@ public class LDAPConnection implements Cloneable, Serializable {
                 throw new LDAPException(e.getMessage(),
                                         LDAPException.PARAM_ERROR);
             }
-            
+
         }
         if ( !isConnected() ) {
             throw new LDAPException( "The connection is not available",
@@ -4660,7 +4681,7 @@ public class LDAPConnection implements Cloneable, Serializable {
      * @exception LDAPException failed to bind or the user has disconncted
      */
     private void internalBind( LDAPConstraints cons ) throws LDAPException {
-        
+
         // If the user has invoked disconnect() no attempt is made
         // to restore the connection
         if ( (_connMgr != null) && _connMgr.isUserDisconnected() ) {
@@ -4699,7 +4720,7 @@ public class LDAPConnection implements Cloneable, Serializable {
             }
         } catch ( LDAPReferralException e ) {
             Vector res = new Vector();
-            
+
             try {
                 performReferrals( e, cons, JDAPProtocolOp.SEARCH_REQUEST, dn,
                                   scope, filter, attrs, attrsOnly, null, null,
@@ -4710,7 +4731,7 @@ public class LDAPConnection implements Cloneable, Serializable {
                      JDAPSearchResultReference ) {
                    /*
                       Don't want to miss all remaining results, so continue.
-                      This is very ugly (using println). We should have a 
+                      This is very ugly (using println). We should have a
                       configurable parameter (probably in LDAPSearchConstraints)
                       whether to ignore failed search references or throw an
                       exception.
@@ -4740,7 +4761,7 @@ public class LDAPConnection implements Cloneable, Serializable {
         }
     }
 
-    
+
     /**
      * Internal routine. Binds to the LDAP server.
      * @param version protocol version to request from server
@@ -4873,12 +4894,12 @@ public class LDAPConnection implements Cloneable, Serializable {
      * string, the output is sent to System.err. If the file name is
      * prefixed with a '+' character, the file is opened in append mode.
      *
-     * @param out Trace output specifier. A file name, an output stream 
+     * @param out Trace output specifier. A file name, an output stream
      * or an instance of LDAPTraceWriter
      * @return An output stream or an LDAPTraceWriter instance
      */
     Object createTraceOutput( Object out ) throws LDAPException {
-                
+
         if ( out instanceof String ) { // trace file name
             OutputStream os = null;
             String file = (String)out;
@@ -4889,7 +4910,7 @@ public class LDAPConnection implements Cloneable, Serializable {
                     boolean appendMode = (file.charAt(0) == '+');
                     if ( appendMode ) {
                         file = file.substring(1);
-                    }                        
+                    }
                     FileOutputStream fos =
                         new FileOutputStream( file, appendMode );
                     os = new BufferedOutputStream( fos );
@@ -4900,10 +4921,10 @@ public class LDAPConnection implements Cloneable, Serializable {
                 }
             }
             return os;
-        }        
+        }
         else if ( out instanceof OutputStream )  {
             return out;
-        }       
+        }
         else if ( out instanceof LDAPTraceWriter )  {
             return out;
         } else {
@@ -4913,7 +4934,7 @@ public class LDAPConnection implements Cloneable, Serializable {
         }
 
     }
-    
+
     /**
      * Sets the LDAP protocol version that your client prefers to use when
      * connecting to the LDAP server.
@@ -4965,13 +4986,13 @@ public class LDAPConnection implements Cloneable, Serializable {
      * Returns the trace output object if set by the user
      */
     Object getTraceOutput() throws LDAPException {
-        
+
         // Check first if trace output has been set using setProperty()
         Object traceOut = _properties.get( TRACE_PROPERTY );
         if ( traceOut != null ) {
             return createTraceOutput( traceOut );
         }
-        
+
         // Check if the property has been set with java
         // -Dcom.org.ietf.ldap.trace
         // If the property does not have a value, send the trace to the
@@ -4986,9 +5007,9 @@ public class LDAPConnection implements Cloneable, Serializable {
             ;// In browser, access to property might not be allowed
         }
         return null;
-    }        
-        
-        
+    }
+
+
     private synchronized LDAPConnThread getNewThread(LDAPConnSetupMgr connMgr,
                                                      LDAPCache cache)
         throws LDAPException {
@@ -5204,12 +5225,12 @@ public class LDAPConnection implements Cloneable, Serializable {
     }
 
     /**
-     * Set response controls for the current connection for a particular 
-     * thread. Get the oldest returned controls and remove them from the 
+     * Set response controls for the current connection for a particular
+     * thread. Get the oldest returned controls and remove them from the
      * queue. If the connection is executing a persistent search, there may
-     * be more than one set of controls in the queue. For any other 
-     * operation, there will only ever be at most one set of controls 
-     * (controls from any earlier operation are replaced by controls 
+     * be more than one set of controls in the queue. For any other
+     * operation, there will only ever be at most one set of controls
+     * (controls from any earlier operation are replaced by controls
      * received on the latest operation on this connection by this thread).
      * @param current the target thread
      * @param con the server response controls
@@ -5225,21 +5246,21 @@ public class LDAPConnection implements Cloneable, Serializable {
 
                 // look at each response control
                 for ( int i = v.size() - 1; i >= 0; i-- ) {
-                    LDAPResponseControl response = 
+                    LDAPResponseControl response =
                       (LDAPResponseControl)v.elementAt( i );
-    
+
                     // if this response control belongs to this connection
                     if ( response.getConnection().equals( this ) ) {
- 
-                        // if the given control is null or 
-                        // the given control is not null and the current 
+
+                        // if the given control is null or
+                        // the given control is not null and the current
                         // control does not correspond to the new LDAPMessage
-                        if ( (con == null) || 
+                        if ( (con == null) ||
                              (con.getMsgID() != response.getMsgID()) ) {
                             v.removeElement( response );
                         }
 
-                        // For the same connection, if the message id from the 
+                        // For the same connection, if the message id from the
                         // given control is the same as the one in the queue,
                         // those controls in the queue will not get removed
                         // since they come from the persistent search control
@@ -5251,7 +5272,7 @@ public class LDAPConnection implements Cloneable, Serializable {
                 if ( con != null ) {
                     v = new Vector();
                 }
-            }          
+            }
 
             if ( con != null ) {
                 v.addElement( con );
@@ -5287,14 +5308,14 @@ public class LDAPConnection implements Cloneable, Serializable {
         throws LDAPException {
         LDAPConnection connection =
             new LDAPConnection( this.getSocketFactory() );
-        
+
         // Set the same connection setup failover policy as for this connection
         connection.setConnSetupDelay( getConnSetupDelay() );
-        
+
         connection.setOption( REFERRALS, new Boolean(true) );
         connection.setOption( REFERRALS_REBIND_PROC,
                               cons.getReferralHandler() );
-  
+
         // need to set the protocol version which gets passed to connection
         connection.setOption( PROTOCOL_VERSION,
                               new Integer(_protocolVersion) );
@@ -5302,7 +5323,7 @@ public class LDAPConnection implements Cloneable, Serializable {
         connection.setOption( REFERRALS_HOP_LIMIT,
                               new Integer(cons.getHopLimit()-1) );
 
-        try { 
+        try {
             connection.connect( connectList, connection.DEFAULT_PORT );
         }
         catch ( LDAPException e ) {
@@ -5336,15 +5357,15 @@ public class LDAPConnection implements Cloneable, Serializable {
         catch ( LDAPException e ) {
             throw new LDAPException( "Referral bind failed: " + e.getMessage(),
                                      e.getResultCode() );
-        }            
+        }
     }
-    
-    
+
+
     private String createReferralConnectList( String[] urls ) {
         String connectList = "";
         String host = null;
         int port = 0;
-        
+
         for ( int i=0; urls != null && i < urls.length; i++ ) {
             try {
                 LDAPUrl url = new LDAPUrl( urls[i] );
@@ -5363,7 +5384,7 @@ public class LDAPConnection implements Cloneable, Serializable {
             }
             connectList += (i==0 ? "" : " ") + host+":"+port;
         }
-        
+
         return (connectList.length() == 0) ? null : connectList;
     }
 
@@ -5378,7 +5399,7 @@ public class LDAPConnection implements Cloneable, Serializable {
                 if ( host == null ||
                      host.length() < 1 ) {
                     // No host:port specified, compare with the latest
-                    // (hop-wise) parameters 
+                    // (hop-wise) parameters
                     if ( connHost.equals( getHost() ) &&
                          connPort == getPort() ) {
                         return url;
@@ -5392,7 +5413,7 @@ public class LDAPConnection implements Cloneable, Serializable {
         }
         return null;
     }
-    
+
     /**
      * Establish the LDAPConnection to the referred server. This one is used
      * for bind operation only since we need to keep this new connection for
@@ -5413,7 +5434,7 @@ public class LDAPConnection implements Cloneable, Serializable {
             throw e;
         }
 
-        String connectList = 
+        String connectList =
             createReferralConnectList( e.getReferrals() );
         // If there are no referrals (because the server isn't set up for
         // them), give up here
@@ -5428,7 +5449,7 @@ public class LDAPConnection implements Cloneable, Serializable {
             connection.bind( _protocolVersion, _boundDN, _boundPasswd );
         } catch ( LDAPException authEx ) {
             // Disconnect needed to terminate the LDAPConnThread
-            try  {                
+            try  {
                 connection.disconnect();
             } catch ( LDAPException ignore ) {
             }
@@ -5490,10 +5511,10 @@ public class LDAPConnection implements Cloneable, Serializable {
         else {
             String connectList = createReferralConnectList( urls );
             connection = prepareReferral( connectList, cons );
-                
+
             // which one did we connect to...
             referralURL = findReferralURL( connection, urls );
-                
+
             // Authenticate
             referralRebind( connection, cons );
         }
@@ -5519,20 +5540,20 @@ public class LDAPConnection implements Cloneable, Serializable {
                           types, attrsOnly, mods, entry, attr, results );
     }
 
-    void performReferrals( LDAPConnection connection, 
+    void performReferrals( LDAPConnection connection,
                            LDAPConstraints cons, int ops, String dn, int scope,
                            String filter, String types[], boolean attrsOnly,
                            LDAPModification mods[], LDAPEntry entry,
                            LDAPAttribute attr,
                            Vector results ) throws LDAPException {
- 
+
         LDAPSearchResults res = null;
         try {
             switch ( ops ) {
                 case JDAPProtocolOp.SEARCH_REQUEST:
 
                     res = connection.search( dn, scope, filter,
-                                             types, attrsOnly, 
+                                             types, attrsOnly,
                                              (LDAPSearchConstraints)cons );
                     if ( res != null ) {
                         res.closeOnCompletion( connection );
@@ -5556,7 +5577,7 @@ public class LDAPConnection implements Cloneable, Serializable {
                     connection.delete( dn, cons );
                     break;
                 case JDAPProtocolOp.MODIFY_RDN_REQUEST:
-                    connection.rename( dn, filter /* newRDN */, 
+                    connection.rename( dn, filter /* newRDN */,
                                        attrsOnly /* deleteOld */, cons );
                     break;
                 case JDAPProtocolOp.COMPARE_REQUEST:
@@ -5570,9 +5591,9 @@ public class LDAPConnection implements Cloneable, Serializable {
         } catch ( LDAPException ee ) {
             throw ee;
         } finally {
-            if ( (connection != null) && 
+            if ( (connection != null) &&
                  ((ops != JDAPProtocolOp.SEARCH_REQUEST) || (res == null)) &&
-                 ((_referralConnection == null) || 
+                 ((_referralConnection == null) ||
                   !connection.equals(_referralConnection)) ) {
                 connection.disconnect();
             }
@@ -5613,7 +5634,7 @@ public class LDAPConnection implements Cloneable, Serializable {
             connection.extendedOperation( op );
         connection.disconnect();
         return results; /* return right away if operation is successful */
-        
+
     }
 
     /**
@@ -5667,16 +5688,16 @@ public class LDAPConnection implements Cloneable, Serializable {
      *
      * <PRE>LDAPConnection {ldap://dilly:389 (2) ldapVersion:3 bindDN:
      * "uid=admin,o=iplanet.com"}</PRE>
-     * 
+     *
      * For cloned connections, the number of LDAPConnection instances sharing
      * the same physical connection is shown in parenthesis following the ldap
-     * url. 
+     * url.
      * If an LDAPConnection objectis not cloned, this number is omitted from
      * the string representation.
      *
      * @return string representation of the connection
      * @see org.ietf.ldap.LDAPConnection#clone
-     */    
+     */
     public String toString() {
         int cloneCnt = (_thread == null) ? 0 : _thread.getClientCount();
         StringBuffer sb = new StringBuffer( "LDAPConnection {" );
@@ -5702,10 +5723,10 @@ public class LDAPConnection implements Cloneable, Serializable {
             sb.append( getAuthenticationDN() );
         }
         sb.append( "\"}" );
-        
+
         return sb.toString();
     }
-                                                                     
+
     /**
      * Prints out the LDAP Java SDK version and the highest LDAP
      * protocol version supported by the SDK. To view this

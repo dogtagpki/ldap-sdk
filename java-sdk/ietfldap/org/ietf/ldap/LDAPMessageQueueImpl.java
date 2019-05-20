@@ -46,7 +46,7 @@ import java.util.ArrayList;
  * requests, there will be only one request per queue. For asynchronous
  * LDAPConnection requests, the user can add multiple request to the
  * same queue.
- * 
+ *
  * Used as a delegate by LDAResponseListener and LDAPSearchListener
  *
  */
@@ -62,7 +62,7 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
         LDAPConnection connection;
         LDAPConnThread connThread;
         long timeToComplete;
-    
+
         RequestEntry( int id, LDAPConnection connection,
                       LDAPConnThread connThread, int timeLimit ) {
             this.id = id;
@@ -70,27 +70,27 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
             this.connThread = connThread;
             this.timeToComplete = (timeLimit == 0) ?
                 Long.MAX_VALUE : (System.currentTimeMillis() + timeLimit);
-        }    
+        }
     }
 
     /**
      * Internal variables
      */
-    protected /*LDAPMessage */ ArrayList _messageQueue = new ArrayList(1);
+    protected ArrayList<LDAPMessage> _messageQueue = new ArrayList<>(1);
     private /*RequestEntry*/ ArrayList _requestList  = new ArrayList(1);
     private LDAPException _exception; /* For network errors */
     private boolean _asynchOp;
-    
-    // A flag to indicate if there are time constrained requests 
+
+    // A flag to indicate if there are time constrained requests
     private boolean _timeConstrained;
 
     /**
      * Constructor
      *
-     * @param asynchOp <CODE>true</CODE> if the object is used 
+     * @param asynchOp <CODE>true</CODE> if the object is used
      * for asynchronous LDAP operations
      * @see org.ietf.ldap.LDAPAsynchronousConnection
-     */   
+     */
     LDAPMessageQueueImpl( boolean asynchOp ) {
         _asynchOp = asynchOp;
     }
@@ -116,7 +116,7 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
             ids[i] = entry.id;
         }
         return ids;
-    }    
+    }
 
     /**
      * Blocks until a message is available or until all operations
@@ -134,9 +134,9 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
             }
 
             // Dequeue the first entry
-            LDAPMessage msg = (LDAPMessage)_messageQueue.get( 0 );
+            LDAPMessage msg = _messageQueue.get( 0 );
             _messageQueue.remove( 0 );
-            
+
             // Has the operation completed?
             if ( msg instanceof LDAPResponse ) {
                 removeRequest( msg.getMessageID() );
@@ -146,10 +146,10 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
     }
 
     /**
-     * Blocks until a message is available for a particular message ID, or 
-     * until all operations associated with the message ID have completed or 
-     * been canceled, and returns the response. If there is no outstanding 
-     * operation for the message ID (or if it is zero or a negative number), 
+     * Blocks until a message is available for a particular message ID, or
+     * until all operations associated with the message ID have completed or
+     * been canceled, and returns the response. If there is no outstanding
+     * operation for the message ID (or if it is zero or a negative number),
      * IllegalArgumentException is thrown.
      *
      * @param msgid A particular message to query for responses available
@@ -161,7 +161,7 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
 
     public synchronized LDAPMessage getResponse( int msgid )
         throws LDAPException {
-            
+
         if ( !isValidMessageID( msgid ) ) {
             throw new IllegalArgumentException( "Invalid msg ID: " + msgid );
         }
@@ -172,24 +172,24 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
                ( (msg = getMessageForID( msgid, true )) == null ) ) {
             waitForMessage();
         }
-        
+
         // Network exception occurred?
         if ( _exception != null ) {
             LDAPException ex = _exception;
             _exception = null;
             throw ex;
-        }   
+        }
 
         // Are there any outstanding requests left?
         if ( _requestList.size() == 0 ) {
             return null; // No outstanding requests
         }
-            
+
         // Has the operation completed?
         if ( msg instanceof LDAPResponse ) {
             removeRequest( msg.getMessageID() );
         }
-        
+
         return msg;
     }
 
@@ -203,9 +203,9 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
     }
 
     /**
-     * Reports true if a response has been received from the server for a 
-     * particular message ID. If there is no outstanding operation for the 
-     * message ID (or if it is zero or a negative number), 
+     * Reports true if a response has been received from the server for a
+     * particular message ID. If there is no outstanding operation for the
+     * message ID (or if it is zero or a negative number),
      * IllegalArgumentException is thrown.
      *
      * @param msgid A particular message to query for responses available
@@ -222,10 +222,10 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
     /**
      * Merge two message queues.
      * Move/append the content from another message queue to this one.
-     * 
+     *
      * To be used for synchronization of asynchronous LDAP operations where
      * requests are sent by one thread but processed by another one
-     * 
+     *
      * A client may be implemented in such a way that one thread makes LDAP
      * requests and calls l.getMessageIDs(), while another thread is
      * responsible for
@@ -241,15 +241,15 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
      * @param mq2 message queue to merge with this one
      */
     public void merge( LDAPMessageQueue mq2 ) {
-        
+
         // Yield just in case the LDAPConnThread is in the process of
         // dispatching a message
         Thread.yield();
-        
+
         synchronized( this ) {
             LDAPMessageQueueImpl mq = (LDAPMessageQueueImpl)mq2;
             synchronized( mq ) {
-				ArrayList queue2 = mq.getAllMessages();
+				ArrayList<LDAPMessage> queue2 = mq.getAllMessages();
                 for( int i = 0; i < queue2.size(); i++ ) {
                     _messageQueue.add( queue2.get( i ) );
                 }
@@ -288,7 +288,7 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
             sb.append( ((RequestEntry)_requestList.get(i)).id );
         }
         sb.append( "} messageCount=" + _messageQueue.size() );
-        
+
         return sb.toString();
     }
 
@@ -304,7 +304,7 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
     synchronized LDAPMessage getMessageForID( int msgid, boolean remove ) {
         LDAPMessage msg = null;
         for ( int i = 0; i < _messageQueue.size(); i++ ) {
-            msg = (LDAPMessage)_messageQueue.get(i);
+            msg = _messageQueue.get(i);
             if ( msg.getMessageID() == msgid ) {
                 if ( remove ) {
                     _messageQueue.remove( i );
@@ -328,7 +328,7 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
 
     /**
      * Waits for request to complete. This method blocks until a message of
-     * type LDAPResponse has been received. Used by synchronous search 
+     * type LDAPResponse has been received. Used by synchronous search
      * with batch size of zero (block until all results are received).
      *
      * @return LDAPResponse message or null if there are no more outstanding
@@ -341,19 +341,19 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
             if ( !waitForSomething() ) {
                 return null; // No outstanding requests
             }
-            
+
             // Search for an instance of LDAPResponse
             for ( int i = _messageQueue.size()-1; i >= 0; i-- ) {
-                Object msg = _messageQueue.get(i);
+                LDAPMessage msg = _messageQueue.get(i);
                 if ( msg instanceof LDAPResponse ) {
-                
+
                     // Dequeue the entry and return
                     _messageQueue.remove( i );
                     return (LDAPResponse)msg;
                 }
             }
             // Not found, wait for the next message
-        }            
+        }
     }
 
     /**
@@ -378,22 +378,22 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
         long now = System.currentTimeMillis();
         for ( int i = 0; i < _requestList.size(); i++ ) {
             RequestEntry entry = (RequestEntry)_requestList.get( i );
-            
+
             // time limit exceeded ?
             if ( entry.timeToComplete <= now ) {
 				entry.connection.abandon( entry.id );
                 throw new LDAPException( "Time to complete operation exceeded",
                                          LDAPException.LDAP_TIMEOUT );
-            }                
-                
+            }
+
             if ( entry.timeToComplete < minTimeToComplete ) {
                 minTimeToComplete = entry.timeToComplete;
-            }            
+            }
         }
-        
+
         long timeLimit = ( minTimeToComplete == Long.MAX_VALUE ) ?
             0 : ( minTimeToComplete - now );
-        
+
         try {
             _timeConstrained = ( timeLimit != 0 );
             wait( timeLimit );
@@ -415,13 +415,13 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
                (_messageQueue.size() == 0) ) {
             waitForMessage();
         }
-        
+
         // Network exception occurred ?
         if ( _exception != null ) {
             LDAPException ex = _exception;
             _exception = null;
             throw ex;
-        }   
+        }
 
         // Are there any outstanding requests left
         if ( _requestList.size() == 0 ) {
@@ -430,7 +430,7 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
 
         return true;
     }
-            
+
 
     /**
      * Retrieves all messages currently in the queue without blocking.
@@ -438,12 +438,12 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
 	 *
      * @return vector of messages
      */
-    synchronized ArrayList getAllMessages() {
-        ArrayList result = _messageQueue;
-        _messageQueue = new ArrayList(1);
+    synchronized ArrayList<LDAPMessage> getAllMessages() {
+        ArrayList<LDAPMessage> result = _messageQueue;
+        _messageQueue = new ArrayList<>(1);
         return result;
     }
-    
+
     /**
      * Retrieves all requests currently in the queue.
 	 * The requests are removed from the queue.
@@ -455,7 +455,7 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
         _requestList = new ArrayList(1);
         return result;
     }
-    
+
     /**
      * Queues the LDAP server's response. This causes anyone waiting
      * in getResponse() to unblock.
@@ -464,7 +464,7 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
      */
     synchronized void addMessage( LDAPMessage msg ) {
         _messageQueue.add(msg);
-        
+
         // Mark conn as bound for asych bind operations
         if ( isAsynchOp() &&
              (msg.getType() == msg.BIND_RESPONSE) ) {
@@ -472,7 +472,7 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
                 getConnection( msg.getMessageID() ).markConnAsBound();
             }
         }
-                
+
         notifyAll();
     }
 
@@ -513,23 +513,23 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
     /**
      * Remove all queued messages associated with the request ID.
      * Called when an LDAP operation is abandoned.
-     * 
+     *
      * Not synchronized as it is private and can be called only by
      * abandon() and removeAllRequests().
-     * 
+     *
      * @return count of removed messages
      */
     private int removeAllMessages( int id ) {
         int removeCount = 0;
         for ( int i = (_messageQueue.size()-1); i >= 0; i-- ) {
-            LDAPMessage msg = (LDAPMessage)_messageQueue.get( i );
+            LDAPMessage msg = _messageQueue.get( i );
             if ( msg.getMessageID() == id ) {
                 _messageQueue.remove( i );
                 removeCount++;
             }
         }
         return removeCount;
-    }   
+    }
 
     /**
      * Resets the state of this object so it can be recycled.
@@ -544,7 +544,7 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
         _requestList.clear();
         _timeConstrained = false;
     }
-    
+
     /**
      * Returns the connection associated with the specified request id
 	 *
@@ -605,7 +605,7 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
             return entry.id;
         }
     }
-    
+
     /**
      * Registers an LDAP request
      *
@@ -613,7 +613,7 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
      * @param connection LDAP Connection for the message ID
      * @param connThread a physical connection to the server
      * @param timeLimit the maximum number of milliseconds to wait for
-     * the request to complete 
+     * the request to complete
     */
     synchronized void addRequest( int id, LDAPConnection connection,
 								  LDAPConnThread connThread, int timeLimit ) {
@@ -629,11 +629,11 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
     /**
      * Returns the number of outstanding requests.
      * @return outstanding request count.
-     */    
+     */
     public int getRequestCount() {
         return _requestList.size();
     }
-    
+
     /**
      * Removes the request with the specified ID.
      * Called when a LDAP operation is abandoned (called from
@@ -653,7 +653,7 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
             }
         }
         return false;
-    }            
+    }
 
     /**
      * Removes all requests associated with the specified connThread.
@@ -668,12 +668,12 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
             if ( connThread == entry.connThread ) {
                 _requestList.remove( i );
                 removeCount++;
-                
+
                 // remove all queued messages as well
                 removeAllMessages( entry.id );
             }
         }
         notifyAll();
         return removeCount;
-    }   
+    }
 }
