@@ -37,14 +37,24 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap;
 
-import java.util.*;
-import org.ietf.ldap.client.*;
-import org.ietf.ldap.client.opers.*;
-import org.ietf.ldap.ber.stream.*;
-import org.ietf.ldap.util.*;
-import java.io.*;
-import java.net.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
+
+import org.ietf.ldap.ber.stream.BERElement;
+import org.ietf.ldap.client.JDAPBERTagDecoder;
+import org.ietf.ldap.client.opers.JDAPAbandonRequest;
+import org.ietf.ldap.client.opers.JDAPProtocolOp;
+import org.ietf.ldap.client.opers.JDAPUnbindRequest;
 
 /**
  * Multiple LDAPConnection clones can share a single physical connection,
@@ -79,7 +89,7 @@ class LDAPConnThread extends Thread {
     transient private static int _highMsgId;
     transient private InputStream _serverInput;
     transient private OutputStream _serverOutput;
-    transient private Hashtable _requests;
+    transient private Hashtable<Integer, LDAPMessageQueue> _requests;
     transient private Hashtable _messages = null;
     transient private Vector _registered;
     transient private boolean _disconnected = false;
@@ -97,7 +107,7 @@ class LDAPConnThread extends Thread {
     // trace msgs
     static SimpleDateFormat _timeFormat =
         new SimpleDateFormat( "HH:mm:ss.SSS" );
-        
+
     /**
      * Constructs a connection thread that maintains connection to the
      * LDAP server
@@ -112,7 +122,7 @@ class LDAPConnThread extends Thread {
         throws LDAPException {
         super( "LDAPConnThread " + connMgr.getHost() +
                ":" + connMgr.getPort() );
-        _requests = new Hashtable ();
+        _requests = new Hashtable<>();
         _registered = new Vector ();
         _connMgr = connMgr;
         _socket = connMgr.getSocket();
@@ -122,7 +132,7 @@ class LDAPConnThread extends Thread {
         // Allow the application to exit if only LDAPConnThread threads are
         // running
         setDaemon( true );
-        
+
         try {
             _serverInput =
                 new BufferedInputStream( _socket.getInputStream() );
@@ -146,7 +156,7 @@ class LDAPConnThread extends Thread {
             sb.append( _connMgr.getLDAPUrl() );
             logTraceMessage( sb );
         }
-        
+
         start(); /* start the thread */
     }
 
@@ -175,16 +185,16 @@ class LDAPConnThread extends Thread {
             } else if ( traceOutput instanceof LDAPTraceWriter ) {
                 _traceOutput = traceOutput;
             }
-        }            
+        }
     }
-    
+
     void logTraceMessage( StringBuffer msg ) {
         if ( _traceOutput == null ) {
             return;
         }
         String timeStamp = _timeFormat.format( new Date() );
         StringBuffer sb = new StringBuffer( timeStamp );
-        sb.append( " ldc=" ); 
+        sb.append( " ldc=" );
         sb.append( _connMgr.getID() );
 
         synchronized( _sendRequestLock ) {
@@ -199,7 +209,7 @@ class LDAPConnThread extends Thread {
             }
         }
     }
-    
+
     /**
      * Set the cache to use for searches.
      * @param cache The cache to use for searches; <CODE>null</CODE> for no
@@ -220,7 +230,7 @@ class LDAPConnThread extends Thread {
         synchronized( _sendRequestLock ) {
             _highMsgId = (_highMsgId + 1) % MAXMSGID;
             return _highMsgId;
-        }            
+        }
     }
 
     /**
@@ -237,7 +247,7 @@ class LDAPConnThread extends Thread {
             throw new LDAPException ( "not connected to a server",
                                       LDAPException.SERVER_DOWN );
         }
-        LDAPMessage msg = 
+        LDAPMessage msg =
             new LDAPMessage( allocateId(), request, cons.getControls() );
 
         LDAPMessageQueueImpl queue = (LDAPMessageQueueImpl)toNotify;
@@ -249,7 +259,7 @@ class LDAPConnThread extends Thread {
                                     queue );
                 /* Notify the backlog checker that there may be another
                    outstanding request */
-                resultRetrieved(); 
+                resultRetrieved();
             }
             queue.addRequest( msg.getMessageID(), conn, this,
                               cons.getTimeLimit() );
@@ -259,7 +269,7 @@ class LDAPConnThread extends Thread {
             try {
                 if ( _traceOutput != null ) {
                     logTraceMessage( msg.toTraceString() );
-                }                    
+                }
                 msg.write( _serverOutput );
                 _serverOutput.flush();
             } catch ( IOException e ) {
@@ -299,16 +309,16 @@ class LDAPConnThread extends Thread {
                 if ( !_disconnected ) {
                     LDAPSearchConstraints cons = conn.getSearchConstraints();
                     sendRequest( null, new JDAPUnbindRequest(), null, cons );
-                }                    
-                
+                }
+
                 // must be set after the call to sendRequest
                 _doRun =false;
-                
+
                 if ( (_thread != null) &&
                      (_thread != Thread.currentThread()) ) {
-                    
+
                     _thread.interrupt();
-                    
+
                     // Wait up to 1 sec for thread to accept disconnect
                     // notification. When the interrupt is accepted,
                     // _thread is set to null. See run() method.
@@ -316,9 +326,9 @@ class LDAPConnThread extends Thread {
                         wait( 1000 );
                     }
                     catch ( InterruptedException e ) {
-                    }                        
+                    }
                 }
-                
+
             } catch( Exception e ) {
                 LDAPConnection.printDebug( e.toString() );
             }
@@ -353,7 +363,7 @@ class LDAPConnThread extends Thread {
             } finally {
                 _socket = null;
             }
-        
+
             _disconnected = true;
 
             /**
@@ -361,18 +371,18 @@ class LDAPConnThread extends Thread {
              * terminated by the user
              */
             _connMgr.disconnect();
-        
+
             /**
              * Cancel all outstanding requests
              */
             if ( _requests != null ) {
-                Enumeration requests = _requests.elements();
+                Enumeration<LDAPMessageQueue> requests = _requests.elements();
                 while ( requests.hasMoreElements() ) {
                     LDAPMessageQueueImpl queue =
                         (LDAPMessageQueueImpl)requests.nextElement();
                     queue.removeAllRequests( this );
                 }
-            }                
+            }
 
             /**
              * Notify all the registered queues of this mishap.
@@ -410,10 +420,10 @@ class LDAPConnThread extends Thread {
             if ( _requests.size() == 0 ) {
                 return;
             }
-            
-            Enumeration queues = _requests.elements();
+
+            Enumeration<LDAPMessageQueue> queues = _requests.elements();
             while( queues.hasMoreElements() ) {
-                LDAPMessageQueue l = (LDAPMessageQueue)queues.nextElement();
+                LDAPMessageQueue l = queues.nextElement();
 
                 // If there are any threads waiting for a regular response
                 // message, we have to go read the next incoming message
@@ -422,7 +432,7 @@ class LDAPConnThread extends Thread {
                 }
 
                 LDAPSearchQueue sl = (LDAPSearchQueue)l;
-                
+
                 // should never happen, but just in case
                 if ( sl.getSearchConstraints() == null ) {
                     return;
@@ -430,24 +440,24 @@ class LDAPConnThread extends Thread {
 
                 int slMaxBacklog = sl.getSearchConstraints().getMaxBacklog();
                 int slBatchSize  = sl.getSearchConstraints().getBatchSize();
-                
+
                 // Disabled backlog check ?
                 if ( slMaxBacklog == 0 ) {
                     return;
                 }
-                
+
                 // Synch op with zero batch size ?
                 if ( !sl.isAsynchOp() && slBatchSize == 0 ) {
                     return;
                 }
-                
+
                 // Max backlog not reached for at least one queue ?
                 // (if multiple requests are in progress)
                 if ( sl.getMessageCount() < slMaxBacklog ) {
                     return;
-                }                    
+                }
             }
-                                   
+
             synchronized( this ) {
                 wait( 3000 );
             }
@@ -469,7 +479,7 @@ class LDAPConnThread extends Thread {
      * Reads from the LDAP server input stream for incoming LDAP messages.
      */
     public void run() {
-        
+
         // if there is a problem establishing a connection to the server,
         // stop the thread right away...
         if ( !_doRun ) {
@@ -500,7 +510,7 @@ class LDAPConnThread extends Thread {
 
                 if ( _traceOutput != null ) {
                     logTraceMessage( msg.toTraceString() );
-                }                    
+                }
 
                 // pass in the ber element size to approximate the size of the
                 // cache entry, thereby avoiding serialization of the entry
@@ -540,7 +550,7 @@ class LDAPConnThread extends Thread {
         // For synch search operations, controls are also copied into
         // LDAPSearchResults (see LDAPConnection.checkSearchMsg())
         if ( ! l.isAsynchOp() ) {
-            
+
             /* Were there any controls for this client? */
             LDAPControl[] con = msg.getControls();
             if ( con != null ) {
@@ -549,22 +559,22 @@ class LDAPConnThread extends Thread {
                 if ( ldc != null ) {
                     ldc.setResponseControls(
                         this, new LDAPResponseControl(ldc, msgid, con) );
-                }                    
+                }
             }
         }
 
         if ( (_cache != null) && (l instanceof LDAPSearchQueue) ) {
             cacheSearchResult( (LDAPSearchQueue)l, msg, size );
-        }            
-        
+        }
+
         l.addMessage( msg );
 
         if ( msg instanceof LDAPResponse ) {
             _requests.remove( messageID );
             if ( _requests.size() == 0 ) {
                 _backlogCheckCounter = BACKLOG_CHKCNT;
-            }            
-        }        
+            }
+        }
     }
 
     /**
@@ -587,7 +597,7 @@ class LDAPConnThread extends Thread {
         if ( (_cache == null) || (key == null) ) {
             return;
         }
-        
+
         if ( msg instanceof LDAPSearchResult ) {
 
             // Get the vector containing the LDAPMessages for the specified
@@ -602,7 +612,7 @@ class LDAPConnThread extends Thread {
             if ( ((Long)v.firstElement()).longValue() == -1L ) {
                 return;
             }
-            
+
             // add the size of the current LDAPMessage to the lump sum
             // assume the size of LDAPMessage is more or less the same as
             // the size of LDAPEntry. Eventually an LDAPEntry object gets
@@ -616,8 +626,8 @@ class LDAPConnThread extends Thread {
                 v.removeAllElements();
                 v.addElement( new Long(-1L) );
                 return;
-            }                
-                
+            }
+
             // update the lump sum located in the first element of the vector
             v.setElementAt( new Long(entrySize), 0 );
 
@@ -628,7 +638,7 @@ class LDAPConnThread extends Thread {
         } else if ( msg instanceof LDAPSearchResultReference ) {
 
             // If a search reference is received disable caching of
-            // this search request 
+            // this search request
             v = (Vector)_messages.get(messageID);
             if ( v == null ) {
                 _messages.put( messageID, v = new Vector() );
@@ -643,10 +653,10 @@ class LDAPConnThread extends Thread {
             // The search request has completed. Store the cache entry
             // in the LDAPCache if the operation has succeded and caching
             // is not disabled due to the entry size or referrals
-            
+
             boolean fail = ((LDAPResponse)msg).getResultCode() > 0;
             v = (Vector)_messages.remove( messageID );
-            
+
             if ( !fail )  {
                 // If v is null, meaning there are no search results from the
                 // server
@@ -673,7 +683,7 @@ class LDAPConnThread extends Thread {
         if ( !_doRun ) {
             return;
         }
-        
+
         LDAPMessageQueueImpl l =
             (LDAPMessageQueueImpl)_requests.remove( new Integer(id) );
         // Clean up cache if enabled
@@ -701,7 +711,7 @@ class LDAPConnThread extends Thread {
                                                    LDAPException.OTHER ) );
             return null;
         }
-        return (LDAPMessageQueue)_requests.put( new Integer(id), toNotify );
+        return _requests.put( new Integer(id), toNotify );
     }
 
     /**
@@ -717,9 +727,9 @@ class LDAPConnThread extends Thread {
         _connMgr.invalidateConnection();
 
         try {
-            
+
             // notify each queue that the server is down.
-            Enumeration requests = _requests.elements();
+            Enumeration<LDAPMessageQueue> requests = _requests.elements();
             while ( requests.hasMoreElements() ) {
                 LDAPMessageQueueImpl queue =
                     (LDAPMessageQueueImpl)requests.nextElement();
