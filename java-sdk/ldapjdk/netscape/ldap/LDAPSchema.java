@@ -431,7 +431,7 @@ public class LDAPSchema implements java.io.Serializable {
      * Gets an enumeration ofthe attribute type definitions in this schema.
      * @return an enumeration of attribute type definitions.
      */
-    public Enumeration getAttributes() {
+    public Enumeration<LDAPAttributeSchema> getAttributes() {
         return attributes.elements();
     }
 
@@ -492,7 +492,7 @@ public class LDAPSchema implements java.io.Serializable {
      * the attribute type definition, or <CODE>null</CODE> if not found.
      */
     public LDAPAttributeSchema getAttribute( String name ) {
-        return (LDAPAttributeSchema)attributes.get( name.toLowerCase() );
+        return attributes.get( name.toLowerCase() );
     }
 
     /**
@@ -570,7 +570,7 @@ public class LDAPSchema implements java.io.Serializable {
      * Get an enumeration of the names of the attribute types in this schema.
      * @return an enumeration of attribute names (all lower-case).
      */
-    public Enumeration getAttributeNames() {
+    public Enumeration<String> getAttributeNames() {
         return attributes.keys();
     }
 
@@ -824,13 +824,13 @@ public class LDAPSchema implements java.io.Serializable {
             s += '\n';
         }
         s += "Attributes:\n";
-        Enumeration en = getAttributes();
-        while( en.hasMoreElements() ) {
-            s += en.nextElement().toString();
+        Enumeration<LDAPAttributeSchema> en2 = getAttributes();
+        while( en2.hasMoreElements() ) {
+            s += en2.nextElement().toString();
             s += '\n';
         }
         s += "Matching rules:\n";
-        en = getMatchingRules();
+        Enumeration en = getMatchingRules();
         while( en.hasMoreElements() ) {
             s += en.nextElement().toString();
             s += '\n';
@@ -944,7 +944,7 @@ public class LDAPSchema implements java.io.Serializable {
     }
 
     private Hashtable<String, LDAPObjectClassSchema> objectClasses = new Hashtable<>();
-    private Hashtable attributes = new Hashtable();
+    private Hashtable<String, LDAPAttributeSchema> attributes = new Hashtable<>();
     private Hashtable matchingRules = new Hashtable();
     private Hashtable syntaxes = new Hashtable();
     private Hashtable structureRulesByName = new Hashtable();

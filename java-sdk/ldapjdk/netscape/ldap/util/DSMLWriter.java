@@ -135,9 +135,9 @@ public class DSMLWriter extends LDAPWriter {
      * schema schema elements
      */
     protected void printAttributeSchema( LDAPSchema schema ) {
-        Enumeration en = schema.getAttributes();
+        Enumeration<LDAPAttributeSchema> en = schema.getAttributes();
         while( en.hasMoreElements() ) {
-            LDAPAttributeSchema s = (LDAPAttributeSchema)en.nextElement();
+            LDAPAttributeSchema s = en.nextElement();
             printString( "    <dsml:attribute-type" );
             printString( "      id=\"" + s.getName() + "\"" );
             printString( "      oid=\"" + s.getID() + "\"" );

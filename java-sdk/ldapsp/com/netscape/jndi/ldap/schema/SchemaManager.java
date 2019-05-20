@@ -158,7 +158,7 @@ class SchemaManager {
         return m_schema.getObjectClasses();
     }
 
-    Enumeration getAttributes() throws NamingException {
+    Enumeration<LDAPAttributeSchema> getAttributes() throws NamingException {
         if (!m_isLoaded || m_isAttributeDirty) {
             load();
         }
