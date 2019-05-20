@@ -90,7 +90,7 @@ class LDAPConnThread extends Thread {
     transient private InputStream _serverInput;
     transient private OutputStream _serverOutput;
     transient private Hashtable<Integer, LDAPMessageQueue> _requests;
-    transient private Hashtable _messages = null;
+    transient private Hashtable<Integer, Vector<Object>> _messages = null;
     transient private Vector _registered;
     transient private boolean _disconnected = false;
     transient private LDAPCache _cache = null;
@@ -217,7 +217,7 @@ class LDAPConnThread extends Thread {
      */
     synchronized void setCache( LDAPCache cache ) {
         _cache = cache;
-        _messages = (_cache != null) ? new Hashtable() : null;
+        _messages = (_cache != null) ? new Hashtable<>() : null;
     }
 
     /**
@@ -592,7 +592,7 @@ class LDAPConnThread extends Thread {
                                                  LDAPMessage msg, int size ) {
         Integer messageID = new Integer( msg.getMessageID() );
         Long key = l.getKey();
-        Vector v = null;
+        Vector<Object> v = null;
 
         if ( (_cache == null) || (key == null) ) {
             return;
@@ -602,9 +602,9 @@ class LDAPConnThread extends Thread {
 
             // Get the vector containing the LDAPMessages for the specified
             // messageID
-            v = (Vector)_messages.get( messageID );
+            v = _messages.get( messageID );
             if ( v == null ) {
-                _messages.put( messageID, v = new Vector() );
+                _messages.put( messageID, v = new Vector<>() );
                 v.addElement( new Long(0) );
             }
 
@@ -639,9 +639,9 @@ class LDAPConnThread extends Thread {
 
             // If a search reference is received disable caching of
             // this search request
-            v = (Vector)_messages.get(messageID);
+            v = _messages.get(messageID);
             if ( v == null ) {
-                _messages.put( messageID, v = new Vector() );
+                _messages.put( messageID, v = new Vector<>() );
             }
             else {
                 v.removeAllElements();
@@ -655,13 +655,13 @@ class LDAPConnThread extends Thread {
             // is not disabled due to the entry size or referrals
 
             boolean fail = ((LDAPResponse)msg).getResultCode() > 0;
-            v = (Vector)_messages.remove( messageID );
+            v = _messages.remove( messageID );
 
             if ( !fail )  {
                 // If v is null, meaning there are no search results from the
                 // server
                 if ( v == null ) {
-                    v = new Vector();
+                    v = new Vector<>();
                     v.addElement(new Long(0));
                 }
 
