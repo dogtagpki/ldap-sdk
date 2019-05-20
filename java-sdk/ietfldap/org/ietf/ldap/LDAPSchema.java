@@ -262,7 +262,7 @@ public class LDAPSchema implements Serializable {
             return;
         }
         if ( el instanceof LDAPAttributeSchema ) {
-            _attributes.put( name, el );
+            _attributes.put( name, (LDAPAttributeSchema) el );
         } else if ( el instanceof LDAPObjectClassSchema ) {
             _objectClasses.put( name, (LDAPObjectClassSchema) el );
         } else if ( el instanceof LDAPMatchingRuleSchema ) {
@@ -317,7 +317,7 @@ public class LDAPSchema implements Serializable {
      * Get an enumeration of the names of the attribute types in this schema.
      * @return an enumeration of attribute names (all lower-case).
      */
-    public Enumeration getAttributeNames() {
+    public Enumeration<String> getAttributeNames() {
         return _attributes.keys();
     }
 
@@ -328,14 +328,14 @@ public class LDAPSchema implements Serializable {
      * the attribute type definition, or <CODE>null</CODE> if not found.
      */
     public LDAPAttributeSchema getAttributeSchema( String name ) {
-        return (LDAPAttributeSchema)_attributes.get( name.toLowerCase() );
+        return _attributes.get( name.toLowerCase() );
     }
 
     /**
      * Gets an enumeration of the attribute type definitions in this schema.
      * @return an enumeration of attribute type definitions.
      */
-    public Enumeration getAttributeSchemas() {
+    public Enumeration<LDAPAttributeSchema> getAttributeSchemas() {
         return _attributes.elements();
     }
 
@@ -580,7 +580,7 @@ public class LDAPSchema implements Serializable {
         String name = (el.getNames().length > 0) ?
             el.getNames()[0].toLowerCase() : "";
         if ( el instanceof LDAPAttributeSchema ) {
-            _attributes.put( name, el );
+            _attributes.put( name, (LDAPAttributeSchema) el );
         } else if ( el instanceof LDAPObjectClassSchema ) {
             _objectClasses.put( name, (LDAPObjectClassSchema) el );
         } else if ( el instanceof LDAPMatchingRuleSchema ) {
@@ -716,13 +716,13 @@ public class LDAPSchema implements Serializable {
             s += '\n';
         }
         s += "Attributes:\n";
-        Enumeration en = getAttributeSchemas();
-        while( en.hasMoreElements() ) {
-            s += en.nextElement().toString();
+        Enumeration<LDAPAttributeSchema> en2 = getAttributeSchemas();
+        while( en2.hasMoreElements() ) {
+            s += en2.nextElement().toString();
             s += '\n';
         }
         s += "Matching rules:\n";
-        en = getMatchingRuleSchemas();
+        Enumeration en = getMatchingRuleSchemas();
         while( en.hasMoreElements() ) {
             s += en.nextElement().toString();
             s += '\n';
@@ -1105,7 +1105,7 @@ public class LDAPSchema implements Serializable {
     }
 
     private Hashtable<String, LDAPObjectClassSchema> _objectClasses = new Hashtable<>();
-    private Hashtable _attributes = new Hashtable();
+    private Hashtable<String, LDAPAttributeSchema> _attributes = new Hashtable<>();
     private Hashtable _matchingRules = new Hashtable();
     private Hashtable _matchingRuleUses = new Hashtable();
     private Hashtable _syntaxes = new Hashtable();
