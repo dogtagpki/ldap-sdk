@@ -491,7 +491,7 @@ public class LDAPConnection implements Cloneable, Serializable {
        we keep a table of active threads and a table of controls,
        indexed by thread */
     private Vector<LDAPConnThread> _attachedList = new Vector<>();
-    private Hashtable _responseControlTable = new Hashtable();
+    private Hashtable<LDAPConnThread, Vector<LDAPResponseControl>> _responseControlTable = new Hashtable<>();
     private LDAPCache _cache = null;
     static Hashtable<LDAPConnThread, Vector<LDAPConnection>> _threadConnTable = new Hashtable<>();
 
@@ -2358,7 +2358,7 @@ public class LDAPConnection implements Cloneable, Serializable {
 
       /* Get the latest controls returned for our thread */
       synchronized(_responseControlTable) {
-          Vector responses = (Vector)_responseControlTable.get(_thread);
+          Vector responses = _responseControlTable.get(_thread);
 
           if (responses != null) {
               // iterate through each response control
@@ -2391,13 +2391,12 @@ public class LDAPConnection implements Cloneable, Serializable {
 
       /* Get the latest controls returned for our thread */
       synchronized(_responseControlTable) {
-          Vector responses = (Vector)_responseControlTable.get(_thread);
+          Vector<LDAPResponseControl> responses = _responseControlTable.get(_thread);
 
           if (responses != null) {
               // iterate through each response control
               for (int i=0,size=responses.size(); i<size; i++) {
-                  LDAPResponseControl responseObj =
-                    (LDAPResponseControl)responses.elementAt(i);
+                  LDAPResponseControl responseObj = responses.elementAt(i);
 
                   // check if the response matches msgID
                   if (responseObj.getMsgID() == msgID) {
@@ -5238,7 +5237,7 @@ public class LDAPConnection implements Cloneable, Serializable {
     void setResponseControls( LDAPConnThread current,
                               LDAPResponseControl con ) {
         synchronized(_responseControlTable) {
-            Vector v = (Vector)_responseControlTable.get( current );
+            Vector<LDAPResponseControl> v = _responseControlTable.get( current );
 
             // if the current thread already contains response controls from
             // a previous operation
@@ -5246,8 +5245,7 @@ public class LDAPConnection implements Cloneable, Serializable {
 
                 // look at each response control
                 for ( int i = v.size() - 1; i >= 0; i-- ) {
-                    LDAPResponseControl response =
-                      (LDAPResponseControl)v.elementAt( i );
+                    LDAPResponseControl response = v.elementAt( i );
 
                     // if this response control belongs to this connection
                     if ( response.getConnection().equals( this ) ) {
@@ -5270,7 +5268,7 @@ public class LDAPConnection implements Cloneable, Serializable {
                 }
             } else {
                 if ( con != null ) {
-                    v = new Vector();
+                    v = new Vector<>();
                 }
             }
 
