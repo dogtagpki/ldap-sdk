@@ -493,7 +493,7 @@ public class LDAPConnection implements Cloneable, Serializable {
     private Vector _attachedList = new Vector();
     private Hashtable _responseControlTable = new Hashtable();
     private LDAPCache _cache = null;
-    static Hashtable _threadConnTable = new Hashtable();
+    static Hashtable<LDAPConnThread, Vector<LDAPConnection>> _threadConnTable = new Hashtable<>();
 
     // This handles the case when the client lost the connection to the
     // server. After the client reconnects with the server, the bound resets
@@ -1372,7 +1372,7 @@ public class LDAPConnection implements Cloneable, Serializable {
             c._thread = this._thread; /* share current connection thread */
 
             synchronized (_threadConnTable) {
-                Vector v = (Vector)_threadConnTable.get(this._thread);
+                Vector<LDAPConnection> v = _threadConnTable.get(this._thread);
                 if (v != null) {
                     v.addElement(c);
                 } else {
@@ -4874,9 +4874,9 @@ public class LDAPConnection implements Cloneable, Serializable {
     void markConnAsBound() {
         synchronized (_threadConnTable) {
             if (_threadConnTable.containsKey(_thread)) {
-                Vector v = (Vector)_threadConnTable.get(_thread);
+                Vector<LDAPConnection> v = _threadConnTable.get(_thread);
                 for (int i=0, n=v.size(); i<n; i++) {
-                    LDAPConnection conn = (LDAPConnection)v.elementAt(i);
+                    LDAPConnection conn = v.elementAt(i);
                     conn._bound = true;
                 }
             } else {
@@ -4951,15 +4951,15 @@ public class LDAPConnection implements Cloneable, Serializable {
      */
     private void deleteThreadConnEntry() {
         synchronized ( _threadConnTable ) {
-            Vector connVector = (Vector)_threadConnTable.get( _thread );
+            Vector<LDAPConnection> connVector = _threadConnTable.get( _thread );
             if ( connVector == null ) {
                 printDebug( "Thread table does not contain the thread of " +
                             "this object" );
                 return;
             }
-            Enumeration enumv = connVector.elements();
+            Enumeration<LDAPConnection> enumv = connVector.elements();
             while ( enumv.hasMoreElements() ) {
-                LDAPConnection c = (LDAPConnection)enumv.nextElement();
+                LDAPConnection c = enumv.nextElement();
                 if ( c.equals( this ) ) {
                     connVector.removeElement( c );
                     if ( connVector.size() == 0 ) {
@@ -5015,22 +5015,22 @@ public class LDAPConnection implements Cloneable, Serializable {
         throws LDAPException {
 
         LDAPConnThread newThread = null;
-        Vector v = null;
+        Vector<LDAPConnection> v = null;
 
         synchronized( _threadConnTable ) {
 
-            Enumeration keys = _threadConnTable.keys();
+            Enumeration<LDAPConnThread> keys = _threadConnTable.keys();
             boolean connExists = false;
 
             // transverse each thread
             while ( keys.hasMoreElements() ) {
-                LDAPConnThread connThread = (LDAPConnThread)keys.nextElement();
-                Vector connVector = (Vector)_threadConnTable.get( connThread );
-                Enumeration enumv = connVector.elements();
+                LDAPConnThread connThread = keys.nextElement();
+                Vector<LDAPConnection> connVector = _threadConnTable.get( connThread );
+                Enumeration<LDAPConnection> enumv = connVector.elements();
 
                 // traverse each LDAPConnection under the same thread
                 while ( enumv.hasMoreElements() ) {
-                    LDAPConnection conn = (LDAPConnection)enumv.nextElement();
+                    LDAPConnection conn = enumv.nextElement();
 
                     // this is not a brand new connection
                     if ( conn.equals( this ) ) {
@@ -5043,7 +5043,7 @@ public class LDAPConnection implements Cloneable, Serializable {
                                 newThread =
                                     new LDAPConnThread( connMgr, cache,
                                                         getTraceOutput() );
-                                v = (Vector)_threadConnTable.remove(
+                                v = _threadConnTable.remove(
                                     connThread );
                                 break;
                             } catch ( Exception e ) {
@@ -5067,7 +5067,7 @@ public class LDAPConnection implements Cloneable, Serializable {
                 try {
                     newThread = new LDAPConnThread( connMgr, cache,
                                                     getTraceOutput() );
-                    v = new Vector();
+                    v = new Vector<>();
                     v.addElement( this );
                 } catch ( Exception e ) {
                     throw new LDAPException( "unable to establish connection",
@@ -5079,7 +5079,7 @@ public class LDAPConnection implements Cloneable, Serializable {
             if ( newThread != null ) {
                 _threadConnTable.put( newThread, v );
                 for ( int i = 0, n = v.size(); i < n; i++ ) {
-                    LDAPConnection c = (LDAPConnection)v.elementAt( i );
+                    LDAPConnection c = v.elementAt( i );
                     newThread.register( c );
                     c._thread = newThread;
                 }
