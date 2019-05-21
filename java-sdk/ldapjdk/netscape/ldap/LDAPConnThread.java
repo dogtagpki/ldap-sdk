@@ -90,7 +90,7 @@ class LDAPConnThread implements Runnable {
     transient private OutputStream m_serverOutput, m_origServerOutput;
     transient private Hashtable<Integer, LDAPMessageQueue> m_requests;
     transient private Hashtable<Integer, Vector<Object>> m_messages = null;
-    transient private Vector m_registered;
+    transient private Vector<LDAPConnection> m_registered;
     transient private LDAPCache m_cache = null;
     transient private Thread m_thread = null;
     transient private Object m_sendRequestLock = new Object();
@@ -118,7 +118,7 @@ class LDAPConnThread implements Runnable {
      */
     public LDAPConnThread(LDAPConnSetupMgr connMgr, LDAPCache cache, Object traceOutput) {
         m_requests = new Hashtable<>();
-        m_registered = new Vector ();
+        m_registered = new Vector<>();
         m_connMgr = connMgr;
         setCache( cache );
         setTraceOutput(traceOutput);
