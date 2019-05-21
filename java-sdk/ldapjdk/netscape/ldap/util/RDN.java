@@ -37,7 +37,9 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.util;
 
-import java.util.*;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
 
 /**
  * Objects of this class represent the components of a distinguished
@@ -73,8 +75,8 @@ public final class RDN implements java.io.Serializable {
     /**
      * Hash table of case sensitive attributes
      */
-    private static Hashtable m_attributehash = new Hashtable();    
-        
+    private static Hashtable<String, String> m_attributehash = new Hashtable<>();
+
     /**
      * Constructs a new <CODE>RDN</CODE> object from the specified
      * DN component.
@@ -92,11 +94,11 @@ public final class RDN implements java.io.Serializable {
         if (index <= 0)
             return;
 
-        Vector values = new Vector();
-        Vector types = new Vector();
+        Vector<String> values = new Vector<>();
+        Vector<String> types = new Vector<>();
 
         types.addElement( rdn.substring( 0, index ).trim() );
-        next_plus = neutralRDN.indexOf( '+', index ); 
+        next_plus = neutralRDN.indexOf( '+', index );
         while ( next_plus != -1 ) {
             m_ismultivalued = true;
             values.addElement( rdn.substring( index + 1, next_plus).trim() );
@@ -107,26 +109,26 @@ public final class RDN implements java.io.Serializable {
             }
             types.addElement( rdn.substring( next_plus + 1, index ).trim() );
             next_plus = neutralRDN.indexOf('+', index );
-        }    
+        }
         values.addElement( rdn.substring( index + 1 ).trim() );
-        
+
         m_type = new String[types.size()];
         m_value = new String[values.size()];
 
         for( int i = 0; i < types.size(); i++ ) {
-            m_type[i] = (String)types.elementAt( i );
+            m_type[i] = types.elementAt( i );
             if (!isValidType(m_type[i])) {
                 m_type = m_value = null;
                 return; // malformed
             }
-            m_value[i] = (String)values.elementAt( i );
+            m_value[i] = values.elementAt( i );
             if (!isValidValue(m_value[i])) {
                 m_type = m_value = null;
                 return; // malformed
             }
         }
     }
-    
+
     /**
      * Neutralize backslash escapes and quoted sequences for easy parsing.
      * @return rdn string with disabled escapes or null if malformed rdn
@@ -134,7 +136,7 @@ public final class RDN implements java.io.Serializable {
      static String neutralizeEscapes(String rdn) {
         if (rdn == null) {
             return null;
-        }        
+        }
         StringBuffer sb = new StringBuffer(rdn);
         boolean quoteOn = false;
         // first pass, disable backslash escapes
@@ -158,7 +160,7 @@ public final class RDN implements java.io.Serializable {
             if (quoteOn) {
                 sb.setCharAt(i, 'x');
             }
-        }        
+        }
         return quoteOn ? null : sb.toString();
     }
 
@@ -178,7 +180,7 @@ public final class RDN implements java.io.Serializable {
         }
         return true;
     }
-    
+
     /**
      * Values can contain only single quote sequence, where quotes are
      * at the beginning and the end of the sequence
@@ -207,10 +209,10 @@ public final class RDN implements java.io.Serializable {
         else if (val.charAt(0) != '"' || val.charAt(val.length()-1) != '"') {
             return false;
         }
-    
+
         return true;
     }
-    
+
     /**
      * Returns the DN component as the first element in an
      * array of strings.
@@ -271,21 +273,21 @@ public final class RDN implements java.io.Serializable {
         return m_value;
     }
 
-    /** 
+    /**
      * Returns <code>true</code> if the RDN is multi-valued.
      * @return <code>true</code> if the RDN is multi-valued.
      */
     public boolean isMultivalued() {
         return m_ismultivalued;
     }
-    
+
     /**
      * Returns the string representation of the DN component.
      * @return the string representation of the DN component.
      */
     public String toString() {
         StringBuffer buf = new StringBuffer();
-                
+
         for ( int i = 0; m_type != null  && i < m_type.length; i++ ) {
             if ( i != 0) {
                 buf.append(" + ");
@@ -308,7 +310,7 @@ public final class RDN implements java.io.Serializable {
 
     /**
      * Determines if the current DN component is equal to the specified
-     * DN component. Uses an internal table of ces (case exact string) 
+     * DN component. Uses an internal table of ces (case exact string)
      * attributes to determine how the attributes should be compared.
      * @param rdn the DN component to compare against the
      * current DN component.
@@ -317,10 +319,10 @@ public final class RDN implements java.io.Serializable {
      * @see netscape.ldap.util.RDN#getAttributeSyntax
      */
     public boolean equals(RDN rdn) {
-        String[] this_types = (String[])getTypes().clone(); 
-        String[] this_values = (String[])getValues().clone();
-        String[] rdn_types = (String[])rdn.getTypes().clone();
-        String[] rdn_values = (String[])rdn.getValues().clone();
+        String[] this_types = getTypes().clone();
+        String[] this_values = getValues().clone();
+        String[] rdn_types = rdn.getTypes().clone();
+        String[] rdn_values = rdn.getValues().clone();
 
         if ( this_types.length != rdn_types.length ) {
             return false;
@@ -328,9 +330,9 @@ public final class RDN implements java.io.Serializable {
 
         sortTypesAndValues( this_types, this_values );
         sortTypesAndValues( rdn_types, rdn_values );
-        
-        for (int i = 0; i < this_types.length; i++ ) { 
-            
+
+        for (int i = 0; i < this_types.length; i++ ) {
+
             if ( !this_types[i].equalsIgnoreCase( rdn_types[i] ) ) {
                 return false;
             }
@@ -339,7 +341,7 @@ public final class RDN implements java.io.Serializable {
                 if ( !this_values[i].equals( rdn_values[i] ) ) {
                     return false;
                 }
-            } else { 
+            } else {
                 if ( !this_values[i].equalsIgnoreCase( rdn_values[i] ) ) {
                     return false;
                 }
@@ -366,12 +368,12 @@ public final class RDN implements java.io.Serializable {
                     no_changes = false;
                 }
             }
-        } while ( no_changes = false );   
+        } while ( no_changes = false );
     }
 
     /**
      * Registers the the given attribute for the given syntax in an
-     * internal table. This table is used for attribute comparison in the 
+     * internal table. This table is used for attribute comparison in the
      * <code>equals()</code> method.
      * @param attr the attribute to register.
      * @param oid the syntax to register with the attribute.
@@ -383,9 +385,9 @@ public final class RDN implements java.io.Serializable {
     public static void registerAttributeSyntax( String attr, String oid ) {
         m_attributehash.put( attr.toLowerCase(), oid );
     }
-    
+
     /**
-     * Removes the the given attribute from the attribute syntax table. 
+     * Removes the the given attribute from the attribute syntax table.
      * @param attr the attribute to remove.
      * @see netscape.ldap.util.RDN#registerAttributeSyntax
      * @see netscape.ldap.util.RDN#getAttributeSyntax
@@ -396,7 +398,7 @@ public final class RDN implements java.io.Serializable {
     }
 
     /**
-     * Returns the syntax for the attribute if the given attribute is registered 
+     * Returns the syntax for the attribute if the given attribute is registered
      * in the internal attribute table.
      * @param attr the attribute to lookup in the table.
      * @return the syntax of the attribute if found, null otherwise.
@@ -405,11 +407,11 @@ public final class RDN implements java.io.Serializable {
      * @see netscape.ldap.util.RDN#getAttributesForSyntax
      */
     public static String getAttributeSyntax( String attr ) {
-        return (String)m_attributehash.get( attr.toLowerCase() );
+        return m_attributehash.get( attr.toLowerCase() );
     }
 
     /**
-     * Returns all attributes registered for the given syntax as a 
+     * Returns all attributes registered for the given syntax as a
      * <code>String</code> Array.
      * @param oid the syntax to look up in the table.
      * @return all attributes for the given syntax as a <code>String[]</code>
@@ -418,22 +420,22 @@ public final class RDN implements java.io.Serializable {
      * @see netscape.ldap.util.RDN#getAttributeSyntax
      */
     public static String[] getAttributesForSyntax( String oid ) {
-        Enumeration itr = m_attributehash.keys();
-        Vector key_v = new Vector();
+        Enumeration<String> itr = m_attributehash.keys();
+        Vector<String> key_v = new Vector<>();
         String tmp_str = null;
 
         while ( itr.hasMoreElements() ) {
-            tmp_str = (String)itr.nextElement();
-            if ( oid.equals( (String)m_attributehash.get( tmp_str ) ) ) {
+            tmp_str = itr.nextElement();
+            if ( oid.equals( m_attributehash.get( tmp_str ) ) ) {
                 key_v.addElement( tmp_str );
             }
         }
 
         String[]  str = new String[key_v.size()];
         for ( int i = 0; i < str.length; i++ ) {
-            str[i] = new String( (String)key_v.elementAt( i ) );
+            str[i] = new String( key_v.elementAt( i ) );
         }
-        
+
         return str;
     }
 
@@ -468,9 +470,9 @@ public final class RDN implements java.io.Serializable {
     public static final String CES_SYNTAX = "1.3.6.1.4.1.1466.115.121.1.26";
 
     static {
-        /* static initializer to fill the ces attribute hash 
+        /* static initializer to fill the ces attribute hash
          * this list was generated from the slapd.at.conf that
-         * ships with Netscape Directory Server 4.1 
+         * ships with Netscape Directory Server 4.1
          */
         for ( int i = 0; i < _cesAttributes.length; i++ ) {
             registerAttributeSyntax( _cesAttributes[i], CES_SYNTAX );
