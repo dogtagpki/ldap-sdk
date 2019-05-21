@@ -880,7 +880,7 @@ public class LDAPSchema implements Serializable {
 
         /* Matching rules are tricky, because we have to match up a
            rule with its use. First get all the uses. */
-        Hashtable h = new Hashtable();
+        Hashtable<String, String> h = new Hashtable<>();
         attr = entry.getAttribute( "matchingruleuse" );
         if ( attr != null ) {
             en = attr.getStringValues();
@@ -899,7 +899,7 @@ public class LDAPSchema implements Serializable {
                 String raw = en.nextElement();
                 LDAPMatchingRuleSchema sch =
                     new LDAPMatchingRuleSchema( raw, null );
-                String use = (String)h.get( sch.getID() );
+                String use = h.get( sch.getID() );
                 if ( use != null )
                     sch = new LDAPMatchingRuleSchema( raw, use );
                 add( sch, false );
@@ -919,7 +919,7 @@ public class LDAPSchema implements Serializable {
         throws LDAPException {
 
         /* Check if this has already been investigated */
-        String schemaBug = (String)ld.getProperty( ld.SCHEMA_BUG_PROPERTY );
+        String schemaBug = (String)ld.getProperty( LDAPConnection.SCHEMA_BUG_PROPERTY );
         if ( schemaBug != null ) {
             return schemaBug.equalsIgnoreCase( "standard" );
         }
@@ -937,7 +937,7 @@ public class LDAPSchema implements Serializable {
                 compliant = !isSyntaxQuoted( en.nextElement() );
             }
         }
-        ld.setProperty( ld.SCHEMA_BUG_PROPERTY, compliant ? "standard" :
+        ld.setProperty( LDAPConnection.SCHEMA_BUG_PROPERTY, compliant ? "standard" :
                         "NetscapeBug" );
         return compliant;
     }
@@ -1026,9 +1026,9 @@ public class LDAPSchema implements Serializable {
      *
      * @param en enumeration of schema elements
      */
-    private static void printEnum( Enumeration en ) {
+    private static void printEnum( Enumeration<? extends LDAPSchemaElement> en ) {
         while( en.hasMoreElements() ) {
-            LDAPSchemaElement s = (LDAPSchemaElement)en.nextElement();
+            LDAPSchemaElement s = en.nextElement();
             System.out.println( "  " + s );
         }
     }
@@ -1040,7 +1040,7 @@ public class LDAPSchema implements Serializable {
                                          String dn,
                                          String[] attrs )
         throws LDAPException {
-        LDAPSearchResults results = ld.search (dn, ld.SCOPE_BASE,
+        LDAPSearchResults results = ld.search (dn, LDAPConnection.SCOPE_BASE,
                                                "objectclass=subschema",
                                                attrs, false);
         if ( !results.hasMore() ) {
