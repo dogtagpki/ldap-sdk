@@ -237,7 +237,7 @@ public class LDAPSchema implements Serializable {
                       boolean isChange ) {
         String ID = el.getID();
         if ( ID != null ) {
-            LDAPSchemaElement oldEl = (LDAPSchemaElement)_IDToElement.get( ID );
+            LDAPSchemaElement oldEl = _IDToElement.get( ID );
             if ( (oldEl != null) && namesTheSame( oldEl, el ) ) {
                 throw new IllegalArgumentException( "Schema element already " +
                                                     "defined for " + ID +
@@ -1110,6 +1110,6 @@ public class LDAPSchema implements Serializable {
     private Hashtable<Integer, LDAPDITStructureRuleSchema> _structureRulesById = new Hashtable<>();
     private Hashtable<String, LDAPDITContentRuleSchema> _contentRules = new Hashtable<>();
     private Hashtable<String, LDAPNameFormSchema> _nameForms = new Hashtable<>();
-    private Hashtable _IDToElement = new Hashtable();
+    private Hashtable<String, LDAPSchemaElement> _IDToElement = new Hashtable<>();
     private ArrayList<LDAPModification> _changeList = new ArrayList<>();
 }
