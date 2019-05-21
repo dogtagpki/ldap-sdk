@@ -473,8 +473,8 @@ public class LDAPConnection implements Cloneable, Serializable {
     // "smart failover" for the automatic rebind
     private LDAPConstraints _rebindConstraints;
 
-    private Vector _responseListeners;
-    private Vector _searchListeners;
+    private Vector<LDAPResponseQueue> _responseListeners;
+    private Vector<LDAPSearchQueue> _searchListeners;
     private boolean _bound;
     private String _prevBoundDN;
     private byte[] _prevBoundPasswd;
@@ -502,11 +502,10 @@ public class LDAPConnection implements Cloneable, Serializable {
     // request to the server.
     private boolean _anonymousBound = false;
 
-    private Object _security = null;
     private LDAPSaslBind _saslBinder = null;
     private CallbackHandler _saslCallbackHandler = null;
     private Properties _securityProperties;
-    private Hashtable _properties = new Hashtable();
+    private Hashtable<String, Object> _properties = new Hashtable<>();
     private LDAPConnection _referralConnection;
     private String _authMethod = "none";
 
@@ -776,9 +775,9 @@ public class LDAPConnection implements Cloneable, Serializable {
         LDAPResponseQueue myListener = getResponseListener ();
         LDAPAttributeSet attrs = entry.getAttributeSet ();
         LDAPAttribute[] attrList = new LDAPAttribute[attrs.size()];
-        Iterator it = attrs.iterator();
+        Iterator<LDAPAttribute> it = attrs.iterator();
         for( int i = 0; i < attrs.size(); i++ ) {
-            attrList[i] = (LDAPAttribute)it.next();
+            attrList[i] = it.next();
         }
         int attrPosition = 0;
         LDAPMessage response;
@@ -851,9 +850,9 @@ public class LDAPConnection implements Cloneable, Serializable {
 
         LDAPAttributeSet attrs = entry.getAttributeSet ();
         LDAPAttribute[] attrList = new LDAPAttribute[attrs.size()];
-        Iterator it = attrs.iterator();
+        Iterator<LDAPAttribute> it = attrs.iterator();
         for( int i = 0; i < attrs.size(); i++ ) {
-            attrList[i] = (LDAPAttribute)it.next();
+            attrList[i] = it.next();
         }
         int attrPosition = 0;
 
@@ -1456,7 +1455,7 @@ public class LDAPConnection implements Cloneable, Serializable {
             checkMsg (response);
 
         } catch (LDAPReferralException e) {
-            Vector res = new Vector();
+            Vector<Object> res = new Vector<>();
             performReferrals(e, cons, JDAPProtocolOp.COMPARE_REQUEST,
                              DN, 0, null, null, false, null, null, attr, res);
             boolean bool = false;
@@ -2358,13 +2357,12 @@ public class LDAPConnection implements Cloneable, Serializable {
 
       /* Get the latest controls returned for our thread */
       synchronized(_responseControlTable) {
-          Vector responses = _responseControlTable.get(_thread);
+          Vector<LDAPResponseControl> responses = _responseControlTable.get(_thread);
 
           if (responses != null) {
               // iterate through each response control
               for (int i=0,size=responses.size(); i<size; i++) {
-                  LDAPResponseControl responseObj =
-                    (LDAPResponseControl)responses.elementAt(i);
+                  LDAPResponseControl responseObj = responses.elementAt(i);
 
                   // check if the response belongs to this connection
                   if (responseObj.getConnection().equals(this)) {
@@ -2429,7 +2427,7 @@ public class LDAPConnection implements Cloneable, Serializable {
      * @return the properties, if any, specified on binding with a
      * SASL mechanism
      */
-    public Map getSaslBindProperties() {
+    public Properties getSaslBindProperties() {
         return _securityProperties;
     }
 
@@ -3106,7 +3104,7 @@ public class LDAPConnection implements Cloneable, Serializable {
 
         LDAPConnection connection = new LDAPConnection ();
         if (toGet.isSecure()) {
-            LDAPSocketFactory factory = toGet.getSocketFactory();
+            LDAPSocketFactory factory = LDAPUrl.getSocketFactory();
             if (factory == null) {
                 throw new LDAPException("No socket factory for LDAPUrl",
                                          LDAPException.OTHER);
@@ -3594,7 +3592,7 @@ public class LDAPConnection implements Cloneable, Serializable {
 
         LDAPConnection connection = new LDAPConnection ();
         if (toGet.isSecure()) {
-            LDAPSocketFactory factory = toGet.getSocketFactory();
+            LDAPSocketFactory factory = LDAPUrl.getSocketFactory();
             if (factory == null) {
                 throw new LDAPException("No socket factory for LDAPUrl",
                                          LDAPException.OTHER);
@@ -3764,7 +3762,7 @@ public class LDAPConnection implements Cloneable, Serializable {
         LDAPSearchResults returnValue =
             new LDAPSearchResults( this, cons, base, scope, filter,
                                    attrs, attrsOnly );
-        Vector cacheValue = null;
+        Vector<Object> cacheValue = null;
         Long key = null;
         boolean isKeyValid = true;
 
@@ -3775,7 +3773,7 @@ public class LDAPConnection implements Cloneable, Serializable {
                 key = _cache.createKey( getHost(), getPort(),base, filter,
                                         scope, attrs, _boundDN, cons );
 
-                cacheValue = (Vector)_cache.getEntry(key);
+                cacheValue = _cache.getEntry(key);
 
                 if ( cacheValue != null ) {
                     return new LDAPSearchResults(
@@ -4718,7 +4716,7 @@ public class LDAPConnection implements Cloneable, Serializable {
                 value.add( msg );
             }
         } catch ( LDAPReferralException e ) {
-            Vector res = new Vector();
+            Vector<Object> res = new Vector<>();
 
             try {
                 performReferrals( e, cons, JDAPProtocolOp.SEARCH_REQUEST, dn,
@@ -5115,7 +5113,7 @@ public class LDAPConnection implements Cloneable, Serializable {
      */
     synchronized LDAPResponseQueue getResponseListener() {
         if ( _responseListeners == null ) {
-            _responseListeners = new Vector( 5 );
+            _responseListeners = new Vector<>( 5 );
         }
 
         LDAPResponseQueue l;
@@ -5123,7 +5121,7 @@ public class LDAPConnection implements Cloneable, Serializable {
             l = new LDAPResponseQueue ( /*asynchOp=*/false );
         }
         else {
-            l = (LDAPResponseQueue)_responseListeners.elementAt( 0 );
+            l = _responseListeners.elementAt( 0 );
             _responseListeners.removeElementAt( 0 );
         }
         return l;
@@ -5138,7 +5136,7 @@ public class LDAPConnection implements Cloneable, Serializable {
     private synchronized LDAPSearchQueue getSearchListener (
         LDAPSearchConstraints cons ) {
         if ( _searchListeners == null ) {
-            _searchListeners = new Vector( 5 );
+            _searchListeners = new Vector<>( 5 );
         }
 
         LDAPSearchQueue l;
@@ -5146,7 +5144,7 @@ public class LDAPConnection implements Cloneable, Serializable {
             l = new LDAPSearchQueue ( /*asynchOp=*/false, cons );
         }
         else {
-            l = (LDAPSearchQueue)_searchListeners.elementAt( 0 );
+            l = _searchListeners.elementAt( 0 );
             _searchListeners.removeElementAt( 0 );
             l.setSearchConstraints( cons );
         }
@@ -5161,7 +5159,7 @@ public class LDAPConnection implements Cloneable, Serializable {
      */
     synchronized void releaseResponseListener( LDAPResponseQueue l ) {
         if ( _responseListeners == null ) {
-            _responseListeners = new Vector( 5 );
+            _responseListeners = new Vector<>( 5 );
         }
 
         l.reset();
@@ -5176,7 +5174,7 @@ public class LDAPConnection implements Cloneable, Serializable {
      */
     synchronized void releaseSearchListener( LDAPSearchQueue l ) {
         if ( _searchListeners == null ) {
-            _searchListeners = new Vector( 5 );
+            _searchListeners = new Vector<>( 5 );
         }
 
         l.reset();
@@ -5322,7 +5320,7 @@ public class LDAPConnection implements Cloneable, Serializable {
                               new Integer(cons.getHopLimit()-1) );
 
         try {
-            connection.connect( connectList, connection.DEFAULT_PORT );
+            connection.connect( connectList, LDAPConnection.DEFAULT_PORT );
         }
         catch ( LDAPException e ) {
             throw new LDAPException( "Referral connect failed: " +
@@ -5470,7 +5468,7 @@ public class LDAPConnection implements Cloneable, Serializable {
                            LDAPEntry entry,
                            LDAPAttribute attr,
                            /* result */
-                           Vector results )
+                           Vector<Object> results )
         throws LDAPException {
 
         if ( cons.getHopLimit() <= 0 ) {
@@ -5543,7 +5541,7 @@ public class LDAPConnection implements Cloneable, Serializable {
                            String filter, String types[], boolean attrsOnly,
                            LDAPModification mods[], LDAPEntry entry,
                            LDAPAttribute attr,
-                           Vector results ) throws LDAPException {
+                           Vector<Object> results ) throws LDAPException {
 
         LDAPSearchResults res = null;
         try {
