@@ -439,7 +439,7 @@ public class LDAPSchema implements java.io.Serializable {
      * Gets an enumeration ofthe matching rule definitions in this schema.
      * @return an enumeration of matching rule definitions.
      */
-    public Enumeration getMatchingRules() {
+    public Enumeration<LDAPMatchingRuleSchema> getMatchingRules() {
         return matchingRules.elements();
     }
 
@@ -502,7 +502,7 @@ public class LDAPSchema implements java.io.Serializable {
      * the matching rule definition, or <CODE>null</CODE> if not found.
      */
     public LDAPMatchingRuleSchema getMatchingRule( String name ) {
-        return (LDAPMatchingRuleSchema)matchingRules.get( name.toLowerCase() );
+        return matchingRules.get( name.toLowerCase() );
     }
 
     /**
@@ -578,7 +578,7 @@ public class LDAPSchema implements java.io.Serializable {
      * Get an enumeration of the names of the matching rules in this schema.
      * @return an enumeration of matching rule names (all lower-case).
      */
-    public Enumeration getMatchingRuleNames() {
+    public Enumeration<String> getMatchingRuleNames() {
         return matchingRules.keys();
     }
 
@@ -709,7 +709,7 @@ public class LDAPSchema implements java.io.Serializable {
 
         /* Matching rules are tricky, because we have to match up a
            rule with its use. First get all the uses. */
-        Hashtable h = new Hashtable();
+        Hashtable<String, String> h = new Hashtable<>();
         attr = entry.getAttribute( "matchingruleuse" );
         if ( attr != null ) {
             en = attr.getStringValues();
@@ -728,7 +728,7 @@ public class LDAPSchema implements java.io.Serializable {
                 String raw = en.nextElement();
                 LDAPMatchingRuleSchema sch =
                     new LDAPMatchingRuleSchema( raw, null );
-                String use = (String)h.get( sch.getOID() );
+                String use = h.get( sch.getOID() );
                 if ( use != null )
                     sch = new LDAPMatchingRuleSchema( raw, use );
                 addMatchingRule( sch );
@@ -830,13 +830,13 @@ public class LDAPSchema implements java.io.Serializable {
             s += '\n';
         }
         s += "Matching rules:\n";
-        Enumeration en = getMatchingRules();
-        while( en.hasMoreElements() ) {
-            s += en.nextElement().toString();
+        Enumeration<LDAPMatchingRuleSchema> en3 = getMatchingRules();
+        while( en3.hasMoreElements() ) {
+            s += en3.nextElement().toString();
             s += '\n';
         }
         s += "Syntaxes:\n";
-        en = getSyntaxes();
+        Enumeration en = getSyntaxes();
         while( en.hasMoreElements() ) {
             s += en.nextElement().toString();
             s += '\n';
@@ -945,7 +945,7 @@ public class LDAPSchema implements java.io.Serializable {
 
     private Hashtable<String, LDAPObjectClassSchema> objectClasses = new Hashtable<>();
     private Hashtable<String, LDAPAttributeSchema> attributes = new Hashtable<>();
-    private Hashtable matchingRules = new Hashtable();
+    private Hashtable<String, LDAPMatchingRuleSchema> matchingRules = new Hashtable<>();
     private Hashtable syntaxes = new Hashtable();
     private Hashtable structureRulesByName = new Hashtable();
     private Hashtable structureRulesById = new Hashtable();

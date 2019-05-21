@@ -144,7 +144,7 @@ class SchemaManager {
         return m_schema.getAttributeNames();
     }
 
-    Enumeration getMatchingRuleNames() throws NamingException {
+    Enumeration<String> getMatchingRuleNames() throws NamingException {
         if (!m_isLoaded || m_isMatchingRuleDirty) {
             load();
         }
@@ -165,7 +165,7 @@ class SchemaManager {
         return m_schema.getAttributes();
     }
 
-    Enumeration getMatchingRules() throws NamingException {
+    Enumeration<LDAPMatchingRuleSchema> getMatchingRules() throws NamingException {
         if (!m_isLoaded || m_isMatchingRuleDirty) {
             load();
         }
