@@ -270,7 +270,7 @@ public class LDAPSchema implements Serializable {
         } else if ( el instanceof LDAPMatchingRuleUseSchema ) {
             _matchingRuleUses.put( name, (LDAPMatchingRuleUseSchema) el );
         } else if ( el instanceof LDAPNameFormSchema ) {
-            _nameForms.put( name, el );
+            _nameForms.put( name, (LDAPNameFormSchema) el );
         } else if ( el instanceof LDAPSyntaxSchema ) {
             if ( name.length() < 1 ) {
                 name = el.getID();
@@ -457,7 +457,7 @@ public class LDAPSchema implements Serializable {
      * Get an enumeration of the names of the name forms in this schema.
      * @return an enumeration of names of name form objects
      */
-    public Enumeration getNameFormNames() {
+    public Enumeration<String> getNameFormNames() {
         return _nameForms.keys();
     }
 
@@ -468,14 +468,14 @@ public class LDAPSchema implements Serializable {
      * the syntax definition, or <CODE>null</CODE> if not found.
      */
     public LDAPNameFormSchema getNameFormSchema( String name ) {
-        return (LDAPNameFormSchema)_nameForms.get( name.toLowerCase() );
+        return _nameForms.get( name.toLowerCase() );
     }
 
     /**
      * Get an enumeration of the name forms in this schema.
      * @return an enumeration of name form objects
      */
-    public Enumeration getNameFormSchemas() {
+    public Enumeration<LDAPNameFormSchema> getNameFormSchemas() {
         return _nameForms.elements();
     }
 
@@ -585,7 +585,7 @@ public class LDAPSchema implements Serializable {
         } else if ( el instanceof LDAPMatchingRuleUseSchema ) {
             _matchingRuleUses.put( name, (LDAPMatchingRuleUseSchema) el );
         } else if ( el instanceof LDAPNameFormSchema ) {
-            _nameForms.put( name, el );
+            _nameForms.put( name, (LDAPNameFormSchema) el );
         } else if ( el instanceof LDAPSyntaxSchema ) {
             if ( name.length() < 1 ) {
                 name = el.getID();
@@ -1109,7 +1109,7 @@ public class LDAPSchema implements Serializable {
     private Hashtable<String, LDAPDITStructureRuleSchema> _structureRulesByName = new Hashtable<>();
     private Hashtable<Integer, LDAPDITStructureRuleSchema> _structureRulesById = new Hashtable<>();
     private Hashtable<String, LDAPDITContentRuleSchema> _contentRules = new Hashtable<>();
-    private Hashtable _nameForms = new Hashtable();
+    private Hashtable<String, LDAPNameFormSchema> _nameForms = new Hashtable<>();
     private Hashtable _IDToElement = new Hashtable();
     private ArrayList<LDAPModification> _changeList = new ArrayList<>();
 }
