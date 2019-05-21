@@ -273,7 +273,7 @@ public class LDAPConnection
     private transient LDAPConnThread m_thread = null;
 
     /* To manage received server controls on a per-thread basis */
-    private Hashtable m_responseControlTable = new Hashtable();
+    private Hashtable<Thread, ResponseControls> m_responseControlTable = new Hashtable<>();
     private LDAPCache m_cache = null;
 
     // A flag set if startTLS() called successfully
@@ -4549,7 +4549,7 @@ public class LDAPConnection
         /* Get the latest controls for the caller thread */
         synchronized(m_responseControlTable) {
             ResponseControls rspCtrls =
-                (ResponseControls) m_responseControlTable.get(caller);
+                m_responseControlTable.get(caller);
 
             if (rspCtrls != null) {
                 Vector v = rspCtrls.ctrls;
@@ -4575,10 +4575,10 @@ public class LDAPConnection
         LDAPControl[] controls = null;
 
         synchronized(m_responseControlTable) {
-            Enumeration itr = m_responseControlTable.keys();
+            Enumeration<Thread> itr = m_responseControlTable.keys();
             while (itr.hasMoreElements()) {
-                Object client = itr.nextElement();
-                ResponseControls rspCtrls = (ResponseControls)m_responseControlTable.get(client);
+                Thread client = itr.nextElement();
+                ResponseControls rspCtrls = m_responseControlTable.get(client);
 
                 if (msgID == rspCtrls.msgID) {
                     Vector v = rspCtrls.ctrls;
@@ -4936,7 +4936,7 @@ public class LDAPConnection
      */
     void setResponseControls( Thread client, int msgID, LDAPControl[] ctrls ) {
         synchronized(m_responseControlTable) {
-            ResponseControls rspCtrls = (ResponseControls)m_responseControlTable.get(client);
+            ResponseControls rspCtrls = m_responseControlTable.get(client);
 
             if (rspCtrls == null || rspCtrls.msgID != msgID) {
                 rspCtrls = new ResponseControls(msgID, ctrls);
@@ -5334,7 +5334,7 @@ public class LDAPConnection
             c.m_responseListeners = null;
             c.m_searchListeners = null;
             c.m_properties = (Hashtable)m_properties.clone();
-            c.m_responseControlTable = new Hashtable();
+            c.m_responseControlTable = new Hashtable<>();
 
             if (c.m_cache != null) {
                 c.m_cache.addReference();
