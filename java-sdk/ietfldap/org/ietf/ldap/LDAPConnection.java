@@ -1004,7 +1004,7 @@ public class LDAPConnection implements Cloneable, Serializable {
      */
     public void bind( String dn,
                       String authzid,
-                      Map props,
+                      Map<String, String> props,
                       CallbackHandler cbh )
         throws LDAPException {
         bind( dn, authzid, props, cbh, _defaultConstraints );
@@ -1034,7 +1034,7 @@ public class LDAPConnection implements Cloneable, Serializable {
      */
     public void bind( String dn,
                       String authzid,
-                      Map props,
+                      Map<String, String> props,
                       CallbackHandler cbh,
                       LDAPConstraints cons )
         throws LDAPException {
@@ -1081,7 +1081,7 @@ public class LDAPConnection implements Cloneable, Serializable {
     public void bind( String dn,
                       String authzid,
                       String[] mechanisms,
-                      Map props,
+                      Map<String, String> props,
                       CallbackHandler cbh )
         throws LDAPException {
         bind( dn, authzid, mechanisms, props, cbh, _defaultConstraints );
@@ -1116,7 +1116,7 @@ public class LDAPConnection implements Cloneable, Serializable {
     public void bind( String dn,
                       String authzid,
                       String[] mechanisms,
-                      Map props,
+                      Map<String, String> props,
                       CallbackHandler cbh,
                       LDAPConstraints cons )
         throws LDAPException {
@@ -1135,7 +1135,7 @@ public class LDAPConnection implements Cloneable, Serializable {
         _boundDN = null;
         _protocolVersion = 3; // Must be 3 for SASL
         if ( props == null ) {
-            props = new Hashtable();
+            props = new Hashtable<>();
         }
         _saslBinder = new LDAPSaslBind( dn, mechanisms,
                                         props, cbh );
@@ -1323,12 +1323,12 @@ public class LDAPConnection implements Cloneable, Serializable {
                       String authzid,
                       String[] mechanisms,
                       String packageName,
-                      Map props,
+                      Map<String, String> props,
                       CallbackHandler cbh,
                       LDAPConstraints cons )
         throws LDAPException {
         if ( props == null ) {
-            props = new Hashtable();
+            props = new Hashtable<>();
         }
         props.put( LDAPSaslBind.CLIENTPKGS, packageName );
         bind( dn, authzid, mechanisms, props, cbh, cons );

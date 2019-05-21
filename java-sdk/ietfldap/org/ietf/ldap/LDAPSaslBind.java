@@ -37,15 +37,20 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap;
 
-import java.util.*;
-import org.ietf.ldap.client.*;
-import org.ietf.ldap.client.opers.*;
-import org.ietf.ldap.ber.stream.*;
-import org.ietf.ldap.util.*;
-import java.io.*;
-import java.net.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.StringTokenizer;
+
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.sasl.*;
+import javax.security.sasl.SaslClient;
+
+import org.ietf.ldap.client.opers.JDAPBindRequest;
+import org.ietf.ldap.client.opers.JDAPBindResponse;
+import org.ietf.ldap.client.opers.JDAPProtocolOp;
 
 /**
  * Authenticates to a server using SASL
@@ -69,7 +74,7 @@ public class LDAPSaslBind implements LDAPBindHandler, Serializable {
      */
     public LDAPSaslBind( String dn,
                          String[] mechanisms,
-                         Map props,
+                         Map<String, String> props,
                          CallbackHandler cbh ) {
         _dn = dn;
         _mechanisms = mechanisms;
@@ -92,14 +97,14 @@ public class LDAPSaslBind implements LDAPBindHandler, Serializable {
      */
     public void bind( LDAPConnection ldc ) throws LDAPException {
         if ( _props == null ) {
-            _props = new HashMap();
+            _props = new HashMap<>();
         }
-        String packageNames = (String)_props.get( CLIENTPKGS );
+        String packageNames = _props.get( CLIENTPKGS );
         if ( packageNames == null ) {
             packageNames = System.getProperty( CLIENTPKGS );
         }
         if ( packageNames == null ) {
-            packageNames = ldc.DEFAULT_SASL_PACKAGE;
+            packageNames = LDAPConnection.DEFAULT_SASL_PACKAGE;
         }
         StringTokenizer st = new StringTokenizer( packageNames, "|" );
         while( st.hasMoreTokens() ) {
@@ -119,7 +124,7 @@ public class LDAPSaslBind implements LDAPBindHandler, Serializable {
             bind( ldc, true );
             return;
         } else {
-            ldc.printDebug( "LDAPSaslBind.bind: getClient " +
+            LDAPConnection.printDebug( "LDAPSaslBind.bind: getClient " +
                             "returned null" );
         }
     }
@@ -188,7 +193,7 @@ public class LDAPSaslBind implements LDAPBindHandler, Serializable {
                                                 args, argNames );
 
         } catch ( Exception e ) {
-            ldc.printDebug( "LDAPSaslBind.getClient: " +
+            LDAPConnection.printDebug( "LDAPSaslBind.getClient: " +
                             packageName+".Sasl.createSaslClient: " +
                             e );
             throw new LDAPException( e.toString(), LDAPException.OTHER );
@@ -202,7 +207,7 @@ public class LDAPSaslBind implements LDAPBindHandler, Serializable {
              !ldc.isConnected() ) {
             try {
                 String className = _saslClient.getClass().getName();
-                ldc.printDebug( "LDAPSaslBind.bind: calling " +
+                LDAPConnection.printDebug( "LDAPSaslBind.bind: calling " +
                                 className+".hasInitialResponse" );
                 // Get initial response if any
                 byte[] outVals = null;
@@ -211,11 +216,11 @@ public class LDAPSaslBind implements LDAPBindHandler, Serializable {
                 }
 
                 String mechanismName = getMechanismName();
-                ldc.printDebug( "LDAPSaslBind.bind: mechanism " +
+                LDAPConnection.printDebug( "LDAPSaslBind.bind: mechanism " +
                                 "name is " +
                                 mechanismName );
                 boolean isExternal = isExternalMechanism( mechanismName );
-                ldc.printDebug( "LDAPSaslBind.bind: calling " +
+                LDAPConnection.printDebug( "LDAPSaslBind.bind: calling " +
                                 "saslBind" );
                 JDAPBindResponse response =
                     saslBind( ldc, mechanismName, outVals );
@@ -229,7 +234,7 @@ public class LDAPSaslBind implements LDAPBindHandler, Serializable {
                         b = new byte[0];
                     }
                     outVals = evaluateChallenge( b );
-                    ldc.printDebug( "SaslClient.evaluateChallenge returned [" +
+                    LDAPConnection.printDebug( "SaslClient.evaluateChallenge returned [" +
                                     ((outVals != null) ?
                                      new String( outVals ) : "null") +
                                     "] for [" + new String( b ) + "]" );
@@ -271,7 +276,7 @@ public class LDAPSaslBind implements LDAPBindHandler, Serializable {
                         ldc.setOutputStream(
                             new SecureOutputStream( ldc.getOutputStream(),
                                                     _saslClient ) );
-                    }                
+                    }
                     ldc.markConnAsBound();
                 }
 
@@ -292,7 +297,7 @@ public class LDAPSaslBind implements LDAPBindHandler, Serializable {
                                                 int resultCode )
         throws LDAPException {
 
-        ldc.printDebug( "LDAPSaslBind.bind: saslBind " +
+        LDAPConnection.printDebug( "LDAPSaslBind.bind: saslBind " +
                         "returned " + resultCode );
         if ( isComplete() ) {
             if ( (resultCode == LDAPException.SUCCESS) ||
@@ -430,7 +435,7 @@ public class LDAPSaslBind implements LDAPBindHandler, Serializable {
         "org.ietf.ldap.sasl.reflect";
     private String _dn;
     private String[] _mechanisms;
-    private Map _props = null;
+    private Map<String, String> _props = null;
     private CallbackHandler _cbh;
     private Object _saslClient = null;
     private static boolean _useReflection =
@@ -440,24 +445,20 @@ public class LDAPSaslBind implements LDAPBindHandler, Serializable {
     class SecureInputStream extends InputStream {
         public SecureInputStream( InputStream is, Object saslClient ) {
             _input = is;
-            _saslClient = saslClient;
         }
         public int read() throws IOException {
             return _input.read();
         }
         private InputStream _input;
-        private Object _saslClient;
     }
 
     class SecureOutputStream extends OutputStream {
         public SecureOutputStream( OutputStream os, Object saslClient ) {
             _output = os;
-            _saslClient = saslClient;
         }
         public void write( int b ) throws IOException {
             _output.write( b );
         }
         private OutputStream _output;
-        private Object _saslClient;
     }
 }
