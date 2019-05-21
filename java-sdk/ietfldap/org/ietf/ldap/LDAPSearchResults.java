@@ -59,7 +59,7 @@ import java.util.Vector;
 public class LDAPSearchResults implements Serializable {
 
     static final long serialVersionUID = -501692208613904825L;
-    private Vector entries = null;
+    private Vector<Object> entries = null;
     private LDAPSearchQueue resultSource;
     private boolean searchComplete = false;
     private LDAPConnection connectionToClose;
@@ -71,8 +71,8 @@ public class LDAPSearchResults implements Serializable {
     private String currFilter;
     private String[] currAttrs;
     private boolean currAttrsOnly;
-    private Vector referralResults = new Vector();
-    private Vector exceptions;
+    private Vector<LDAPSearchResults> referralResults = new Vector<>();
+    private Vector<LDAPException> exceptions;
     private int msgID = -1;
 
     // only used for the persistent search
@@ -86,7 +86,7 @@ public class LDAPSearchResults implements Serializable {
      * @see org.ietf.ldap.LDAPConnection#search(java.lang.String, int, java.lang.String, java.lang.String[], boolean)
      */
     public LDAPSearchResults() {
-        entries = new Vector();
+        entries = new Vector<Object>();
         connectionToClose = null;
         searchComplete = true;
         currCons = new LDAPSearchConstraints();
@@ -115,9 +115,9 @@ public class LDAPSearchResults implements Serializable {
      * @param v the vector containing LDAPEntries
      * @see org.ietf.ldap.LDAPConnection#search(java.lang.String, int, java.lang.String, java.lang.String[], boolean)
      */
-    LDAPSearchResults( Vector v ) {
+    LDAPSearchResults( Vector<Object> v ) {
         this();
-        entries = (Vector)v.clone();
+        entries = (Vector<Object>)v.clone();
 
         if ((entries != null) && (entries.size() >= 1)) {
             // Each cache value is represented by a vector. The first element
@@ -127,7 +127,7 @@ public class LDAPSearchResults implements Serializable {
         }
     }
 
-    LDAPSearchResults( Vector v,
+    LDAPSearchResults( Vector<Object> v,
                        LDAPConnection conn,
                        LDAPSearchConstraints cons,
                        String base,
@@ -162,8 +162,7 @@ public class LDAPSearchResults implements Serializable {
         int count = entries.size();
 
         for ( int i = 0; i < referralResults.size(); i++ ) {
-            LDAPSearchResults res =
-                (LDAPSearchResults)referralResults.elementAt(i);
+            LDAPSearchResults res = referralResults.elementAt(i);
             count += res.getCount();
         }
 
@@ -213,7 +212,7 @@ public class LDAPSearchResults implements Serializable {
           ((exceptions == null) || (exceptions.size() == 0))) {
             while (referralResults.size() > 0) {
                 LDAPSearchResults res =
-                  (LDAPSearchResults)referralResults.elementAt(0);
+                  referralResults.elementAt(0);
                 if (res.hasMore())
                     return true;
                 else
@@ -355,7 +354,7 @@ public class LDAPSearchResults implements Serializable {
             String urls[] = ((LDAPSearchResultReference)msg).getReferrals();
             if ( urls != null ) {
                 if (exceptions == null) {
-                    exceptions = new Vector();
+                    exceptions = new Vector<>();
                 }
                 exceptions.addElement(
                     new LDAPReferralException(null, 0, urls) );
@@ -369,7 +368,7 @@ public class LDAPSearchResults implements Serializable {
      */
     void add( LDAPException e ) {
         if ( exceptions == null ) {
-            exceptions = new Vector();
+            exceptions = new Vector<>();
         }
         exceptions.addElement( e );
     }
@@ -496,7 +495,7 @@ public class LDAPSearchResults implements Serializable {
         }
 
         if ((exceptions != null) && (exceptions.size() > 0)) {
-            Object obj = exceptions.elementAt(0);
+            LDAPException obj = exceptions.elementAt(0);
             exceptions.removeElementAt(0);
             return obj;
         }
@@ -505,8 +504,7 @@ public class LDAPSearchResults implements Serializable {
     }
 
     Object nextReferralElement() {
-        LDAPSearchResults res =
-          (LDAPSearchResults)referralResults.elementAt(0);
+        LDAPSearchResults res = referralResults.elementAt(0);
         if ((!res.persistentSearch && res.hasMore()) ||
           (res.persistentSearch)) {
             Object obj = res.nextElement();
