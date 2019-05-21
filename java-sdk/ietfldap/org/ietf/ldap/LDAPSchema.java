@@ -279,7 +279,7 @@ public class LDAPSchema implements Serializable {
         } else if ( el instanceof LDAPDITContentRuleSchema ) {
             _contentRules.put( name, el );
         } else if ( el instanceof LDAPDITStructureRuleSchema ) {
-            _structureRulesByName.put( name, el );
+            _structureRulesByName.put( name, (LDAPDITStructureRuleSchema) el );
             _structureRulesById.put( new Integer(
                 ((LDAPDITStructureRuleSchema)el).getRuleID() ), el );
         }
@@ -370,7 +370,7 @@ public class LDAPSchema implements Serializable {
      * Get an enumeration of the names of the structure rules in this schema.
      * @return an enumeration of names of the structure rule objects
      */
-    public Enumeration getDITStructureRuleNames() {
+    public Enumeration<String> getDITStructureRuleNames() {
         return _structureRulesByName.keys();
     }
 
@@ -381,8 +381,7 @@ public class LDAPSchema implements Serializable {
      * the rule, or <CODE>null</CODE> if not found.
      */
     public LDAPDITStructureRuleSchema getDITStructureRuleSchema( String name ) {
-        return (LDAPDITStructureRuleSchema)_structureRulesByName.get(
-            name.toLowerCase() );
+        return _structureRulesByName.get(name.toLowerCase() );
     }
 
     /**
@@ -400,7 +399,7 @@ public class LDAPSchema implements Serializable {
      * Get an enumeration of the structure rules in this schema.
      * @return an enumeration of structure rule objects
      */
-    public Enumeration getDITStructureRuleSchemas() {
+    public Enumeration<LDAPDITStructureRuleSchema> getDITStructureRuleSchemas() {
         return _structureRulesByName.elements();
     }
 
@@ -597,7 +596,7 @@ public class LDAPSchema implements Serializable {
         } else if ( el instanceof LDAPDITContentRuleSchema ) {
             _contentRules.put( name, el );
         } else if ( el instanceof LDAPDITStructureRuleSchema ) {
-            _structureRulesByName.put( name, el );
+            _structureRulesByName.put( name, (LDAPDITStructureRuleSchema) el );
             _structureRulesById.put( new Integer(
                 ((LDAPDITStructureRuleSchema)el).getRuleID() ), el );
         }
@@ -1109,7 +1108,7 @@ public class LDAPSchema implements Serializable {
     private Hashtable<String, LDAPMatchingRuleSchema> _matchingRules = new Hashtable<>();
     private Hashtable<String, LDAPMatchingRuleUseSchema> _matchingRuleUses = new Hashtable<>();
     private Hashtable<String, LDAPSyntaxSchema> _syntaxes = new Hashtable<>();
-    private Hashtable _structureRulesByName = new Hashtable();
+    private Hashtable<String, LDAPDITStructureRuleSchema> _structureRulesByName = new Hashtable<>();
     private Hashtable _structureRulesById = new Hashtable();
     private Hashtable _contentRules = new Hashtable();
     private Hashtable _nameForms = new Hashtable();
