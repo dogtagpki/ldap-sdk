@@ -285,7 +285,7 @@ public class LDAPConnection
     private Object m_security = null;
     private LDAPSaslBind m_saslBinder = null;
     private Properties m_securityProperties;
-    private Hashtable m_properties = new Hashtable();
+    private Hashtable<String, Object> m_properties = new Hashtable<>();
     private LDAPConnection m_referralConnection;
 
     /**
@@ -5333,7 +5333,7 @@ public class LDAPConnection
                 (LDAPSearchConstraints)m_defaultConstraints.clone();
             c.m_responseListeners = null;
             c.m_searchListeners = null;
-            c.m_properties = (Hashtable)m_properties.clone();
+            c.m_properties = (Hashtable<String, Object>)m_properties.clone();
             c.m_responseControlTable = new Hashtable<>();
 
             if (c.m_cache != null) {
