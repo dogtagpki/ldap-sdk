@@ -104,7 +104,7 @@ public class LDAPUrl implements java.io.Serializable {
     private String m_hostName;
     private int m_portNumber;
     private String m_DN;
-    private Vector m_attributes;
+    private Vector<String> m_attributes;
     private int m_scope;
     private String m_filter;
     private String m_URL;
@@ -249,7 +249,7 @@ public class LDAPUrl implements java.io.Serializable {
         if (!str.equals("?")) {
             StringTokenizer attributeParser = new
                 StringTokenizer (decode(str), ", ");
-            m_attributes = new Vector ();
+            m_attributes = new Vector<>();
 
             while (attributeParser.hasMoreTokens()) {
                 m_attributes.addElement (attributeParser.nextToken());
@@ -350,7 +350,7 @@ public class LDAPUrl implements java.io.Serializable {
      * no filter (this effectively makes the URL reference a single object).
      */
     public LDAPUrl (String host, int port, String DN,
-      Enumeration attributes, int scope, String filter) {
+      Enumeration<String> attributes, int scope, String filter) {
 
         initialize(host, port, DN, attributes, scope, filter, false);
     }
@@ -374,7 +374,7 @@ public class LDAPUrl implements java.io.Serializable {
       String[] attributes, int scope, String filter, boolean secure) {
 
         if (attributes != null) {
-            Vector list = new Vector();
+            Vector<String> list = new Vector<>();
             for (int k = 0; k < attributes.length; k++) {
                 list.addElement(attributes[k]);
             }
@@ -389,7 +389,7 @@ public class LDAPUrl implements java.io.Serializable {
      * Initializes URL object.
      */
     private void initialize (String host, int port, String DN,
-      Enumeration attributes, int scope, String filter, boolean secure) {
+      Enumeration<String> attributes, int scope, String filter, boolean secure) {
 
         m_hostName = host;
         m_DN = DN;
@@ -399,7 +399,7 @@ public class LDAPUrl implements java.io.Serializable {
         m_secure = secure;
 
         if (attributes != null) {
-            m_attributes = new Vector ();
+            m_attributes = new Vector<>();
             while (attributes.hasMoreElements()) {
                 m_attributes.addElement (attributes.nextElement());
             }
@@ -419,7 +419,7 @@ public class LDAPUrl implements java.io.Serializable {
 
         if (attributes != null) {
             url.append ('?');
-            Enumeration attrList = m_attributes.elements();
+            Enumeration<String> attrList = m_attributes.elements();
             boolean firstElement = true;
 
             while (attrList.hasMoreElements()) {
@@ -428,7 +428,7 @@ public class LDAPUrl implements java.io.Serializable {
                 else
                     firstElement = false;
 
-                url.append ((String)attrList.nextElement());
+                url.append (attrList.nextElement());
             }
         }
 
@@ -493,7 +493,7 @@ public class LDAPUrl implements java.io.Serializable {
      * for "every attribute"
      * @return enumeration of attributes.
      */
-    public Enumeration getAttributes () {
+    public Enumeration<String> getAttributes () {
         if (m_attributes == null)
             return null;
         else
@@ -510,11 +510,11 @@ public class LDAPUrl implements java.io.Serializable {
             return null;
         else {
             String[] attrNames = new String[m_attributes.size()];
-            Enumeration attrs = getAttributes();
+            Enumeration<String> attrs = getAttributes();
             int i = 0;
 
             while (attrs.hasMoreElements())
-                attrNames[i++] = (String)attrs.nextElement();
+                attrNames[i++] = attrs.nextElement();
 
             return attrNames;
         }
