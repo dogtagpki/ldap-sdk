@@ -40,6 +40,7 @@ package org.ietf.ldap;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Constructor;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Hashtable;
@@ -179,7 +180,7 @@ class LDAPSSLSocket extends Socket {
             // instantiate the SSLSocketFactory implementation, and
             // find the right constructor
             Class<?> c = Class.forName(_packageName);
-            java.lang.reflect.Constructor[] m = c.getConstructors();
+            Constructor<?>[] m = c.getConstructors();
 
             for (int i = 0; i < m.length; i++) {
                 /* Check if the signature is right: String, int */
@@ -218,7 +219,7 @@ class LDAPSSLSocket extends Socket {
             // instantiate the SSLSocketFactory implementation, and
             // find the right constructor
             Class<?> c = Class.forName(_packageName);
-            java.lang.reflect.Constructor[] m = c.getConstructors();
+            Constructor<?>[] m = c.getConstructors();
 
             for (int i = 0; i < m.length; i++) {
                 /* Check if the signature is right: String, int */

@@ -38,6 +38,7 @@
 package org.ietf.ldap;
 
 import java.io.Serializable;
+import java.lang.reflect.Constructor;
 import java.net.Socket;
 
 /**
@@ -291,7 +292,7 @@ public class LDAPSSLSocketFactory
             /* Instantiate the SSLSocketFactory implementation, and
                find the right constructor */
             Class<?> c = Class.forName(_packageName);
-            java.lang.reflect.Constructor[] m = c.getConstructors();
+            Constructor<?>[] m = c.getConstructors();
             for (int i = 0; i < m.length; i++) {
                 /* Check if the signature is right: String, int */
                 Class<?>[] params = m[i].getParameterTypes();

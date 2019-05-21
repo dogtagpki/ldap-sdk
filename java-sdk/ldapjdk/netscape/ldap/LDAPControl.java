@@ -353,7 +353,7 @@ public class LDAPControl implements Cloneable, java.io.Serializable {
 	}
 
 	Class<?>[] cparams = { String.class, boolean.class, byte[].class };
-	Constructor creator = null;
+	Constructor<?> creator = null;
 	try {
 	    creator = controlClass.getConstructor(cparams);
 	} catch (NoSuchMethodException e) {
