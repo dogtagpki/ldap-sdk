@@ -37,7 +37,6 @@
  * ***** END LICENSE BLOCK ***** */
 package com.netscape.jndi.ldap.schema;
 
-import java.util.Enumeration;
 import java.util.Vector;
 
 import javax.naming.Name;
@@ -206,7 +205,7 @@ public class SchemaElement extends SchemaDirContext {
                     attrs.put(attr);
                 }
                 else {
-                    for (NamingEnumeration vals = attr.getAll(); vals.hasMore();) {
+                    for (NamingEnumeration<?> vals = attr.getAll(); vals.hasMore();) {
                         curAttr.add(vals.nextElement());
                     }
                 }
@@ -223,7 +222,7 @@ public class SchemaElement extends SchemaDirContext {
                     attrs.remove(attr.getID());
                 }
                 else {
-                    for (NamingEnumeration vals = attr.getAll(); vals.hasMore();) {
+                    for (NamingEnumeration<?> vals = attr.getAll(); vals.hasMore();) {
                         String val = (String) vals.nextElement();
                         curAttr.remove(val);
                         // Schema definition Values are case insensitive
@@ -246,7 +245,7 @@ public class SchemaElement extends SchemaDirContext {
      */
     static boolean parseTrueFalseValue(Attribute attr) throws NamingException{
 
-        for (NamingEnumeration valEnum = attr.getAll(); valEnum.hasMore(); ) {
+        for (NamingEnumeration<?> valEnum = attr.getAll(); valEnum.hasMore(); ) {
             String flag = (String)valEnum.nextElement();
             if (flag.equals("true")) {
                 return true;
@@ -266,7 +265,7 @@ public class SchemaElement extends SchemaDirContext {
      * Read a string value for a schema attribute
      */
     static String getSchemaAttrValue(Attribute attr) throws NamingException {
-        for (Enumeration valEnum = attr.getAll(); valEnum.hasMoreElements(); ) {
+        for (NamingEnumeration<?> valEnum = attr.getAll(); valEnum.hasMoreElements(); ) {
             return (String)valEnum.nextElement();
         }
         throw new InvalidAttributeValueException(attr.getID() + " must have a value");

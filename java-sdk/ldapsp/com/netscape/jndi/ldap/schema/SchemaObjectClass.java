@@ -96,12 +96,12 @@ public class SchemaObjectClass extends SchemaElement {
                 desc = getSchemaAttrValue(attr);
             }
             else if (attrName.equals(MAY)) {
-                for (Enumeration valEnum = attr.getAll(); valEnum.hasMoreElements(); ) {
+                for (NamingEnumeration<?> valEnum = attr.getAll(); valEnum.hasMoreElements(); ) {
                     may.addElement(valEnum.nextElement());
                 }
             }
             else if (attrName.equals(MUST)) {
-                for (Enumeration valEnum = attr.getAll(); valEnum.hasMoreElements(); ) {
+                for (NamingEnumeration<?> valEnum = attr.getAll(); valEnum.hasMoreElements(); ) {
                     must.addElement(valEnum.nextElement());
                 }
             }

@@ -104,7 +104,7 @@ class ProviderUtils {
 
             // Add attribute values to the filter, ecsaping if necessary
             String attrValues = "";
-            for (NamingEnumeration valEnum = attrib.getAll(); valEnum.hasMore();) {
+            for (NamingEnumeration<?> valEnum = attrib.getAll(); valEnum.hasMore();) {
                 Object val = valEnum.next();
                 if (val instanceof String) {
                     attrValues += "(" + attrib.getID() + "=" + escapeString((String)val) +")";

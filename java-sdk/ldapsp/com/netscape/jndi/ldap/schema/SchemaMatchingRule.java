@@ -37,7 +37,6 @@
  * ***** END LICENSE BLOCK ***** */
 package com.netscape.jndi.ldap.schema;
 
-import java.util.Enumeration;
 import java.util.Vector;
 
 import javax.naming.Name;
@@ -54,7 +53,6 @@ import netscape.ldap.LDAPConnection;
 import netscape.ldap.LDAPMatchingRuleSchema;
 
 public class SchemaMatchingRule extends SchemaElement {
-
 
     private static final String APPLIES = "APPLIES";
 
@@ -101,7 +99,7 @@ public class SchemaMatchingRule extends SchemaElement {
                 desc = getSchemaAttrValue(attr);
             }
             else if (attrName.equals(APPLIES)) {
-                for (Enumeration valEnum = attr.getAll(); valEnum.hasMoreElements(); ) {
+                for (NamingEnumeration<?> valEnum = attr.getAll(); valEnum.hasMoreElements(); ) {
                     applies.addElement(valEnum.nextElement());
                 }
             }
