@@ -633,5 +633,5 @@ public abstract class LDAPSchemaElement implements Serializable {
     // Additional qualifiers
     protected Hashtable<String, Object> properties = null;
     // Qualifiers known to not have values
-    static protected Hashtable novalsTable = new Hashtable();
+    static protected Hashtable<String, String> novalsTable = new Hashtable<>();
 }
