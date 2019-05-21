@@ -254,7 +254,7 @@ public class LDAPConnection
     // "smart failover" for the automatic rebind
     private LDAPConstraints m_rebindConstraints;
 
-    private Vector m_responseListeners;
+    private Vector<LDAPResponseListener> m_responseListeners;
     private Vector m_searchListeners;
 
     private String m_boundDN;
@@ -4801,7 +4801,7 @@ public class LDAPConnection
      */
     synchronized LDAPResponseListener getResponseListener () {
         if (m_responseListeners == null) {
-            m_responseListeners = new Vector (5);
+            m_responseListeners = new Vector<>(5);
         }
 
         LDAPResponseListener l;
@@ -4809,7 +4809,7 @@ public class LDAPConnection
             l = new LDAPResponseListener ( /*asynchOp=*/false );
         }
         else {
-            l = (LDAPResponseListener)m_responseListeners.elementAt (0);
+            l = m_responseListeners.elementAt (0);
             m_responseListeners.removeElementAt (0);
         }
         return l;
@@ -4847,7 +4847,7 @@ public class LDAPConnection
      */
     synchronized void releaseResponseListener (LDAPResponseListener l) {
         if (m_responseListeners == null) {
-            m_responseListeners = new Vector (5);
+            m_responseListeners = new Vector<>(5);
         }
 
         l.reset ();
