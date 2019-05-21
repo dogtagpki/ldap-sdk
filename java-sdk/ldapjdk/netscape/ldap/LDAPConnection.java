@@ -2623,13 +2623,13 @@ public class LDAPConnection
             try {
                 /* Block until all results are in */
                 LDAPMessage response = myListener.completeSearchOperation();
-                Enumeration results = myListener.getAllMessages().elements();
+                Enumeration<LDAPMessage> results = myListener.getAllMessages().elements();
 
                 checkSearchMsg(returnValue, response, cons, base, scope,
                                filter, attrs, attrsOnly);
 
                 while (results.hasMoreElements ()) {
-                    LDAPMessage msg = (LDAPMessage)results.nextElement();
+                    LDAPMessage msg = results.nextElement();
 
                     checkSearchMsg(returnValue, msg, cons, base, scope, filter, attrs,
                         attrsOnly);
