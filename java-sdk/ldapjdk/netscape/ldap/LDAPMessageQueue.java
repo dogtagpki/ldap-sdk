@@ -77,7 +77,7 @@ class LDAPMessageQueue implements java.io.Serializable {
      * Internal variables
      */
     private Vector<LDAPMessage> m_messageQueue = new Vector<>(1);
-    private /*RequestEntry*/ Vector m_requestList  = new Vector(1);
+    private Vector<RequestEntry> m_requestList  = new Vector<>(1);
     private LDAPException m_exception; /* For network errors */
     private boolean m_asynchOp;
 
@@ -226,7 +226,7 @@ class LDAPMessageQueue implements java.io.Serializable {
         long minTimeToComplete = Long.MAX_VALUE;
         long now = System.currentTimeMillis();
         for (int i=0; i < m_requestList.size(); i++) {
-            RequestEntry entry = (RequestEntry)m_requestList.elementAt(i);
+            RequestEntry entry = m_requestList.elementAt(i);
 
             // time limit exceeded ?
             if (entry.timeToComplete <= now) {
@@ -288,7 +288,7 @@ class LDAPMessageQueue implements java.io.Serializable {
                     m_exception = mq2.m_exception;
                 }
                 for (int i=0; i < mq2.m_requestList.size(); i++) {
-                    RequestEntry entry = (RequestEntry)mq2.m_requestList.elementAt(i);
+                    RequestEntry entry = mq2.m_requestList.elementAt(i);
                     m_requestList.addElement(entry);
                     // Notify LDAPConnThread to redirect mq2 designated responses to this mq
                     entry.connThread.changeListener(entry.id, this);
@@ -401,7 +401,7 @@ class LDAPMessageQueue implements java.io.Serializable {
      */
     synchronized LDAPConnection getConnection(int id) {
         for (int i=0; i < m_requestList.size(); i++) {
-            RequestEntry entry = (RequestEntry)m_requestList.elementAt(i);
+            RequestEntry entry = m_requestList.elementAt(i);
             if (id == entry.id) {
                 return entry.connection;
             }
@@ -417,7 +417,7 @@ class LDAPMessageQueue implements java.io.Serializable {
      */
     synchronized LDAPConnThread getConnThread(int id) {
         for (int i=0; i < m_requestList.size(); i++) {
-            RequestEntry entry = (RequestEntry)m_requestList.elementAt(i);
+            RequestEntry entry = m_requestList.elementAt(i);
             if (id == entry.id) {
                 return entry.connThread;
             }
@@ -436,7 +436,7 @@ class LDAPMessageQueue implements java.io.Serializable {
             return -1;
         }
         else {
-            RequestEntry entry = (RequestEntry)m_requestList.elementAt(reqCnt-1);
+            RequestEntry entry = m_requestList.elementAt(reqCnt-1);
             return entry.id;
         }
     }
@@ -448,7 +448,7 @@ class LDAPMessageQueue implements java.io.Serializable {
     synchronized int[] getMessageIDs() {
         int[] ids = new int[m_requestList.size()];
         for (int i=0; i < ids.length; i++) {
-            RequestEntry entry = (RequestEntry)m_requestList.elementAt(i);
+            RequestEntry entry = m_requestList.elementAt(i);
             ids[i] = entry.id;
         }
         return ids;
@@ -490,7 +490,7 @@ class LDAPMessageQueue implements java.io.Serializable {
      */
     synchronized boolean removeRequest(int id) {
         for (int i=0; i < m_requestList.size(); i++) {
-            RequestEntry entry = (RequestEntry)m_requestList.elementAt(i);
+            RequestEntry entry = m_requestList.elementAt(i);
             if (id == entry.id) {
                 m_requestList.removeElementAt(i);
                 removeAllMessages(id);
@@ -509,7 +509,7 @@ class LDAPMessageQueue implements java.io.Serializable {
     synchronized int removeAllRequests(LDAPConnThread connThread) {
         int removeCount=0;
         for (int i=(m_requestList.size()-1); i>=0; i--) {
-            RequestEntry entry = (RequestEntry)m_requestList.elementAt(i);
+            RequestEntry entry = m_requestList.elementAt(i);
             if (connThread == entry.connThread) {
                 m_requestList.removeElementAt(i);
                 removeCount++;
@@ -532,7 +532,7 @@ class LDAPMessageQueue implements java.io.Serializable {
             if (i>0) {
                 sb.append(",");
             }
-            sb.append(((RequestEntry)m_requestList.elementAt(i)).id);
+            sb.append(m_requestList.elementAt(i).id);
         }
         sb.append("} messageCount="+m_messageQueue.size());
 
