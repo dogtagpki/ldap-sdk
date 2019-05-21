@@ -134,7 +134,7 @@ public class LDAPCache implements Serializable {
      * of all entries, followed by the actual search result entries (of type
      * LDAPEntry).
      */
-    private Hashtable m_cache;
+    private Hashtable<Long, Vector<Object>> m_cache;
 
     /**
      * A list of cached entries ordered by time (augments m_cache). Each
@@ -301,11 +301,11 @@ public class LDAPCache implements Serializable {
 
         DN dn2 = new DN(dn);
 
-        Enumeration e = m_cache.keys();
+        Enumeration<Long> e = m_cache.keys();
 
         while(e.hasMoreElements()) {
-            Long key = (Long)e.nextElement();
-            Vector val = (Vector)m_cache.get(key);
+            Long key = e.nextElement();
+            Vector<Object> val = m_cache.get(key);
 
             // LDAPEntries start at idx 1, at idx 0 is a Long
             // (size of all LDAPEntries returned by search())
@@ -338,7 +338,7 @@ public class LDAPCache implements Serializable {
                         break;
                     }
                 }
-                Vector entry = (Vector)m_cache.remove(key);
+                Vector<Object> entry = m_cache.remove(key);
                 m_remainingSize += ((Long)entry.firstElement()).longValue();
                 if (m_debug)
                     System.out.println("DEBUG: Successfully removed entry ->"+key);
@@ -478,10 +478,8 @@ public class LDAPCache implements Serializable {
      * @param key the key for the cache entry
      * @return the cache entry.
      */
-    synchronized Object getEntry(Long key) {
-        Object obj = null;
-
-        obj = m_cache.get(key);
+    synchronized Vector<Object> getEntry(Long key) {
+        Vector<Object> obj = m_cache.get(key);
         m_totalOpers++;
 
         if (m_debug) {
@@ -522,7 +520,7 @@ public class LDAPCache implements Serializable {
 
                 if (m_debug)
                     System.out.println("DEBUG: Timer flush entry whose key is "+key);
-                Vector entry = (Vector)m_cache.remove(key);
+                Vector<Object> entry = m_cache.remove(key);
                 m_remainingSize += ((Long)entry.firstElement()).longValue();
 
                 // always delete the first one
@@ -553,7 +551,7 @@ public class LDAPCache implements Serializable {
         if (m_cache.get(key) != null)
             return false;
 
-        Vector v = (Vector)value;
+        Vector<Object> v = (Vector<Object>)value;
         long size = ((Long)v.elementAt(0)).longValue();
 
         if (size > m_maxSize) {
@@ -569,7 +567,7 @@ public class LDAPCache implements Serializable {
             while (true) {
                 Vector<Long> element = m_orderedStruct.firstElement();
                 Long str = element.elementAt(0);
-                Vector val = (Vector)m_cache.remove(str);
+                Vector<Object> val = m_cache.remove(str);
                 if (m_debug)
                     System.out.println("DEBUG: The spare size of the cache is not big enough "+
                         "to hold the new entry, deleting the entry whose key -> "+str);
@@ -692,7 +690,7 @@ public class LDAPCache implements Serializable {
      */
     private void init(long ttl, long size)
     {
-        m_cache = new Hashtable();
+        m_cache = new Hashtable<>();
         m_timeToLive = ttl*1000;
         m_maxSize = size;
         m_remainingSize = size;
