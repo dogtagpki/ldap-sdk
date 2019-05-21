@@ -471,7 +471,7 @@ public class LDAPSchema implements java.io.Serializable {
      * Get an enumeration of the name forms in this schema.
      * @return an enumeration of name form objects
      */
-    public Enumeration getNameForms() {
+    public Enumeration<LDAPNameFormSchema> getNameForms() {
         return nameForms.elements();
     }
 
@@ -552,7 +552,7 @@ public class LDAPSchema implements java.io.Serializable {
      * the syntax definition, or <CODE>null</CODE> if not found.
      */
     public LDAPNameFormSchema getNameForm( String name ) {
-        return (LDAPNameFormSchema)nameForms.get( name.toLowerCase() );
+        return nameForms.get( name.toLowerCase() );
     }
 
     /**
@@ -607,7 +607,7 @@ public class LDAPSchema implements java.io.Serializable {
      * Get an enumeration of the names of the name forms in this schema.
      * @return an enumeration of names of name form objects
      */
-    public Enumeration getNameFormNames() {
+    public Enumeration<String> getNameFormNames() {
         return nameForms.keys();
     }
 
@@ -947,5 +947,5 @@ public class LDAPSchema implements java.io.Serializable {
     private Hashtable<String, LDAPDITStructureRuleSchema> structureRulesByName = new Hashtable<>();
     private Hashtable<Integer, LDAPDITStructureRuleSchema> structureRulesById = new Hashtable<>();
     private Hashtable<String, LDAPDITContentRuleSchema> contentRules = new Hashtable<>();
-    private Hashtable nameForms = new Hashtable();
+    private Hashtable<String, LDAPNameFormSchema> nameForms = new Hashtable<>();
 }
