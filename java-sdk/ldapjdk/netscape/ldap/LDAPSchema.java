@@ -621,7 +621,6 @@ public class LDAPSchema implements java.io.Serializable {
         throws LDAPException {
         /* Find the subschemasubentry value for this DN */
         String entryName = getSchemaDN( ld, dn );
-        Enumeration en;
 
         /* Get the entire schema definition entry */
         LDAPEntry entry = readSchema( ld, entryName );
@@ -754,7 +753,7 @@ public class LDAPSchema implements java.io.Serializable {
         throws LDAPException {
 
         /* Check if this has already been investigated */
-        String schemaBug = (String)ld.getProperty( ld.SCHEMA_BUG_PROPERTY );
+        String schemaBug = (String)ld.getProperty( LDAPConnection.SCHEMA_BUG_PROPERTY );
         if ( schemaBug != null ) {
             return schemaBug.equalsIgnoreCase( "standard" );
         }
@@ -772,7 +771,7 @@ public class LDAPSchema implements java.io.Serializable {
                 compliant = !isSyntaxQuoted( en.nextElement() );
             }
         }
-        ld.setProperty( ld.SCHEMA_BUG_PROPERTY, compliant ? "standard" :
+        ld.setProperty( LDAPConnection.SCHEMA_BUG_PROPERTY, compliant ? "standard" :
                         "NetscapeBug" );
         return compliant;
     }
@@ -871,7 +870,7 @@ public class LDAPSchema implements java.io.Serializable {
     private static LDAPEntry readSchema( LDAPConnection ld, String dn,
                                          String[] attrs )
                                          throws LDAPException {
-        LDAPSearchResults results = ld.search (dn, ld.SCOPE_BASE,
+        LDAPSearchResults results = ld.search (dn, LDAPv2.SCOPE_BASE,
                                                "objectclass=subschema",
                                                attrs, false);
         if ( !results.hasMoreElements() ) {
@@ -891,9 +890,9 @@ public class LDAPSchema implements java.io.Serializable {
      * Helper for "main" to print out schema elements.
      * @param en enumeration of schema elements
      */
-    private static void printEnum( Enumeration en ) {
+    private static void printEnum( Enumeration<? extends LDAPSchemaElement> en ) {
         while( en.hasMoreElements() ) {
-            LDAPSchemaElement s = (LDAPSchemaElement)en.nextElement();
+            LDAPSchemaElement s = en.nextElement();
             System.out.println( "  " + s );
 //            System.out.println( "  " + s.getValue() );
         }
