@@ -275,7 +275,7 @@ public class LDAPSchema implements Serializable {
             if ( name.length() < 1 ) {
                 name = el.getID();
             }
-            _syntaxes.put( name, el );
+            _syntaxes.put( name, (LDAPSyntaxSchema) el );
         } else if ( el instanceof LDAPDITContentRuleSchema ) {
             _contentRules.put( name, el );
         } else if ( el instanceof LDAPDITStructureRuleSchema ) {
@@ -512,7 +512,7 @@ public class LDAPSchema implements Serializable {
      * Get an enumeration of the names of the syntaxes in this schema.
      * @return an enumeration of syntax names (all lower-case).
      */
-    public Enumeration getSyntaxNames() {
+    public Enumeration<String> getSyntaxNames() {
         return _syntaxes.keys();
     }
 
@@ -523,14 +523,14 @@ public class LDAPSchema implements Serializable {
      * the syntax definition, or <CODE>null</CODE> if not found.
      */
     public LDAPSyntaxSchema getSyntaxSchema( String name ) {
-        return (LDAPSyntaxSchema)_syntaxes.get( name.toLowerCase() );
+        return _syntaxes.get( name.toLowerCase() );
     }
 
     /**
      * Get an enumeration of the syntaxes in this schema.
      * @return an enumeration of syntax objects
      */
-    public Enumeration getSyntaxSchemas() {
+    public Enumeration<LDAPSyntaxSchema> getSyntaxSchemas() {
         return _syntaxes.elements();
     }
 
@@ -593,7 +593,7 @@ public class LDAPSchema implements Serializable {
             if ( name.length() < 1 ) {
                 name = el.getID();
             }
-            _syntaxes.put( name, el );
+            _syntaxes.put( name, (LDAPSyntaxSchema) el );
         } else if ( el instanceof LDAPDITContentRuleSchema ) {
             _contentRules.put( name, el );
         } else if ( el instanceof LDAPDITStructureRuleSchema ) {
@@ -728,9 +728,9 @@ public class LDAPSchema implements Serializable {
             s += '\n';
         }
         s += "Syntaxes:\n";
-        Enumeration en = getSyntaxSchemas();
-        while( en.hasMoreElements() ) {
-            s += en.nextElement().toString();
+        Enumeration<LDAPSyntaxSchema> en4 = getSyntaxSchemas();
+        while( en4.hasMoreElements() ) {
+            s += en4.nextElement().toString();
             s += '\n';
         }
         return s;
@@ -1108,7 +1108,7 @@ public class LDAPSchema implements Serializable {
     private Hashtable<String, LDAPAttributeSchema> _attributes = new Hashtable<>();
     private Hashtable<String, LDAPMatchingRuleSchema> _matchingRules = new Hashtable<>();
     private Hashtable<String, LDAPMatchingRuleUseSchema> _matchingRuleUses = new Hashtable<>();
-    private Hashtable _syntaxes = new Hashtable();
+    private Hashtable<String, LDAPSyntaxSchema> _syntaxes = new Hashtable<>();
     private Hashtable _structureRulesByName = new Hashtable();
     private Hashtable _structureRulesById = new Hashtable();
     private Hashtable _contentRules = new Hashtable();
