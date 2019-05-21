@@ -89,7 +89,7 @@ class LDAPConnThread implements Runnable {
     transient private InputStream m_serverInput, m_origServerInput;
     transient private OutputStream m_serverOutput, m_origServerOutput;
     transient private Hashtable<Integer, LDAPMessageQueue> m_requests;
-    transient private Hashtable m_messages = null;
+    transient private Hashtable<Integer, Vector<Object>> m_messages = null;
     transient private Vector m_registered;
     transient private LDAPCache m_cache = null;
     transient private Thread m_thread = null;
@@ -251,7 +251,7 @@ class LDAPConnThread implements Runnable {
      */
     synchronized void setCache( LDAPCache cache ) {
         m_cache = cache;
-        m_messages = (m_cache != null) ? new Hashtable() : null;
+        m_messages = (m_cache != null) ? new Hashtable<>() : null;
     }
 
     /**
@@ -658,7 +658,7 @@ class LDAPConnThread implements Runnable {
     private synchronized void cacheSearchResult (LDAPSearchListener l, LDAPMessage msg, int size) {
         Integer messageID = new Integer (msg.getMessageID());
         Long key = l.getKey();
-        Vector v = null;
+        Vector<Object> v = null;
 
         if ((m_cache == null) || (key == null)) {
             return;
@@ -667,9 +667,9 @@ class LDAPConnThread implements Runnable {
         if (msg instanceof LDAPSearchResult) {
 
             // get the vector containing the LDAPMessages for the specified messageID
-            v = (Vector)m_messages.get(messageID);
+            v = m_messages.get(messageID);
             if (v == null) {
-                m_messages.put(messageID, v = new Vector());
+                m_messages.put(messageID, v = new Vector<Object>());
                 v.addElement(new Long(0));
             }
 
@@ -704,9 +704,9 @@ class LDAPConnThread implements Runnable {
 
             // If a search reference is received disable caching of
             // this search request
-            v = (Vector)m_messages.get(messageID);
+            v = m_messages.get(messageID);
             if (v == null) {
-                m_messages.put(messageID, v = new Vector());
+                m_messages.put(messageID, v = new Vector<Object>());
             }
             else {
                 v.removeAllElements();
@@ -720,13 +720,13 @@ class LDAPConnThread implements Runnable {
             // is not disabled due to the entry size or referrals
 
             boolean fail = ((LDAPResponse)msg).getResultCode() > 0;
-            v = (Vector)m_messages.remove(messageID);
+            v = m_messages.remove(messageID);
 
             if (!fail)  {
                 // If v is null, meaning there are no search results from the
                 // server
                 if (v == null) {
-                    v = new Vector();
+                    v = new Vector<Object>();
                     v.addElement(new Long(0));
                 }
 
