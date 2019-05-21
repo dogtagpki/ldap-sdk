@@ -447,7 +447,7 @@ public class LDAPSchema implements java.io.Serializable {
      * Get an enumeration of the syntaxes in this schema.
      * @return an enumeration of syntax objects
      */
-    public Enumeration getSyntaxes() {
+    public Enumeration<LDAPSyntaxSchema> getSyntaxes() {
         return syntaxes.elements();
     }
 
@@ -512,7 +512,7 @@ public class LDAPSchema implements java.io.Serializable {
      * the syntax definition, or <CODE>null</CODE> if not found.
      */
     public LDAPSyntaxSchema getSyntax( String name ) {
-        return (LDAPSyntaxSchema)syntaxes.get( name.toLowerCase() );
+        return syntaxes.get( name.toLowerCase() );
     }
 
     /**
@@ -586,7 +586,7 @@ public class LDAPSchema implements java.io.Serializable {
      * Get an enumeration of the names of the syntaxes in this schema.
      * @return an enumeration of syntax names (all lower-case).
      */
-    public Enumeration getSyntaxNames() {
+    public Enumeration<String> getSyntaxNames() {
         return syntaxes.keys();
     }
 
@@ -836,9 +836,9 @@ public class LDAPSchema implements java.io.Serializable {
             s += '\n';
         }
         s += "Syntaxes:\n";
-        Enumeration en = getSyntaxes();
-        while( en.hasMoreElements() ) {
-            s += en.nextElement().toString();
+        Enumeration<LDAPSyntaxSchema> en4 = getSyntaxes();
+        while( en4.hasMoreElements() ) {
+            s += en4.nextElement().toString();
             s += '\n';
         }
         return s;
@@ -946,7 +946,7 @@ public class LDAPSchema implements java.io.Serializable {
     private Hashtable<String, LDAPObjectClassSchema> objectClasses = new Hashtable<>();
     private Hashtable<String, LDAPAttributeSchema> attributes = new Hashtable<>();
     private Hashtable<String, LDAPMatchingRuleSchema> matchingRules = new Hashtable<>();
-    private Hashtable syntaxes = new Hashtable();
+    private Hashtable<String, LDAPSyntaxSchema> syntaxes = new Hashtable<>();
     private Hashtable structureRulesByName = new Hashtable();
     private Hashtable structureRulesById = new Hashtable();
     private Hashtable contentRules = new Hashtable();
