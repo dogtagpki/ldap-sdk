@@ -455,7 +455,7 @@ public class LDAPSchema implements java.io.Serializable {
      * Get an enumeration of the structure rules in this schema.
      * @return an enumeration of structure rule objects
      */
-    public Enumeration getDITStructureRules() {
+    public Enumeration<LDAPDITStructureRuleSchema> getDITStructureRules() {
         return structureRulesByName.elements();
     }
 
@@ -522,8 +522,7 @@ public class LDAPSchema implements java.io.Serializable {
      * the rule, or <CODE>null</CODE> if not found.
      */
     public LDAPDITStructureRuleSchema getDITStructureRule( String name ) {
-        return (LDAPDITStructureRuleSchema)structureRulesByName.get(
-            name.toLowerCase() );
+        return structureRulesByName.get( name.toLowerCase() );
     }
 
     /**
@@ -594,7 +593,7 @@ public class LDAPSchema implements java.io.Serializable {
      * Get an enumeration of the names of the structure rules in this schema.
      * @return an enumeration of names of the structure rule objects
      */
-    public Enumeration getDITStructureRuleNames() {
+    public Enumeration<String> getDITStructureRuleNames() {
         return structureRulesByName.keys();
     }
 
@@ -947,7 +946,7 @@ public class LDAPSchema implements java.io.Serializable {
     private Hashtable<String, LDAPAttributeSchema> attributes = new Hashtable<>();
     private Hashtable<String, LDAPMatchingRuleSchema> matchingRules = new Hashtable<>();
     private Hashtable<String, LDAPSyntaxSchema> syntaxes = new Hashtable<>();
-    private Hashtable structureRulesByName = new Hashtable();
+    private Hashtable<String, LDAPDITStructureRuleSchema> structureRulesByName = new Hashtable<>();
     private Hashtable structureRulesById = new Hashtable();
     private Hashtable contentRules = new Hashtable();
     private Hashtable nameForms = new Hashtable();
