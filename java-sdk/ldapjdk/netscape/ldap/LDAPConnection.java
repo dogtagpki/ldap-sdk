@@ -255,7 +255,7 @@ public class LDAPConnection
     private LDAPConstraints m_rebindConstraints;
 
     private Vector<LDAPResponseListener> m_responseListeners;
-    private Vector m_searchListeners;
+    private Vector<LDAPSearchListener> m_searchListeners;
 
     private String m_boundDN;
     private String m_boundPasswd;
@@ -4824,7 +4824,7 @@ public class LDAPConnection
     private synchronized LDAPSearchListener getSearchListener (
         LDAPSearchConstraints cons ) {
         if (m_searchListeners == null) {
-            m_searchListeners = new Vector (5);
+            m_searchListeners = new Vector<>(5);
         }
 
         LDAPSearchListener l;
@@ -4832,7 +4832,7 @@ public class LDAPConnection
             l = new LDAPSearchListener ( /*asynchOp=*/false, cons );
         }
         else {
-            l = (LDAPSearchListener)m_searchListeners.elementAt (0);
+            l = m_searchListeners.elementAt (0);
             m_searchListeners.removeElementAt (0);
             l.setSearchConstraints(cons);
         }
@@ -4867,7 +4867,7 @@ public class LDAPConnection
         }
 
         if (m_searchListeners == null) {
-            m_searchListeners = new Vector (5);
+            m_searchListeners = new Vector<>(5);
         }
 
         l.reset ();
