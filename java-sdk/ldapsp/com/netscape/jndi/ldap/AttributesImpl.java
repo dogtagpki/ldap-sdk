@@ -94,11 +94,11 @@ class AttributesImpl implements Attributes {
         return (attr == null) ? null : ldapAttrToJndiAttr(attr);
     }
 
-    public NamingEnumeration getAll() {
+    public NamingEnumeration<Attribute> getAll() {
         return new AttributeEnum(m_attrSet.getAttributes());
     }
 
-    public NamingEnumeration getIDs() {
+    public NamingEnumeration<String> getIDs() {
         return new AttributeIDEnum(m_attrSet.getAttributes());
     }
 
@@ -178,8 +178,8 @@ class AttributesImpl implements Attributes {
      */
     static LDAPAttributeSet jndiAttrsToLdapAttrSet(Attributes jndiAttrs) throws NamingException{
         LDAPAttributeSet attrs = new LDAPAttributeSet();
-        for (Enumeration itr = jndiAttrs.getAll(); itr.hasMoreElements();) {
-            attrs.add(jndiAttrToLdapAttr((Attribute) itr.nextElement()));
+        for (Enumeration<? extends Attribute> itr = jndiAttrs.getAll(); itr.hasMoreElements();) {
+            attrs.add(jndiAttrToLdapAttr(itr.nextElement()));
         }
         return attrs;
     }
@@ -190,7 +190,7 @@ class AttributesImpl implements Attributes {
     static LDAPAttribute jndiAttrToLdapAttr(Attribute jndiAttr) throws NamingException{
         LDAPAttribute attr = new LDAPAttribute(jndiAttr.getID());
 
-        for (NamingEnumeration vals = jndiAttr.getAll(); vals.hasMoreElements();) {
+        for (NamingEnumeration<?> vals = jndiAttr.getAll(); vals.hasMoreElements();) {
             Object val = vals.nextElement();
             if (val == null) {
                 ;  // no value
@@ -234,12 +234,12 @@ class AttributesImpl implements Attributes {
 	   * from a TreeSet.
 	   */
 	  class BigAttribute extends BasicAttribute {
-		public BigAttribute (String id, TreeSet val) {
+		public BigAttribute (String id, TreeSet<Object> val) {
 			super(id);
-			values = new Vector (val);
+			values = new Vector<Object>(val);
 		}
 	  }
-	  TreeSet valSet = new TreeSet();
+	  TreeSet<Object> valSet = new TreeSet<>();
           if (itrVals != null) {
               while ( itrVals.hasMoreElements() ) {
                   valSet.add(itrVals.nextElement());
@@ -280,8 +280,8 @@ class AttributesImpl implements Attributes {
      */
     static LDAPModificationSet jndiAttrsToLdapModSet(int modop, Attributes jndiAttrs) throws NamingException{
         LDAPModificationSet mods = new LDAPModificationSet();
-        for (NamingEnumeration attrEnum = jndiAttrs.getAll(); attrEnum.hasMore();) {
-            LDAPAttribute attr = jndiAttrToLdapAttr((Attribute)attrEnum.next());
+        for (NamingEnumeration<? extends Attribute> attrEnum = jndiAttrs.getAll(); attrEnum.hasMore();) {
+            LDAPAttribute attr = jndiAttrToLdapAttr(attrEnum.next());
             if (modop == DirContext.ADD_ATTRIBUTE) {
                 mods.add(LDAPModification.ADD, attr);
             }
@@ -303,21 +303,21 @@ class AttributesImpl implements Attributes {
  * Wrapper for enumeration of LDAPAttrubute-s. Convert each LDAPAttribute
  * into a JNDI Attribute accessed through the NamingEnumeration
  */
-class AttributeEnum implements NamingEnumeration {
+class AttributeEnum implements NamingEnumeration<Attribute> {
 
-    Enumeration _attrEnum;
+    Enumeration<LDAPAttribute> _attrEnum;
 
-    public AttributeEnum(Enumeration attrEnum) {
+    public AttributeEnum(Enumeration<LDAPAttribute> attrEnum) {
         _attrEnum = attrEnum;
     }
 
-    public Object next() throws NamingException{
-        LDAPAttribute attr = (LDAPAttribute) _attrEnum.nextElement();
+    public Attribute next() throws NamingException{
+        LDAPAttribute attr = _attrEnum.nextElement();
         return AttributesImpl.ldapAttrToJndiAttr(attr);
     }
 
-    public Object nextElement() {
-        LDAPAttribute attr = (LDAPAttribute) _attrEnum.nextElement();
+    public Attribute nextElement() {
+        LDAPAttribute attr = _attrEnum.nextElement();
         return AttributesImpl.ldapAttrToJndiAttr(attr);
     }
 
@@ -337,21 +337,21 @@ class AttributeEnum implements NamingEnumeration {
  * Wrapper for enumeration of LDAPAttrubute-s. Return the name for each
  * LDAPAttribute accessed through the NamingEnumeration
  */
-class AttributeIDEnum implements NamingEnumeration {
+class AttributeIDEnum implements NamingEnumeration<String> {
 
-    Enumeration _attrEnum;
+    Enumeration<LDAPAttribute> _attrEnum;
 
-    public AttributeIDEnum(Enumeration attrEnum) {
+    public AttributeIDEnum(Enumeration<LDAPAttribute> attrEnum) {
         _attrEnum = attrEnum;
     }
 
-    public Object next() throws NamingException{
-        LDAPAttribute attr = (LDAPAttribute) _attrEnum.nextElement();
+    public String next() throws NamingException{
+        LDAPAttribute attr = _attrEnum.nextElement();
         return attr.getName();
     }
 
-    public Object nextElement() {
-        LDAPAttribute attr = (LDAPAttribute) _attrEnum.nextElement();
+    public String nextElement() {
+        LDAPAttribute attr = _attrEnum.nextElement();
         return attr.getName();
     }
 
