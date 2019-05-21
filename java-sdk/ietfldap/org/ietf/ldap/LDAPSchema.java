@@ -266,7 +266,7 @@ public class LDAPSchema implements Serializable {
         } else if ( el instanceof LDAPObjectClassSchema ) {
             _objectClasses.put( name, (LDAPObjectClassSchema) el );
         } else if ( el instanceof LDAPMatchingRuleSchema ) {
-            _matchingRules.put( name, el );
+            _matchingRules.put( name, (LDAPMatchingRuleSchema) el );
         } else if ( el instanceof LDAPMatchingRuleUseSchema ) {
             _matchingRuleUses.put( name, el );
         } else if ( el instanceof LDAPNameFormSchema ) {
@@ -408,7 +408,7 @@ public class LDAPSchema implements Serializable {
      * Get an enumeration of the names of the matching rules in this schema.
      * @return an enumeration of matching rule names (all lower-case).
      */
-    public Enumeration getMatchingRuleNames() {
+    public Enumeration<String> getMatchingRuleNames() {
         return _matchingRules.keys();
     }
 
@@ -419,14 +419,14 @@ public class LDAPSchema implements Serializable {
      * the matching rule definition, or <CODE>null</CODE> if not found.
      */
     public LDAPMatchingRuleSchema getMatchingRuleSchema( String name ) {
-        return (LDAPMatchingRuleSchema)_matchingRules.get( name.toLowerCase() );
+        return _matchingRules.get( name.toLowerCase() );
     }
 
     /**
      * Gets an enumeration ofthe matching rule definitions in this schema.
      * @return an enumeration of matching rule definitions.
      */
-    public Enumeration getMatchingRuleSchemas() {
+    public Enumeration<LDAPMatchingRuleSchema> getMatchingRuleSchemas() {
         return _matchingRules.elements();
     }
 
@@ -584,7 +584,7 @@ public class LDAPSchema implements Serializable {
         } else if ( el instanceof LDAPObjectClassSchema ) {
             _objectClasses.put( name, (LDAPObjectClassSchema) el );
         } else if ( el instanceof LDAPMatchingRuleSchema ) {
-            _matchingRules.put( name, el );
+            _matchingRules.put( name, (LDAPMatchingRuleSchema) el );
         } else if ( el instanceof LDAPMatchingRuleUseSchema ) {
             _matchingRuleUses.put( name, el );
         } else if ( el instanceof LDAPNameFormSchema ) {
@@ -722,13 +722,13 @@ public class LDAPSchema implements Serializable {
             s += '\n';
         }
         s += "Matching rules:\n";
-        Enumeration en = getMatchingRuleSchemas();
-        while( en.hasMoreElements() ) {
-            s += en.nextElement().toString();
+        Enumeration<LDAPMatchingRuleSchema> en3 = getMatchingRuleSchemas();
+        while( en3.hasMoreElements() ) {
+            s += en3.nextElement().toString();
             s += '\n';
         }
         s += "Syntaxes:\n";
-        en = getSyntaxSchemas();
+        Enumeration en = getSyntaxSchemas();
         while( en.hasMoreElements() ) {
             s += en.nextElement().toString();
             s += '\n';
@@ -1106,7 +1106,7 @@ public class LDAPSchema implements Serializable {
 
     private Hashtable<String, LDAPObjectClassSchema> _objectClasses = new Hashtable<>();
     private Hashtable<String, LDAPAttributeSchema> _attributes = new Hashtable<>();
-    private Hashtable _matchingRules = new Hashtable();
+    private Hashtable<String, LDAPMatchingRuleSchema> _matchingRules = new Hashtable<>();
     private Hashtable _matchingRuleUses = new Hashtable();
     private Hashtable _syntaxes = new Hashtable();
     private Hashtable _structureRulesByName = new Hashtable();
