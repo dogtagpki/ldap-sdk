@@ -37,13 +37,19 @@
  * ***** END LICENSE BLOCK ***** */
 package com.netscape.jndi.ldap;
 
-import javax.naming.*;
-import javax.naming.directory.*;
-import javax.naming.ldap.*;
+import java.util.StringTokenizer;
 
-import netscape.ldap.*;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.BasicAttribute;
+import javax.naming.directory.BasicAttributes;
+import javax.naming.directory.InvalidSearchControlsException;
+import javax.naming.directory.InvalidSearchFilterException;
+import javax.naming.directory.SearchControls;
 
-import java.util.*;
+import netscape.ldap.LDAPConnection;
 
 /**
  * Common utility methods
@@ -68,9 +74,9 @@ class ProviderUtils {
             throw new InvalidSearchControlsException("Illegal value for the search scope");
         }
         return scope;
-    }        
+    }
 
-    
+
     /**
      * Convert Attribute List to a LDAP filter
      *
@@ -79,30 +85,30 @@ class ProviderUtils {
      * @param attrs An Attribute List
      */
     static String attributesToFilter(Attributes attrs) throws NamingException{
-        
+
         if (attrs == null || attrs.size() == 0) {
             return DEFAULT_FILTER;
         }
-        
+
         String filter = "";
-        
-        for (NamingEnumeration attrEnum = attrs.getAll(); attrEnum.hasMore();) {
-            Attribute attrib = (Attribute) attrEnum.next();
-            
+
+        for (NamingEnumeration<? extends Attribute> attrEnum = attrs.getAll(); attrEnum.hasMore();) {
+            Attribute attrib = attrEnum.next();
+
             //Has attributes any values
             if ( attrib.size() == 0) {
                 // test only for presence of the attribute
                 filter += "(" + attrib.getID() + "=*)";
                 continue;
             }
-            
+
             // Add attribute values to the filter, ecsaping if necessary
             String attrValues = "";
             for (NamingEnumeration valEnum = attrib.getAll(); valEnum.hasMore();) {
                 Object val = valEnum.next();
                 if (val instanceof String) {
                     attrValues += "(" + attrib.getID() + "=" + escapeString((String)val) +")";
-                }    
+                }
                 else if (val instanceof byte[]) {
                     attrValues += "(" + attrib.getID() + "=" + escapeBytes((byte[])val) +")";
                 }
@@ -117,10 +123,10 @@ class ProviderUtils {
             }
             filter += (attrib.size() > 1) ? ("(|" + attrValues + ")") : attrValues;
         }
-        
+
         return (attrs.size() > 1) ? ("(&" + filter + ")") : filter;
-    }    
-            
+    }
+
 
     /**
      * Expand filterExpr. Each occurrence of a variable "{n}", where n is a non-negative
@@ -129,17 +135,17 @@ class ProviderUtils {
      */
      static String expandFilterExpr(String filterExpr, Object[] filterArgs) throws InvalidSearchFilterException{
         StringTokenizer tok = new StringTokenizer(filterExpr, "{}", /*returnTokens=*/true);
-        
-        if (tok.countTokens() == 1) {            
+
+        if (tok.countTokens() == 1) {
             return filterExpr; // No escape characters
         }
-        
+
         StringBuffer out= new StringBuffer();
         boolean expectVarIdx = false, expectVarOff = false;
         Object arg= null;
         while (tok.hasMoreTokens()) {
             String s = tok.nextToken();
-            
+
             if (expectVarIdx) {
                 expectVarIdx = false;
                 try {
@@ -155,7 +161,7 @@ class ProviderUtils {
                     throw new InvalidSearchFilterException("Invalid filter expression");
                 }
             }
-                    
+
             else if (expectVarOff) {
                 expectVarOff = false;
                 if (!s.equals("}")) {
@@ -167,12 +173,12 @@ class ProviderUtils {
                 else if (arg instanceof byte[]) {
                     out.append(escapeBytes((byte[])arg));
                 }
-                else {                
+                else {
                     throw new InvalidSearchFilterException("Invalid filter argument type");
                 }
                 arg = null;
             }
-            
+
             else if  (s.equals("{")) {
                 expectVarIdx = true;
             }
@@ -182,35 +188,35 @@ class ProviderUtils {
         }
         if (expectVarIdx || expectVarOff) {
             throw new InvalidSearchFilterException("Invalid filter expression");
-        }    
+        }
         return out.toString();
-    }    
+    }
 
-         
+
     /**
      * Escape a string according to the RFC 2254
      */
     static String escapeString(String str) {
         String charToEscape = "\\*()\000";
         StringTokenizer tok = new StringTokenizer(str, charToEscape, /*returnTokens=*/true);
-        
-        if (tok.countTokens() == 1) {            
+
+        if (tok.countTokens() == 1) {
             return str; // No escape characters
         }
-        
+
         StringBuffer out= new StringBuffer();
         while (tok.hasMoreTokens()) {
             String s = tok.nextToken();
-            
+
             if (s.equals("*")) {
                 out.append("\\2a");
             }
             else if (s.equals("(")) {
                 out.append("\\28");
-            }    
+            }
             else if (s.equals(")")) {
                 out.append("\\29");
-            }    
+            }
             else if (s.equals("\\")) {
                 out.append("\\5c");
             }
@@ -222,14 +228,14 @@ class ProviderUtils {
             }
         }
         return out.toString();
-    }    
+    }
 
-    
+
     /**
      * Escape a byte array according to the RFC 2254
      */
     static final String hexDigits="0123456789abcdef";
-    
+
     static String escapeBytes(byte[] bytes) {
         StringBuffer out = new StringBuffer("");
         for (int i=0; i < bytes.length; i++) {
@@ -241,7 +247,7 @@ class ProviderUtils {
             out.append(hexDigits.charAt(low));
         }
         return out.toString();
-    }    
+    }
 
     /**
      * A method used only for testing
@@ -249,11 +255,11 @@ class ProviderUtils {
     private    static void testAttributesToFilter() {
         try {
             System.out.println(attributesToFilter(null));
-            
-            BasicAttributes attrs = new BasicAttributes(true);        
-            
+
+            BasicAttributes attrs = new BasicAttributes(true);
+
             System.out.println(attrs + " = " + attributesToFilter(attrs));
-            
+
             attrs.put (new BasicAttribute("attr1", "val1"));
             attrs.put (new BasicAttribute("attr2", "(val2)\\*x"));
             attrs.put (new BasicAttribute("attr3"));
@@ -261,12 +267,12 @@ class ProviderUtils {
             attr4.add("val42");
             attrs.put(attr4);
             attrs.put("attr5", new byte[] { (byte)0x23, (byte)0x3, (byte)0x0, (byte)0xab, (byte)0xff});
-            System.out.println(attrs + " = " +attributesToFilter(attrs));            
+            System.out.println(attrs + " = " +attributesToFilter(attrs));
         }
         catch (Exception e) {
             System.err.println(e);
-        }    
-    }    
+        }
+    }
 
     /**
      * A method used only for testing
@@ -281,8 +287,8 @@ class ProviderUtils {
         }
         catch (Exception e) {
             System.err.println(e);
-        }    
-    }    
+        }
+    }
 
     /**
      * Test

@@ -37,25 +37,31 @@
  * ***** END LICENSE BLOCK ***** */
 package com.netscape.jndi.ldap.schema;
 
-import javax.naming.*;
-import javax.naming.directory.*;
-import javax.naming.ldap.*;
+import java.util.Enumeration;
+import java.util.Vector;
 
-import netscape.ldap.*;
-import netscape.ldap.controls.*;
+import javax.naming.Name;
+import javax.naming.NameNotFoundException;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.BasicAttribute;
+import javax.naming.directory.BasicAttributes;
+import javax.naming.directory.ModificationItem;
 
-import java.util.*;
+import netscape.ldap.LDAPObjectClassSchema;
 
 public class SchemaObjectClass extends SchemaElement {
 
      LDAPObjectClassSchema m_ldapObjectClass;
-     
+
     // Attribute IDs that are exposed through Netscape LdapJDK
     private static String[] m_allAttrIds = {NUMERICOID, NAME, DESC, OBSOLETE, SUP,
                                             ABSTRACT, STRUCTURAL, AUXILIARY, MUST, MAY };
-    
+
     public SchemaObjectClass(LDAPObjectClassSchema ldapObjectClass, SchemaManager schemaManager) {
-        super(schemaManager);        
+        super(schemaManager);
         m_ldapObjectClass = ldapObjectClass;
         m_path = CLASSDEF + "/" + m_ldapObjectClass.getName();
     }
@@ -64,18 +70,18 @@ public class SchemaObjectClass extends SchemaElement {
         super(schemaManager);
         m_ldapObjectClass = parseDefAttributes(attrs);
         m_path = CLASSDEF + "/" + m_ldapObjectClass.getName();
-    }    
-    
+    }
+
     /**
      * Parse Definition Attributes for a LDAP objectcalss
      */
-    static LDAPObjectClassSchema parseDefAttributes(Attributes attrs) throws NamingException {        
+    static LDAPObjectClassSchema parseDefAttributes(Attributes attrs) throws NamingException {
         String name=null, oid=null, desc=null, sup=null;
         boolean obsolete=false, abs=false, structural = false, aux = false;
         Vector must=new Vector(), may=new Vector();
 
-        for (Enumeration attrEnum = attrs.getAll(); attrEnum.hasMoreElements(); ) {
-            Attribute attr = (Attribute) attrEnum.nextElement();
+        for (NamingEnumeration<? extends Attribute> attrEnum = attrs.getAll(); attrEnum.hasMoreElements(); ) {
+            Attribute attr = attrEnum.nextElement();
             String attrName = attr.getID();
             if (attrName.equals(NAME)) {
                 name = getSchemaAttrValue(attr);
@@ -88,15 +94,15 @@ public class SchemaObjectClass extends SchemaElement {
             }
             else if (attrName.equals(DESC)) {
                 desc = getSchemaAttrValue(attr);
-            }            
+            }
             else if (attrName.equals(MAY)) {
                 for (Enumeration valEnum = attr.getAll(); valEnum.hasMoreElements(); ) {
-                    may.addElement((String)valEnum.nextElement());
+                    may.addElement(valEnum.nextElement());
                 }
             }
             else if (attrName.equals(MUST)) {
                 for (Enumeration valEnum = attr.getAll(); valEnum.hasMoreElements(); ) {
-                    must.addElement((String)valEnum.nextElement());
+                    must.addElement(valEnum.nextElement());
                 }
             }
             else if (attrName.equals(OBSOLETE)) {
@@ -111,11 +117,11 @@ public class SchemaObjectClass extends SchemaElement {
             else if (attrName.equals(AUXILIARY)) {
                 aux = parseTrueFalseValue(attr);
             }
-            else { 
+            else {
                 throw new NamingException("Invalid schema attribute type for object class definition "    + attrName);
             }
-        }    
-            
+        }
+
         LDAPObjectClassSchema objectClass =
             new LDAPObjectClassSchema(name, oid, sup, desc,
                                       vectorToStringAry(must),
@@ -133,10 +139,10 @@ public class SchemaObjectClass extends SchemaElement {
         if (aux) {
             objectClass.setQualifier(AUXILIARY, "");
         }
-            
+
         return objectClass;
     }
-        
+
     /**
      * Exctract specified attributes from the ldapObjectClass
      */
@@ -154,19 +160,19 @@ public class SchemaObjectClass extends SchemaElement {
                 val = m_ldapObjectClass.getName();
                 if (val != null) {
                     attrs.put(new BasicAttribute(NAME, val));
-                }                   
+                }
             }
             else if (attrIds[i].equals(DESC)) {
                 val = m_ldapObjectClass.getDescription();
                 if (val != null) {
                     attrs.put(new BasicAttribute(DESC, val));
-                }                    
+                }
             }
             else if (attrIds[i].equals(SUP)) {
                 val = m_ldapObjectClass.getSuperior();
                 if (val != null) {
                     attrs.put(new BasicAttribute(SUP, val));
-                }                    
+                }
             }
             else if (attrIds[i].equals(MAY)) {
                 BasicAttribute optional = new BasicAttribute(MAY);
@@ -189,32 +195,32 @@ public class SchemaObjectClass extends SchemaElement {
             else if (attrIds[i].equals(OBSOLETE)) {
                 if (m_ldapObjectClass.getQualifier(OBSOLETE)!= null) {
                     attrs.put(new BasicAttribute(OBSOLETE, "true"));
-                }                    
+                }
             }
             else if (attrIds[i].equals(ABSTRACT)) {
                 if (m_ldapObjectClass.getQualifier(ABSTRACT)!= null) {
                     attrs.put(new BasicAttribute(ABSTRACT, "true"));
-                }                    
+                }
             }
             else if (attrIds[i].equals(STRUCTURAL)) {
                 if (m_ldapObjectClass.getQualifier(STRUCTURAL)!= null) {
                     attrs.put(new BasicAttribute(STRUCTURAL, "true"));
-                }                    
+                }
             }
             else if (attrIds[i].equals(AUXILIARY)) {
                 if (m_ldapObjectClass.getQualifier(AUXILIARY)!= null) {
                     attrs.put(new BasicAttribute(AUXILIARY, "true"));
-                }                    
+                }
             }
-            else { 
+            else {
                 throw new NamingException("Invalid schema attribute type for object class definition "    + attrIds[i]);
             }
         }
 
         return attrs;
-    }    
-        
-        
+    }
+
+
     /**
      * DirContext Attribute Operations
      */
@@ -270,10 +276,10 @@ public class SchemaObjectClass extends SchemaElement {
     public void modifyAttributes(Name name, ModificationItem[] mods) throws NamingException {
         modifyAttributes(name.toString(), mods);
     }
-    
+
     /**
      * Search operations are not implemented because of complexity. Ir will require
-     * to implement the full LDAP search filter sematics in the client. (The search 
+     * to implement the full LDAP search filter sematics in the client. (The search
      * filter sematics is implemented by the Directory server).
      */
 

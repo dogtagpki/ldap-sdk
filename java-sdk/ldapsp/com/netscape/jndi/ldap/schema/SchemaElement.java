@@ -37,19 +37,27 @@
  * ***** END LICENSE BLOCK ***** */
 package com.netscape.jndi.ldap.schema;
 
-import javax.naming.*;
-import javax.naming.directory.*;
-import javax.naming.ldap.*;
+import java.util.Enumeration;
+import java.util.Vector;
 
-import netscape.ldap.*;
-import netscape.ldap.controls.*;
+import javax.naming.Name;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.BasicAttributes;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.InvalidAttributeValueException;
+import javax.naming.directory.ModificationItem;
+import javax.naming.directory.NoSuchAttributeException;
 
-import java.util.*;
+import netscape.ldap.LDAPModificationSet;
+import netscape.ldap.LDAPSchemaElement;
 
 public class SchemaElement extends SchemaDirContext {
 
     SchemaManager m_schemaMgr;
-    
+
     // Attributes used to define schema elements
     static final String NUMERICOID = "NUMERICOID";
     static final String NAME = "NAME";
@@ -57,12 +65,12 @@ public class SchemaElement extends SchemaDirContext {
     static final String SYNTAX = "SYNTAX";
     static final String SUP = "SUP";
     static final String MUST = "MUST";
-    static final String MAY = "MAY";    
+    static final String MAY = "MAY";
     static final String SINGLEVALUE = "SINGLE-VALUE";
-        
+
     // These attribute definition properties are  not supported by LdapJDK and DS
     // Accept them for the appropriate schema element, but ignore them
-    static final String OBSOLETE = "OBSOLETE";    
+    static final String OBSOLETE = "OBSOLETE";
     static final String EQUALITY = "EQUALITY";
     static final String ORDERING = "ORDERING";
     static final String SUBSTRING = "SUBSTRING";
@@ -72,7 +80,7 @@ public class SchemaElement extends SchemaDirContext {
     static final String ABSTRACT = "ABSTRACT";
     static final String STRUCTURAL = "STRUCTURAL";
     static final String AUXILIARY = "AUXILIARY";
-    
+
 
     // Syntax string recognized by Netscape LdapJDK
     static final String cisString       = "1.3.6.1.4.1.1466.115.121.1.15";
@@ -81,11 +89,11 @@ public class SchemaElement extends SchemaDirContext {
     static final String cesString       = "1.3.6.1.4.1.1466.115.121.1.26";
     static final String intString       = "1.3.6.1.4.1.1466.115.121.1.27";
     static final String dnString        = "1.3.6.1.4.1.1466.115.121.1.12";
-    
+
     SchemaElement(SchemaManager schemaMgr) {
         m_schemaMgr = schemaMgr;
-    }    
-    
+    }
+
     /**
      * Map a syntax oid string to a constant recognized by LdapJDK
      */
@@ -110,8 +118,8 @@ public class SchemaElement extends SchemaDirContext {
         }
         else {
             throw new InvalidAttributeValueException(syntax);
-        }    
-    }    
+        }
+    }
 
     /**
      * Map a syntax identifier to a oid string
@@ -137,8 +145,8 @@ public class SchemaElement extends SchemaDirContext {
         }
         else {
             throw new InvalidAttributeValueException("Interanal error, unexpected syntax value " + syntax);
-        }    
-    }    
+        }
+    }
 
     /**
      * Convert string vector to an array
@@ -190,8 +198,8 @@ public class SchemaElement extends SchemaDirContext {
      */
     void modifySchemaElementAttrs (Attributes attrs, int modop, Attributes modAttrs) throws NamingException{
         LDAPModificationSet mods = new LDAPModificationSet();
-        for (NamingEnumeration attrEnum = modAttrs.getAll(); attrEnum.hasMore();) {
-            Attribute attr = (Attribute)attrEnum.next();
+        for (NamingEnumeration<? extends Attribute> attrEnum = modAttrs.getAll(); attrEnum.hasMore();) {
+            Attribute attr = attrEnum.next();
             if (modop == DirContext.ADD_ATTRIBUTE) {
                 Attribute curAttr = attrs.get(attr.getID());
                 if (curAttr == null) {
@@ -205,7 +213,7 @@ public class SchemaElement extends SchemaDirContext {
             }
             else if (modop == DirContext.REPLACE_ATTRIBUTE) {
                 attrs.put(attr);
-            }    
+            }
             else if (modop == DirContext.REMOVE_ATTRIBUTE) {
                 Attribute curAttr = attrs.get(attr.getID());
                 if (curAttr == null) {
@@ -213,31 +221,31 @@ public class SchemaElement extends SchemaDirContext {
                 }
                 else if (attr.size() == 0) { // remove the attr
                     attrs.remove(attr.getID());
-                }    
+                }
                 else {
                     for (NamingEnumeration vals = attr.getAll(); vals.hasMore();) {
                         String val = (String) vals.nextElement();
                         curAttr.remove(val);
-                        // Schema definition Values are case insensitive 
+                        // Schema definition Values are case insensitive
                         curAttr.remove(val.toLowerCase());
                     }
                     if (curAttr.size() == 0) { // remove attr if no values left
                         attrs.remove(attr.getID());
-                    }    
-                }                
+                    }
+                }
             }
             else {
                 throw new IllegalArgumentException("Illegal Attribute Modification Operation");
             }
         }
-    }         
+    }
 
     /**
      * Parse value for a schema attribute. Return true if the value is
      * "true", return false if the value is "false" or absent
      */
     static boolean parseTrueFalseValue(Attribute attr) throws NamingException{
-        
+
         for (NamingEnumeration valEnum = attr.getAll(); valEnum.hasMore(); ) {
             String flag = (String)valEnum.nextElement();
             if (flag.equals("true")) {
@@ -253,7 +261,7 @@ public class SchemaElement extends SchemaDirContext {
         }
         return false; // no values
     }
-    
+
     /**
      * Read a string value for a schema attribute
      */

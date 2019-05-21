@@ -37,27 +37,34 @@
  * ***** END LICENSE BLOCK ***** */
 package com.netscape.jndi.ldap.schema;
 
-import javax.naming.*;
-import javax.naming.directory.*;
-import javax.naming.ldap.*;
+import java.util.Enumeration;
+import java.util.Vector;
 
-import netscape.ldap.*;
-import netscape.ldap.controls.*;
+import javax.naming.Name;
+import javax.naming.NameNotFoundException;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.BasicAttribute;
+import javax.naming.directory.BasicAttributes;
+import javax.naming.directory.ModificationItem;
 
-import java.util.*;
+import netscape.ldap.LDAPConnection;
+import netscape.ldap.LDAPMatchingRuleSchema;
 
 public class SchemaMatchingRule extends SchemaElement {
 
-    
-    private static final String APPLIES = "APPLIES";    
-        
+
+    private static final String APPLIES = "APPLIES";
+
     LDAPMatchingRuleSchema m_ldapMatchingRule;
-    
+
     // Attribute IDs that are exposed through Netscape LdapJDK
     private static String[] m_allAttrIds = {NUMERICOID, NAME, DESC, OBSOLETE, SYNTAX, APPLIES };
-    
+
     LDAPConnection m_ld;
-    
+
     public SchemaMatchingRule(LDAPMatchingRuleSchema ldapMatchingRule,  SchemaManager schemaManager) {
         super(schemaManager);
         m_ldapMatchingRule = ldapMatchingRule;
@@ -68,18 +75,18 @@ public class SchemaMatchingRule extends SchemaElement {
         super(schemaManager);
         m_ldapMatchingRule = parseDefAttributes(attrs);
         m_path = ATTRDEF + "/" + m_ldapMatchingRule.getName();
-    }    
-    
+    }
+
     /**
      * Parse Definition Attributes for a LDAP matching rule
      */
-    static LDAPMatchingRuleSchema parseDefAttributes(Attributes attrs) throws NamingException {        
+    static LDAPMatchingRuleSchema parseDefAttributes(Attributes attrs) throws NamingException {
         String name=null, oid=null, desc=null, syntax=null;
         boolean obsolete = false;
         Vector applies = new Vector();
 
-        for (Enumeration attrEnum = attrs.getAll(); attrEnum.hasMoreElements(); ) {
-            Attribute attr = (Attribute) attrEnum.nextElement();
+        for (NamingEnumeration<? extends Attribute> attrEnum = attrs.getAll(); attrEnum.hasMoreElements(); ) {
+            Attribute attr = attrEnum.nextElement();
             String attrName = attr.getID();
             if (attrName.equals(NAME)) {
                 name = getSchemaAttrValue(attr);
@@ -95,26 +102,26 @@ public class SchemaMatchingRule extends SchemaElement {
             }
             else if (attrName.equals(APPLIES)) {
                 for (Enumeration valEnum = attr.getAll(); valEnum.hasMoreElements(); ) {
-                    applies.addElement((String)valEnum.nextElement());
+                    applies.addElement(valEnum.nextElement());
                 }
-            }            
-            else if (attrName.equals(OBSOLETE)) {                     
+            }
+            else if (attrName.equals(OBSOLETE)) {
                 obsolete = parseTrueFalseValue(attr);
             }
-            else { 
+            else {
                 throw new NamingException("Invalid schema attribute type for matching rule definition "    + attrName);
             }
-        }    
-            
+        }
+
         LDAPMatchingRuleSchema mrule = new LDAPMatchingRuleSchema(name, oid, desc, vectorToStringAry(applies), syntax);
-        
+
         if (obsolete) {
             mrule.setQualifier(OBSOLETE, "");
         }
         return mrule;
     }
-    
-        
+
+
     /**
      * Exctract specified attributes from the ldapMatchingRule
      */
@@ -126,25 +133,25 @@ public class SchemaMatchingRule extends SchemaElement {
                 val = m_ldapMatchingRule.getID();
                 if (val != null) {
                     attrs.put(new BasicAttribute(NUMERICOID, val));
-                }                    
+                }
             }
             else if (attrIds[i].equals(NAME)) {
                 val = m_ldapMatchingRule.getName();
                 if (val != null) {
                     attrs.put(new BasicAttribute(NAME, val));
-                }                    
+                }
             }
             else if (attrIds[i].equals(DESC)) {
                 val = m_ldapMatchingRule.getDescription();
                 if (val != null) {
                     attrs.put(new BasicAttribute(DESC, val));
-                }                    
+                }
             }
             else if (attrIds[i].equals(SYNTAX)) {
                 val = m_ldapMatchingRule.getSyntaxString();
                 if (val != null) {
                     attrs.put(new BasicAttribute(SYNTAX, val));
-                }                    
+                }
             }
             else if (attrIds[i].equals(APPLIES)) {
                 String[] appliesToAttrs = m_ldapMatchingRule.getAttributes();
@@ -154,12 +161,12 @@ public class SchemaMatchingRule extends SchemaElement {
                         applies.add(appliesToAttrs[a]);
                     }
                     attrs.put(applies);
-                }    
+                }
             }
             else if (attrIds[i].equals(OBSOLETE)) {
                 if (m_ldapMatchingRule.getQualifier(OBSOLETE)!= null) {
                     attrs.put(new BasicAttribute(OBSOLETE, "true"));
-                }                    
+                }
             }
 
             else {
@@ -167,9 +174,9 @@ public class SchemaMatchingRule extends SchemaElement {
             }
         }
         return attrs;
-    }    
-        
-        
+    }
+
+
     /**
      * DirContext Attribute Operations
      */
@@ -225,10 +232,10 @@ public class SchemaMatchingRule extends SchemaElement {
     public void modifyAttributes(Name name, ModificationItem[] mods) throws NamingException {
         modifyAttributes(name.toString(), mods);
     }
-    
+
     /**
      * Search operations are not implemented because of complexity. Ir will require
-     * to implement the full LDAP search filter sematics in the client. (The search 
+     * to implement the full LDAP search filter sematics in the client. (The search
      * filter sematics is implemented by the Directory server).
      */
 
