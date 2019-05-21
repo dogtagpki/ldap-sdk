@@ -532,8 +532,7 @@ public class LDAPSchema implements java.io.Serializable {
      * the rule, or <CODE>null</CODE> if not found.
      */
     public LDAPDITStructureRuleSchema getDITStructureRule( int ID ) {
-        return (LDAPDITStructureRuleSchema)structureRulesById.get(
-            new Integer( ID ) );
+        return structureRulesById.get( new Integer( ID ) );
     }
 
     /**
@@ -947,7 +946,7 @@ public class LDAPSchema implements java.io.Serializable {
     private Hashtable<String, LDAPMatchingRuleSchema> matchingRules = new Hashtable<>();
     private Hashtable<String, LDAPSyntaxSchema> syntaxes = new Hashtable<>();
     private Hashtable<String, LDAPDITStructureRuleSchema> structureRulesByName = new Hashtable<>();
-    private Hashtable structureRulesById = new Hashtable();
+    private Hashtable<Integer, LDAPDITStructureRuleSchema> structureRulesById = new Hashtable<>();
     private Hashtable contentRules = new Hashtable();
     private Hashtable nameForms = new Hashtable();
 }
