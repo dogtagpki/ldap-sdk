@@ -490,7 +490,7 @@ public class LDAPConnection implements Cloneable, Serializable {
     /* To manage received server controls on a per-thread basis,
        we keep a table of active threads and a table of controls,
        indexed by thread */
-    private Vector _attachedList = new Vector();
+    private Vector<LDAPConnThread> _attachedList = new Vector<>();
     private Hashtable _responseControlTable = new Hashtable();
     private LDAPCache _cache = null;
     static Hashtable<LDAPConnThread, Vector<LDAPConnection>> _threadConnTable = new Hashtable<>();
@@ -5282,9 +5282,9 @@ public class LDAPConnection implements Cloneable, Serializable {
             /* Do some garbage collection: check if any attached threads have
                exited */
             /* Now check all threads in the list */
-            Enumeration e = _attachedList.elements();
+            Enumeration<LDAPConnThread> e = _attachedList.elements();
             while( e.hasMoreElements() ) {
-                LDAPConnThread aThread = (LDAPConnThread)e.nextElement();
+                LDAPConnThread aThread = e.nextElement();
                 if ( !aThread.isAlive() ) {
                     _responseControlTable.remove( aThread );
                     _attachedList.removeElement( aThread );
