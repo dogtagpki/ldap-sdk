@@ -37,14 +37,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap;
 
-import java.util.*;
-
 /**
  * The definition of an attribute type in the schema.
  * <A HREF="http://www.ietf.org/rfc/rfc2252.txt"
  * TARGET="_blank">RFC 2252, Lightweight Directory Access Protocol (v3):
  * Attribute Syntax Definitions</A> covers the types of information
- * to specify when defining an attribute type. According to the RFC, 
+ * to specify when defining an attribute type. According to the RFC,
  * the description of an attribute type can include the following:
  * <P>
  *
@@ -156,16 +154,16 @@ public class LDAPAttributeSchema extends LDAPSchemaElement {
      * for the attribute in dotted-decimal format; MAY be null
      * @param ordering Object Identifier of the ordering matching rule
      * for the attribute in dotted-decimal format; MAY be null
-     * @param substring Object Identifier of the substring matching rule 
+     * @param substring Object Identifier of the substring matching rule
      * for the attribute in dotted-decimal format; MAY be null
-     * @param collective true if this is a collective attribute. 
-     * @param userMod true if the attribute is modifiable by users. 
-     * @param usage One of the following: 
+     * @param collective true if this is a collective attribute.
+     * @param userMod true if the attribute is modifiable by users.
+     * @param usage One of the following:
      * <UL>
      * <LI>USER_APPLICATIONS
-     * <LI>DIRECTORY_OPERATION 
-     * <LI>DISTRIBUTED_OPERATION 
-     * <LI>DSA_OPERATION 
+     * <LI>DIRECTORY_OPERATION
+     * <LI>DISTRIBUTED_OPERATION
+     * <LI>DSA_OPERATION
      * </UL>
      */
     public LDAPAttributeSchema( String[] names,
@@ -251,9 +249,9 @@ public class LDAPAttributeSchema extends LDAPSchemaElement {
      }
 
     /**
-     * Returns the Object Identifier of the equality matching rule in effect 
+     * Returns the Object Identifier of the equality matching rule in effect
      * for this attribute, or null if there is none
-     * @return the Object Identifier of the equality matching rule in effect 
+     * @return the Object Identifier of the equality matching rule in effect
      * for this attribute, or null if there is none
      */
      public String getEqualityMatchingRule() {
@@ -261,9 +259,9 @@ public class LDAPAttributeSchema extends LDAPSchemaElement {
      }
 
     /**
-     * Returns the Object Identifier of the order matching rule in effect 
+     * Returns the Object Identifier of the order matching rule in effect
      * for this attribute, or null if there is none
-     * @return the Object Identifier of the order matching rule in effect 
+     * @return the Object Identifier of the order matching rule in effect
      * for this attribute, or null if there is none
      */
      public String getOrderMatchingRule() {
@@ -271,9 +269,9 @@ public class LDAPAttributeSchema extends LDAPSchemaElement {
      }
 
     /**
-     * Returns the Object Identifier of the substring matching rule in effect 
+     * Returns the Object Identifier of the substring matching rule in effect
      * for this attribute, or null if there is none
-     * @return the Object Identifier of the substring matching rule in effect 
+     * @return the Object Identifier of the substring matching rule in effect
      * for this attribute, or null if there is none
      */
      public String getSubstringMatchingRule() {
@@ -315,9 +313,9 @@ public class LDAPAttributeSchema extends LDAPSchemaElement {
      * @return the usage property of the object; one of the following:
      * <UL>
      * <LI>USER_APPLICATIONS
-     * <LI>DIRECTORY_OPERATION 
-     * <LI>DISTRIBUTED_OPERATION 
-     * <LI>DSA_OPERATION 
+     * <LI>DIRECTORY_OPERATION
+     * <LI>DISTRIBUTED_OPERATION
+     * <LI>DSA_OPERATION
      * </UL>
      */
     public int getUsage() {
@@ -385,8 +383,7 @@ public class LDAPAttributeSchema extends LDAPSchemaElement {
      * @return <code>true</code> if collective
      */
     public boolean isCollective() {
-        return (properties != null) ? properties.containsKey( COLLECTIVE ) :
-            false;
+        return properties != null ? properties.containsKey( COLLECTIVE ) : false;
     }
 
     /**
@@ -396,8 +393,7 @@ public class LDAPAttributeSchema extends LDAPSchemaElement {
      * <code>false</code> if multi-valued.
      */
     public boolean isSingleValued() {
-        return (properties != null) ? properties.containsKey( SINGLE ) :
-            false;
+        return properties != null ? properties.containsKey( SINGLE ) : false;
     }
 
     /**
@@ -406,9 +402,7 @@ public class LDAPAttributeSchema extends LDAPSchemaElement {
      * @return <code>true</code> if modifiable by users
      */
     public boolean isUserModifiable() {
-        return (properties != null) ?
-            !properties.containsKey( NO_USER_MODIFICATION ) :
-            true;
+        return properties != null ? !properties.containsKey( NO_USER_MODIFICATION ) : true;
     }
 
     /**
@@ -439,22 +433,22 @@ public class LDAPAttributeSchema extends LDAPSchemaElement {
     public static final String USAGE = "USAGE";
 
     // Usage constants
-    /** An ordinary user attribute 
+    /** An ordinary user attribute
      */
     public static final int USER_APPLICATIONS = 0;
-       
+
     /** An operational attribute used for a directory operation or which
-     * holds a directory specific value 
+     * holds a directory specific value
      */
     public static final int DIRECTORY_OPERATION = 1;
-        
+
     /** An operational attribute used to hold server (DSA) information that
-     * is shared among servers holding replicas of the entry 
+     * is shared among servers holding replicas of the entry
      */
     public static final int DISTRIBUTED_OPERATION = 2;
-      
+
     /** An operational attribute used to hold server (DSA) information that
-     * is local to a server     
+     * is local to a server
      */
     public static final int DSA_OPERATION = 3;
 

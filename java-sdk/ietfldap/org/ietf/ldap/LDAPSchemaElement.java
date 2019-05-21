@@ -38,7 +38,10 @@
 package org.ietf.ldap;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
 /**
  *
@@ -166,7 +169,7 @@ public abstract class LDAPSchemaElement implements Serializable {
             return null;
         }
         if ( o instanceof Vector ) {
-            Vector v = (Vector)o;
+            Vector<String> v = (Vector<String>)o;
             String[] vals = new String[v.size()];
             v.copyInto( vals );
             return vals;
@@ -183,7 +186,7 @@ public abstract class LDAPSchemaElement implements Serializable {
      * Gets an enumeration of all qualifiers which are not predefined.
      * @return enumeration of qualifiers.
      */
-    public Enumeration getQualifierNames() {
+    public Enumeration<String> getQualifierNames() {
         return properties.keys();
     }
 
@@ -192,8 +195,7 @@ public abstract class LDAPSchemaElement implements Serializable {
      * @return <CODE>true<CODE> if the element is defined as obsolete.
      */
     public boolean isObsolete() {
-        return (properties == null) ? false :
-            properties.containsKey(OBSOLETE);
+        return properties == null ? false : properties.containsKey(OBSOLETE);
     }
 
     /**
@@ -204,7 +206,7 @@ public abstract class LDAPSchemaElement implements Serializable {
      */
     public void setQualifier( String name, String value ) {
         if ( properties == null ) {
-            properties = new Hashtable();
+            properties = new Hashtable<String, Object>();
         }
         if ( value != null ) {
             properties.put( name, value );
@@ -223,9 +225,9 @@ public abstract class LDAPSchemaElement implements Serializable {
             return;
         }
         if ( properties == null ) {
-            properties = new Hashtable();
+            properties = new Hashtable<String, Object>();
         }
-        Vector v = new Vector();
+        Vector<String> v = new Vector<>();
         for( int i = 0; i < values.length; i++ ) {
             v.addElement( values[i] );
         }
@@ -233,8 +235,8 @@ public abstract class LDAPSchemaElement implements Serializable {
     }
 
     /**
-     * Returns a String in a format suitable for directly adding to a 
-     * Directory, as a value of the particular schema 
+     * Returns a String in a format suitable for directly adding to a
+     * Directory, as a value of the particular schema
      * element attribute. See the format definition for each derived class
      *
      * @return Directory format of the schema element as a String
@@ -250,7 +252,7 @@ public abstract class LDAPSchemaElement implements Serializable {
     protected void parseValue( String raw ) {
         names = null;
         if ( properties == null ) {
-            properties = new Hashtable();
+            properties = new Hashtable<String, Object>();
         }
         int l = raw.length();
         // Processing is faster in char array than in String
@@ -334,7 +336,7 @@ public abstract class LDAPSchemaElement implements Serializable {
             }
             if ( (ind < last) && (last <= l) ) {
                 if ( list ) {
-                    Vector v = new Vector();
+                    Vector<String> v = new Vector<>();
                     if ( ch[ind] == ' ' ) {
                         ind++;
                     }
@@ -475,9 +477,9 @@ public abstract class LDAPSchemaElement implements Serializable {
      */
     protected String getCustomValues() {
         String s = "";
-        Enumeration en = properties.keys();
+        Enumeration<String> en = properties.keys();
         while( en.hasMoreElements() ) {
-            String key = (String)en.nextElement();
+            String key = en.nextElement();
             if ( !key.startsWith( "X-" ) ) {
                 continue;
             }
@@ -521,12 +523,12 @@ public abstract class LDAPSchemaElement implements Serializable {
             }
         } else {
             s += key + " ( ";
-            Vector v = (Vector)o;
+            Vector<String> v = (Vector<String>)o;
             for( int i = 0; i < v.size(); i++ ) {
                 if ( doQuote ) {
                     s += '\'';
                 }
-                s += (String)v.elementAt(i);
+                s += v.elementAt(i);
                 if ( doQuote ) {
                     s += '\'';
                 }
@@ -562,17 +564,17 @@ public abstract class LDAPSchemaElement implements Serializable {
      * @return a String with any known qualifiers.
      */
     String getQualifierString( String[] ignore ) {
-        Hashtable toIgnore = null;
+        Hashtable<String, Object> toIgnore = null;
         if ( ignore != null ) {
-            toIgnore = new Hashtable();
+            toIgnore = new Hashtable<>();
             for( int i = 0; i < ignore.length; i++ ) {
                 toIgnore.put( ignore[i], ignore[i] );
             }
         }
         String s = "";
-        Enumeration en = getQualifierNames();
+        Enumeration<String> en = getQualifierNames();
         while( en.hasMoreElements() ) {
-            String qualifier = (String)en.nextElement();
+            String qualifier = en.nextElement();
             if ( (toIgnore != null) && toIgnore.containsKey( qualifier ) ) {
                 continue;
             }
@@ -629,7 +631,7 @@ public abstract class LDAPSchemaElement implements Serializable {
     protected String rawValue = null;
     protected String[] names = new String[0];
     // Additional qualifiers
-    protected Hashtable properties = null;
+    protected Hashtable<String, Object> properties = null;
     // Qualifiers known to not have values
     static protected Hashtable novalsTable = new Hashtable();
 }

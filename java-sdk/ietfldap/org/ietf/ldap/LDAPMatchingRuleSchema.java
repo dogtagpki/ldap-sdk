@@ -37,7 +37,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap;
 
-import java.util.*;
+import java.util.Vector;
 
 /**
  * The definition of a matching rule in the schema.
@@ -184,7 +184,7 @@ public class LDAPMatchingRuleSchema extends LDAPAttributeSchema {
         if ( use != null ) {
             parseValue( use );
         }
-        Vector v = (Vector)properties.get( "APPLIES" );
+        Vector<String> v = (Vector<String>)properties.get( "APPLIES" );
         if ( v != null ) {
             _attributes = new String[v.size()];
             v.copyInto( _attributes );
@@ -313,6 +313,6 @@ public class LDAPMatchingRuleSchema extends LDAPAttributeSchema {
     // Qualifiers tracked explicitly
     static final String[] EXPLICIT = { OBSOLETE,
                                        SYNTAX };
-    
+
     private String[] _attributes = null;
 }

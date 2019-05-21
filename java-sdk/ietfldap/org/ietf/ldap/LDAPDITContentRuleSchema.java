@@ -37,14 +37,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap;
 
-import java.util.*;
+import java.util.Vector;
 
 /**
  * The definition of a DIT content rule in the schema.
  * <A HREF="http://www.ietf.org/rfc/rfc2252.txt"
  * TARGET="_blank">RFC 2252, Lightweight Directory Access Protocol (v3):
  * DIT Content Rule Description</A> covers the types of information
- * to specify when defining a DIT content rule. According to the RFC, 
+ * to specify when defining a DIT content rule. According to the RFC,
  * the description of a DIT content rule can include the following:
  * <P>
  *
@@ -201,7 +201,7 @@ public class LDAPDITContentRuleSchema extends LDAPSchemaElement {
         Object o = properties.get( MAY );
         if ( o != null ) {
             if ( o instanceof Vector ) {
-                may = (Vector)o;
+                may = (Vector<String>)o;
             } else {
                 may.addElement( o );
             }
@@ -209,7 +209,7 @@ public class LDAPDITContentRuleSchema extends LDAPSchemaElement {
         o = properties.get( MUST );
         if ( o != null ) {
             if ( o instanceof Vector ) {
-                must = (Vector)o;
+                must = (Vector<String>)o;
             } else {
                 must.addElement( o );
             }
@@ -217,7 +217,7 @@ public class LDAPDITContentRuleSchema extends LDAPSchemaElement {
         o = properties.get( NOT );
         if ( o != null ) {
             if ( o instanceof Vector ) {
-                not = (Vector)o;
+                not = (Vector<String>)o;
             } else {
                 not.addElement( o );
             }
@@ -225,7 +225,7 @@ public class LDAPDITContentRuleSchema extends LDAPSchemaElement {
         o = properties.get( AUX );
         if ( o != null ) {
             if ( o instanceof Vector ) {
-                aux = (Vector)o;
+                aux = (Vector<String>)o;
             } else {
                 aux.addElement( o );
             }

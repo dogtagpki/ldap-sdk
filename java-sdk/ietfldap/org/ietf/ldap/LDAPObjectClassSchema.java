@@ -37,7 +37,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap;
 
-import java.util.*;
+import java.util.Enumeration;
+import java.util.Vector;
 
 /**
  * The definition of an object class in the schema.
@@ -92,7 +93,7 @@ import java.util.*;
  * <CODE>LDAPSchemaElement</CODE>. Optional and custom qualifiers are
  * accessed with <CODE>getQualifier</CODE> and <CODE>getQualifierNames</CODE>
  * from <CODE>LDAPSchemaElement</CODE>.
- 
+
  * <P>
  *
  * To add or remove this object class definition from the
@@ -191,7 +192,7 @@ public class LDAPObjectClassSchema extends LDAPSchemaElement {
         Object o = properties.get( "MAY" );
         if ( o != null ) {
             if ( o instanceof Vector ) {
-                may = (Vector)o;
+                may = (Vector<String>)o;
             } else {
                 may.addElement( o );
             }
@@ -199,7 +200,7 @@ public class LDAPObjectClassSchema extends LDAPSchemaElement {
         o = properties.get( "MUST" );
         if ( o != null ) {
             if ( o instanceof Vector ) {
-                must = (Vector)o;
+                must = (Vector<String>)o;
             } else {
                 must.addElement( o );
             }
@@ -212,7 +213,7 @@ public class LDAPObjectClassSchema extends LDAPSchemaElement {
      * @return an enumeration of the names of optional attributes
      * allowed in this object class.
      */
-    public Enumeration getOptionalAttributes() {
+    public Enumeration<Object> getOptionalAttributes() {
         return may.elements();
     }
 
