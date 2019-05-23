@@ -350,15 +350,20 @@ public class LDAPBasePropertySupport implements Serializable {
     protected void setDefaultReferralCredentials(
         LDAPConnection conn ) {
         final LDAPConnection m_conn = conn;
+
         LDAPRebind rebind = new LDAPRebind() {
-            public LDAPRebindAuth getRebindAuthentication(
-                String host,
-                int port ) {
-                    return new LDAPRebindAuth(
-                        m_conn.getAuthenticationDN(),
-                        m_conn.getAuthenticationPassword() );
-                }
+            public LDAPRebindAuth getRebindAuthentication(String host, int port ) {
+                return new LDAPRebindAuth() {
+                    public String getDN() {
+                        return m_conn.getAuthenticationDN();
+                    }
+                    public String getPassword() {
+                        return m_conn.getAuthenticationPassword();
+                    }
+                };
+            }
         };
+
         try {
             conn.setOption(LDAPConnection.REFERRALS, Boolean.TRUE);
             conn.setOption(LDAPConnection.REFERRALS_REBIND_PROC, rebind);

@@ -37,16 +37,24 @@
  * ***** END LICENSE BLOCK ***** */
 package com.netscape.jndi.ldap;
 
-import javax.naming.*;
-import javax.naming.directory.*;
-import javax.naming.ldap.*;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.StringTokenizer;
 
-import netscape.ldap.*;
-import netscape.ldap.controls.*;
+import javax.naming.AuthenticationNotSupportedException;
+import javax.naming.Context;
+import javax.naming.NamingException;
+import javax.naming.ldap.Control;
 
-import com.netscape.jndi.ldap.common.*;
+import com.netscape.jndi.ldap.common.ShareableEnv;
 
-import java.util.*;
+import netscape.ldap.LDAPConnection;
+import netscape.ldap.LDAPControl;
+import netscape.ldap.LDAPRebind;
+import netscape.ldap.LDAPRebindAuth;
+import netscape.ldap.LDAPSearchConstraints;
+import netscape.ldap.LDAPUrl;
+import netscape.ldap.LDAPv2;
 
 /**
  * Context Environment
@@ -56,7 +64,7 @@ class ContextEnv extends ShareableEnv  {
     public static final String DEFAULT_HOST = "localhost";
     public static final int    DEFAULT_PORT = LDAPv2.DEFAULT_PORT;
     public static final int    DEFAULT_SSL_PORT = 636;
-    public static final int    DEFAULT_LDAP_VERSION = 3;    
+    public static final int    DEFAULT_LDAP_VERSION = 3;
 
     // JNDI defined environment propertiies
     public static final String P_PROVIDER_URL = Context.PROVIDER_URL;
@@ -74,7 +82,7 @@ class ContextEnv extends ShareableEnv  {
     public static final String P_CONNECT_CTRLS = "java.naming.ldap.control.connect";
     public static final String P_BINARY_ATTRS = "java.naming.ldap.attributes.binary";
     public static final String P_ATTRS_ONLY = "java.naming.ldap.typesOnly";
-    public static final String P_DELETE_OLDRDN = "java.naming.ldap.deleteRDN";    
+    public static final String P_DELETE_OLDRDN = "java.naming.ldap.deleteRDN";
     public static final String P_SOCKET_FACTORY = "java.naming.ldap.factory.socket";
     public static final String P_CIPHER_SUITE = "java.naming.ldap.ssl.ciphers"; // new
     public static final String P_TIME_LIMIT = "java.naming.ldap.timelimit";     // new
@@ -86,11 +94,11 @@ class ContextEnv extends ShareableEnv  {
     public static final String P_SASL_AUTHID = "java.naming.security.sasl.authorizationId";
     public static final String P_SASL_CALLBACK = "java.naming.security.sasl.callback";
     public static final String P_SASL_PKGS = "javax.security.sasl.client.pkgs";
-    
+
     private static final String SASL_PROP_PREFIX = "javax.security.sasl";
-    
+
     public static final String P_TRACE = LDAPConnection.TRACE_PROPERTY;
-    
+
     // Possible values for the Context.REFERRAL env property
     private static final String V_REFERRAL_FOLLOW = "follow";
     private static final String V_REFERRAL_IGNORE = "ignore";
@@ -98,11 +106,11 @@ class ContextEnv extends ShareableEnv  {
 
     // Possible values for the java.naming.ldap.derefAliases env property
     private static final String V_DEREF_NEVER = "never";
-    
+
     private static final String V_DEREF_SEARCHING = "searching";
     private static final String V_DEREF_FINDING = "finding";
     private static final String V_DEREF_ALWAYS = "always";
-    
+
     // Possible values for the java.naming... env property
     private static final String V_AUTH_NONE = "none";
     private static final String V_AUTH_SIMPLE = "simple";
@@ -116,10 +124,10 @@ class ContextEnv extends ShareableEnv  {
     public ContextEnv(ShareableEnv parent, int parentSharedEnvIdx) {
         super(parent, parentSharedEnvIdx);
     }
-    
+
     /**
      * Constructor for the root context
-     * 
+     *
      * @param initialEnv a hashtable with environemnt properties
      */
     public ContextEnv(Hashtable initialEnv) {
@@ -133,27 +141,27 @@ class ContextEnv extends ShareableEnv  {
      */
     /**
      * Clone ShareableEnv
-     * The code is the same as in the superclass (ShareableEnv) except that  
+     * The code is the same as in the superclass (ShareableEnv) except that
      * a ContextEnv instance is returned
      *
      * @return A "clone" of the current context environment
      */
     public Object clone() {
-        
+
         // First freeze updates for this context
         freezeUpdates();
-        
+
          // If the context has been modified, then it is the parent of the clone
         if (m_sharedEnv != null) {
             return new ContextEnv(this, m_sharedEnv.size()-1);
         }
-        
+
         // No changes has been done to the inherited parent context. Pass the parent
         // context to the clone
         else {
             return new ContextEnv(m_parentEnv, m_parentSharedEnvIdx);
-        }    
-    }    
+        }
+    }
 
     /**
      * Update property value. Properties that pertain to LDAPSearchConstraints
@@ -182,7 +190,7 @@ class ContextEnv extends ShareableEnv  {
             }
             else if (name.equalsIgnoreCase(P_REFERRAL_HOPLIMIT)) {
                 updateReferralHopLimit(cons);
-            }            
+            }
         }
         catch (IllegalArgumentException e) {
             if (oldVal == null) {
@@ -195,7 +203,7 @@ class ContextEnv extends ShareableEnv  {
         }
         return oldVal;
     }
-    
+
     /**
      * Initialize LDAPSearchConstraints with environment properties
      */
@@ -207,7 +215,7 @@ class ContextEnv extends ShareableEnv  {
         updateReferralMode(cons);
         updateReferralHopLimit(cons);
     }
-    
+
     /**
      * Set the suggested number of result to return at a time during search in the
      * default SearchConstraints for the connection.
@@ -306,7 +314,7 @@ class ContextEnv extends ShareableEnv  {
                 String user = getUserDN(), passwd = getUserPassword();
                 if (user != null && passwd != null) {
                     cons.setRebindProc(new ReferralRebindProc(user, passwd));
-                }    
+                }
             }
             else if(mode.equalsIgnoreCase(V_REFERRAL_THROW_EXCEPTION)) {
                 cons.setReferrals(false);
@@ -320,7 +328,7 @@ class ContextEnv extends ShareableEnv  {
             }
             else {
                 throw new IllegalArgumentException("Illegal value for " + P_REFERRAL_MODE);
-            }    
+            }
         }
     }
 
@@ -338,11 +346,18 @@ class ContextEnv extends ShareableEnv  {
      */
     static class ReferralRebindProc implements LDAPRebind {
         LDAPRebindAuth auth;
-        
+
         public ReferralRebindProc(String user, String passwd) {
-            auth = new LDAPRebindAuth(user, passwd);
-        }    
-        
+            auth = new LDAPRebindAuth() {
+                public String getDN() {
+                    return user;
+                }
+                public String getPassword() {
+                    return passwd;
+                }
+            };
+        }
+
         public LDAPRebindAuth getRebindAuthentication(String host, int port) {
             return auth;
         }
@@ -413,47 +428,47 @@ class ContextEnv extends ShareableEnv  {
                 throw new IllegalArgumentException(
                 "Illegal value for java.naming.ldap.version property.");
             }
-            /*if ( v !=2 && v !=3) { 
+            /*if ( v !=2 && v !=3) {
                 throw new IllegalArgumentException(
                 "Illegal value for + java.naming.ldap.version property.");
             }BLITS*/
             return v;
         }
         return DEFAULT_LDAP_VERSION;
-    }        
-    
+    }
+
     /**
      * Get user authenticate name
      */
     String getUserDN() {
         return (String) getProperty(Context.SECURITY_PRINCIPAL);
-    }        
+    }
 
     /**
      * Get user authenticate password
      */
     String getUserPassword() {
         return (String) getProperty(Context.SECURITY_CREDENTIALS);
-    }    
+    }
 
     /**
      * Get full qualified socket factory class name
      */
     String getSocketFactory() {
         return (String)getProperty(P_SOCKET_FACTORY);
-    }    
+    }
 
     /**
      * Get cipher suite for the socket factory
      */
     Object getCipherSuite() {
         return getProperty(P_CIPHER_SUITE);
-    }    
+    }
 
     /**
      * Get controls to be used during a connection request like ProxyAuth
      */
-    LDAPControl[] getConnectControls() throws NamingException{        
+    LDAPControl[] getConnectControls() throws NamingException{
         Control[] reqCtls = (Control[])getProperty(P_CONNECT_CTRLS);
         if (reqCtls != null) {
             LDAPControl[] ldapCtls = new LDAPControl[reqCtls.length];
@@ -483,19 +498,19 @@ class ContextEnv extends ShareableEnv  {
         }
         else if (flag.equalsIgnoreCase("true")) {
             return true;
-        }    
+        }
         else if (flag.equalsIgnoreCase("false")) {
             return false;
-        }    
+        }
         else {
             throw new IllegalArgumentException("Illegal value for " + P_ATTRS_ONLY);
         }
-    }    
+    }
 
     /**
      * Flag whether rename operation should delete old RDN
      * Read environment property P_ATTRS_ONLY. If not defined
-     * TRUE is returned (delete old RDN by default)     
+     * TRUE is returned (delete old RDN by default)
      */
     boolean getDeleteOldRDNFlag() {
         String flag = (String)getProperty(P_DELETE_OLDRDN);
@@ -504,10 +519,10 @@ class ContextEnv extends ShareableEnv  {
         }
         else if (flag.equalsIgnoreCase("true")) {
             return true;
-        }    
+        }
         else if (flag.equalsIgnoreCase("false")) {
             return false;
-        }    
+        }
         else {
             throw new IllegalArgumentException("Illegal value for " + P_DELETE_OLDRDN);
         }
@@ -523,7 +538,7 @@ class ContextEnv extends ShareableEnv  {
         if(sep != null) {
             if (sep.length() !=1) {
                 throw new IllegalArgumentException("Illegal value for " + P_JNDIREF_SEPARATOR);
-            }            
+            }
             return sep.charAt(0);
         }
         return '#';
@@ -539,8 +554,8 @@ class ContextEnv extends ShareableEnv  {
         if (binAttrList == null) {
             return null;
         }
-        
-        StringTokenizer tok = new StringTokenizer(binAttrList);        
+
+        StringTokenizer tok = new StringTokenizer(binAttrList);
         String[] binAttrs = new String[tok.countTokens()];
         for (int i=0; tok.hasMoreTokens(); i++) {
             binAttrs[i] = tok.nextToken();
@@ -561,7 +576,7 @@ class ContextEnv extends ShareableEnv  {
             }
             else if (authMode.equalsIgnoreCase(V_AUTH_SIMPLE)) {
                  return null;
-            }     
+            }
             else {
                 // The value must be a space separated list of sasl
                 // mechanism names
@@ -570,7 +585,7 @@ class ContextEnv extends ShareableEnv  {
                 String[] mechanisms = new String[cnt];
                 for (int i=0; tok.hasMoreTokens(); i++) {
                     mechanisms[i] = tok.nextToken();
-                }                                        
+                }
             }
         }
         return null;
@@ -578,23 +593,23 @@ class ContextEnv extends ShareableEnv  {
 
     /**
      * Returned all sasl properties (startwith javax.security.sasl) except
-     * AUTHID and CALLBACK, as a Hashtable. AUTHID and CALLBACK as used 
+     * AUTHID and CALLBACK, as a Hashtable. AUTHID and CALLBACK as used
      * directly as parameters to authenticate()
-     * 
+     *
      */
     Hashtable getSaslProps() {
         Hashtable props = getAllProperties();
         Hashtable saslProps = new Hashtable();
         String prefixUpperCase = SASL_PROP_PREFIX.toUpperCase();
-        
+
         for (Enumeration e = props.keys(); e.hasMoreElements();) {
             String key = (String) e.nextElement();
             if (key.startsWith(SASL_PROP_PREFIX) ||
                 key.startsWith(prefixUpperCase)) {
-                if (!key.equalsIgnoreCase(P_SASL_AUTHID) && 
+                if (!key.equalsIgnoreCase(P_SASL_AUTHID) &&
                     !key.equalsIgnoreCase(P_SASL_CALLBACK)) {
                     saslProps.put(key, props.get(key));
-                }                    
+                }
             }
         }
         return (saslProps.size() > 0) ? saslProps : null;
@@ -603,15 +618,15 @@ class ContextEnv extends ShareableEnv  {
 
     /**
      * Return DN to be used for sasl auth. Check first the P_SASL_AUTHID
-     * property, then fallback to P_USERDN if not defined.    
+     * property, then fallback to P_USERDN if not defined.
      */
     String getSaslAuthId() {
         String id = (String)getProperty(P_SASL_AUTHID);
         if (id != null) {
             return id;
-        }       
+        }
         return (String)getProperty(P_USER_DN);
-    }        
+    }
 
     /**
      * Return the callback object for sasl, if specified
@@ -619,4 +634,4 @@ class ContextEnv extends ShareableEnv  {
     Object getSaslCallback() {
         return getProperty(P_SASL_CALLBACK);
     }
-}   
+}

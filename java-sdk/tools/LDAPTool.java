@@ -36,9 +36,13 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-import netscape.ldap.*;
-import netscape.ldap.util.*;
-import netscape.ldap.controls.*;
+import netscape.ldap.LDAPConnection;
+import netscape.ldap.LDAPConstraints;
+import netscape.ldap.LDAPControl;
+import netscape.ldap.LDAPRebind;
+import netscape.ldap.LDAPRebindAuth;
+import netscape.ldap.controls.LDAPProxiedAuthControl;
+import netscape.ldap.util.GetOpt;
 
 /**
  * LDAPTool
@@ -54,7 +58,7 @@ class LDAPTool {
 	 * arguments list.
 	 * @param args list of args
 	 */
-    protected static GetOpt extractParameters(String privateOpts, String args[]) { 
+    protected static GetOpt extractParameters(String privateOpts, String args[]) {
 
 		GetOpt options = new GetOpt("vnRMD:h:O:p:w:d:V:y:" + privateOpts, args);
 
@@ -74,7 +78,7 @@ class LDAPTool {
 		/* -h ldap host */
 		if (options.hasOption('h'))
 			m_ldaphost = options.getOptionParam('h');
-      
+
 		/* -p ldap port */
 		if (options.hasOption('p')) { /* if the option is -p */
 			try {
@@ -128,15 +132,20 @@ class LDAPTool {
 
     protected static void setDefaultReferralCredentials(
 		LDAPConstraints cons ) {
-		LDAPRebind rebind = new LDAPRebind() {
-			public LDAPRebindAuth getRebindAuthentication(
-				String host,
-				int port ) {
-					return new LDAPRebindAuth( 
-						m_client.getAuthenticationDN(),
-						m_client.getAuthenticationPassword() );
-				}
-		};
+
+        LDAPRebind rebind = new LDAPRebind() {
+            public LDAPRebindAuth getRebindAuthentication(String host, int port ) {
+                return new LDAPRebindAuth() {
+                    public String getDN() {
+                        return m_client.getAuthenticationDN();
+                    }
+                    public String getPassword() {
+                        return m_client.getAuthenticationPassword();
+                    }
+                };
+            }
+        };
+
 		cons.setReferrals( true );
 		cons.setRebindProc( rebind );
 	}

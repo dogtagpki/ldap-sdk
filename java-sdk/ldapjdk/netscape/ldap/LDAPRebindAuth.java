@@ -37,9 +37,6 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap;
 
-import java.util.*;
-import java.io.*;
-
 /**
  * Represents information used to authenticate the client in cases where
  * the client follows referrals automatically.  If you are defining a class
@@ -75,16 +72,24 @@ public class LDAPRebindAuth implements java.io.Serializable {
     private String m_dn;
     private String m_password;
 
+    public LDAPRebindAuth() {
+    }
+
     /**
      * Constructs information that is used by the client
      * for authentication when following referrals automatically.
+     *
      * @param dn distinguished name to use for authenticating to
      * the LDAP server during an automatic referral (if the client
      * is set up to follow referrals automatically)
+     *
      * @param password password to use for authenticating to
      * the LDAP server during an automatic referral (if the client
      * is set up to follow referrals automatically)
+     *
+     * @deprecated
      */
+    @Deprecated
     public LDAPRebindAuth(String dn, String password) {
         m_dn = dn;
         m_password = password;
