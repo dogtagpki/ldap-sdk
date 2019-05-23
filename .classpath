@@ -8,5 +8,6 @@
 	<classpathentry kind="src" path="java-sdk/ldapsp"/>
 	<classpathentry kind="src" path="java-sdk/tools"/>
 	<classpathentry kind="lib" path="/usr/lib/java/jss4.jar"/>
+	<classpathentry kind="lib" path="/usr/share/java/slf4j/slf4j-api.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

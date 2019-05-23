@@ -45,6 +45,12 @@ BuildRequires:	  jpackage-utils >= 0:1.5
 %else
 BuildRequires:    javapackages-local
 %endif
+BuildRequires:    slf4j
+%if 0%{?rhel} && 0%{?rhel} <= 7
+# no slf4j-jdk14
+%else
+BuildRequires:    slf4j-jdk14
+%endif
 BuildRequires:    jss >= 4.5.0-1
 
 ################################################################################
@@ -52,6 +58,12 @@ BuildRequires:    jss >= 4.5.0-1
 ################################################################################
 
 Requires:         jpackage-utils >= 0:1.5
+Requires:         slf4j
+%if 0%{?rhel} && 0%{?rhel} <= 7
+# no slf4j-jdk14
+%else
+Requires:         slf4j-jdk14
+%endif
 Requires:         jss >= 4.5.0-1
 
 

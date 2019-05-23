@@ -64,6 +64,7 @@
     <property name="build"               value="build"/>
     <property name="dist"                value="dist"/>
     <property name="jss.lib"             value="/usr/lib/java/jss4.jar"/>
+    <property name="slf4j.lib"           value="/usr/share/java/slf4j/slf4j-api.jar" />
 
     <!-- the following is to setup the correct info for sun jsse which
         is jdk dependent -->
@@ -185,22 +186,22 @@
         <!-- Compile the java jdk code from ${src} into ${dest} -->
         <javac srcdir="${basedir}/ldapjdk/com" destdir="${jdk.dist}"
             excludes="cvs/**"
-            classpath="${jsselibs}"
+            classpath="${jsselibs}:${slf4j.lib}"
         />
         <javac srcdir="${basedir}/ldapjdk/netscape" destdir="${jdk.dist}"
             excludes="cvs/**"
-            classpath="${jsselibs}"
+            classpath="${jsselibs}:${slf4j.lib}"
         />
         <javac srcdir="${basedir}/tools" destdir="${jdk.dist}"
             excludes="cvs/**"
-            classpath="${jsselibs}"
+            classpath="${jsselibs}:${slf4j.lib}"
         />
       </target>
 
     <target name="build-filter" depends="init,build-jdk">
         <javac srcdir="${basedir}/ldapfilter" destdir="${filter.dist}"
             excludes="cvs/**"
-            classpath="${jdk.dist}:${jsselibs}"
+            classpath="${jdk.dist}:${jsselibs}:${slf4j.lib}"
         />
       </target>
 
@@ -208,7 +209,7 @@
         <!-- Compile the java jdk bean code from ${src} into ${dest} -->
         <javac srcdir="${basedir}/ldapbeans" destdir="${jdk.dist}"
             excludes="cvs/**"
-            classpath="${jsselibs}"
+            classpath="${jsselibs}:${slf4j.lib}"
         />
       </target>
 
@@ -216,7 +217,7 @@
         <!-- Compile the java code from ${src} into ${dest} -->
         <javac srcdir="${basedir}/ldapsp" destdir="${jndi.dist}"
             excludes="cvs/**"
-            classpath="${jsselibs}:${basedir}/ldapsp/lib/jndi.jar"
+            classpath="${jsselibs}:${basedir}/ldapsp/lib/jndi.jar:${slf4j.lib}"
         />
       </target>
 
@@ -231,14 +232,14 @@
                  author="true"
                  version="true"
                  use="true"
-                 classpath="${basedir}/ldapjdk:${jss.lib}:${basedir}/ldapjdk/lib/jss32_stub.jar:${basedir}/ldapbeans"
+                 classpath="${basedir}/ldapjdk:${jss.lib}:${basedir}/ldapjdk/lib/jss32_stub.jar:${basedir}/ldapbeans:${slf4j.lib}"
                  additionalparam="-Xdoclint:none">
         </javadoc>
 
         <javadoc packagenames="com.netscape.jndi.ldap.controls.*"
                 sourcepath="${basedir}/ldapsp"    
                 destdir="${doc.dist}/ldapsp"
-                classpath="${jndi.dist}:${basedir}/ldapsp:${basedir}/ldapsp/lib/jndi.jar"
+                classpath="${jndi.dist}:${basedir}/ldapsp:${basedir}/ldapsp/lib/jndi.jar:${slf4j.lib}"
                 author="true"
                 version="true"
                 use="true"

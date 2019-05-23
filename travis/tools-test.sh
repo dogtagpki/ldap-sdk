@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Checking Root DSE"
-java -cp /usr/share/java/ldapjdk.jar \
+java -cp /usr/share/java/ldapjdk.jar:/usr/share/java/slf4j/slf4j-api.jar \
     LDAPSearch -D "cn=Directory Manager" -w Secret.123 -b "" -s base "(objectClass=*)"
 
 if [ $? -ne 0 ]; then
@@ -10,7 +10,7 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "Adding dc=test,dc=example,dc=com"
-java -cp /usr/share/java/ldapjdk.jar \
+java -cp /usr/share/java/ldapjdk.jar:/usr/share/java/slf4j/slf4j-api.jar \
     LDAPModify -D "cn=Directory Manager" -w Secret.123 -a << EOF
 dn: dc=test,dc=example,dc=com
 objectClass: dcObject
@@ -23,7 +23,7 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "Verifying dc=test,dc=example,dc=com"
-java -cp /usr/share/java/ldapjdk.jar \
+java -cp /usr/share/java/ldapjdk.jar:/usr/share/java/slf4j/slf4j-api.jar \
     LDAPSearch -D "cn=Directory Manager" -w Secret.123 -b "dc=test,dc=example,dc=com" -s base "(objectClass=*)"
 
 if [ $? -ne 0 ]; then
@@ -32,7 +32,7 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "Deleting dc=test,dc=example,dc=com"
-java -cp /usr/share/java/ldapjdk.jar \
+java -cp /usr/share/java/ldapjdk.jar:/usr/share/java/slf4j/slf4j-api.jar \
     LDAPDelete -D "cn=Directory Manager" -w Secret.123 "dc=test,dc=example,dc=com"
 
 if [ $? -ne 0 ]; then
@@ -41,7 +41,7 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "Verifying dc=test,dc=example,dc=com"
-java -cp /usr/share/java/ldapjdk.jar \
+java -cp /usr/share/java/ldapjdk.jar:/usr/share/java/slf4j/slf4j-api.jar \
     LDAPSearch -D "cn=Directory Manager" -w Secret.123 -b "dc=test,dc=example,dc=com" -s base "(objectClass=*)"
 
 if [ $? -eq 0 ]; then
