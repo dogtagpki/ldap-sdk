@@ -70,7 +70,7 @@ public class LDAPSearchResults implements Enumeration, java.io.Serializable {
     private String currFilter;
     private String[] currAttrs;
     private boolean currAttrsOnly;
-    private Vector referralResults = new Vector();
+    private Vector<LDAPSearchResults> referralResults = new Vector<>();
     private Vector<LDAPException> exceptions;
     private int msgID = -1;
 
@@ -428,7 +428,7 @@ public class LDAPSearchResults implements Enumeration, java.io.Serializable {
 
     Object nextReferralElement() {
         LDAPSearchResults res =
-          (LDAPSearchResults)referralResults.elementAt(0);
+          referralResults.elementAt(0);
         if ((!res.persistentSearch && res.hasMoreElements()) ||
           (res.persistentSearch)) {
             Object obj = res.nextElement();
@@ -474,7 +474,7 @@ public class LDAPSearchResults implements Enumeration, java.io.Serializable {
           ((exceptions == null) || (exceptions.size() == 0))) {
             while (referralResults.size() > 0) {
                 LDAPSearchResults res =
-                  (LDAPSearchResults)referralResults.elementAt(0);
+                  referralResults.elementAt(0);
                 if (res.hasMoreElements())
                     return true;
                 else
@@ -504,7 +504,7 @@ public class LDAPSearchResults implements Enumeration, java.io.Serializable {
 
         for ( int i = 0; i < referralResults.size(); i++ ) {
             LDAPSearchResults res =
-                (LDAPSearchResults)referralResults.elementAt(i);
+                referralResults.elementAt(i);
             count += res.getCount();
         }
 
