@@ -55,10 +55,10 @@ import java.util.Vector;
  * @see netscape.ldap.LDAPConnection#search(java.lang.String, int, java.lang.String, java.lang.String[], boolean)
  * @see netscape.ldap.LDAPConnection#abandon(netscape.ldap.LDAPSearchResults)
  */
-public class LDAPSearchResults implements Enumeration, java.io.Serializable {
+public class LDAPSearchResults implements Enumeration<Object>, java.io.Serializable {
 
     static final long serialVersionUID = -501692208613904825L;
-    private Vector entries = null;
+    private Vector<Object> entries = null;
     private LDAPSearchListener resultSource;
     private boolean searchComplete = false;
     private LDAPConnection connectionToClose;
@@ -85,7 +85,7 @@ public class LDAPSearchResults implements Enumeration, java.io.Serializable {
      * @see netscape.ldap.LDAPConnection#search(java.lang.String, int, java.lang.String, java.lang.String[], boolean)
      */
     public LDAPSearchResults() {
-        entries = new Vector();
+        entries = new Vector<>();
         connectionToClose = null;
         searchComplete = true;
         currCons = new LDAPSearchConstraints();
@@ -109,9 +109,9 @@ public class LDAPSearchResults implements Enumeration, java.io.Serializable {
      * @param v the vector containing LDAPEntries
      * @see netscape.ldap.LDAPConnection#search(java.lang.String, int, java.lang.String, java.lang.String[], boolean)
      */
-    LDAPSearchResults(Vector v) {
+    LDAPSearchResults(Vector<Object> v) {
         this();
-        entries = (Vector)v.clone();
+        entries = (Vector<Object>)v.clone();
 
         if ((entries != null) && (entries.size() >= 1)) {
             // Each cache value is represented by a vector. The first element
@@ -121,7 +121,7 @@ public class LDAPSearchResults implements Enumeration, java.io.Serializable {
         }
     }
 
-    LDAPSearchResults(Vector v, LDAPConnection conn,
+    LDAPSearchResults(Vector<Object> v, LDAPConnection conn,
                       LDAPSearchConstraints cons,
                       String base, int scope, String filter,
                       String[] attrs, boolean attrsOnly) {
