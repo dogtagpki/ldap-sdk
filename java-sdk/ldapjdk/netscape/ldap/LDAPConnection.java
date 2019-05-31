@@ -1639,7 +1639,7 @@ public class LDAPConnection
      * obtain additional required information
      * @exception LDAPException Failed to authenticate to the LDAP server.
      */
-    public void bind(String dn, Hashtable props,
+    public void bind(String dn, Hashtable<Object, Object> props,
                      /*CallbackHandler*/ Object cbh)
         throws LDAPException {
         authenticate(dn, props, cbh);
@@ -1850,7 +1850,7 @@ public class LDAPConnection
                 // else try to restore the connection
             }
             catch (LDAPException e) {
-                if (e.getLDAPResultCode() != e.SERVER_DOWN || restoreTried) {
+                if (e.getLDAPResultCode() != LDAPException.SERVER_DOWN || restoreTried) {
                     throw e; // give up
                 }
                 // else try to restore the connection
@@ -2237,7 +2237,7 @@ public class LDAPConnection
 
         LDAPConnection connection = new LDAPConnection ();
         if (toGet.isSecure()) {
-            LDAPSocketFactory factory = toGet.getSocketFactory();
+            LDAPSocketFactory factory = LDAPUrl.getSocketFactory();
             if (factory == null) {
                 throw new LDAPException("No socket factory for LDAPUrl",
                                          LDAPException.OTHER);
@@ -2383,7 +2383,7 @@ public class LDAPConnection
 
         LDAPConnection connection = new LDAPConnection ();
         if (toGet.isSecure()) {
-            LDAPSocketFactory factory = toGet.getSocketFactory();
+            LDAPSocketFactory factory = LDAPUrl.getSocketFactory();
             if (factory == null) {
                 throw new LDAPException("No socket factory for LDAPUrl",
                                          LDAPException.OTHER);
@@ -2679,7 +2679,7 @@ public class LDAPConnection
                 value.add (msg);
             }
         } catch (LDAPReferralException e) {
-            Vector res = new Vector();
+            Vector<Object> res = new Vector<>();
 
             try {
                 performReferrals(e, cons, JDAPProtocolOp.SEARCH_REQUEST, dn,
@@ -2688,7 +2688,7 @@ public class LDAPConnection
             catch (LDAPException ex) {
                 if (msg.getProtocolOp() instanceof JDAPSearchResultReference) {
                     // Ignore Search Result Referral Errors ?
-                    if (cons.getReferralErrors() == cons.REFERRAL_ERROR_CONTINUE) {
+                    if (cons.getReferralErrors() == LDAPSearchConstraints.REFERRAL_ERROR_CONTINUE) {
                         return; // Don't want to miss all remaining results
                     }
                     else {
@@ -2784,7 +2784,7 @@ public class LDAPConnection
             checkMsg (response);
 
         } catch (LDAPReferralException e) {
-            Vector res = new Vector();
+            Vector<Object> res = new Vector<>();
             performReferrals(e, cons, JDAPProtocolOp.COMPARE_REQUEST,
                              DN, 0, null, null, false, null, null, attr, res);
             boolean bool = false;
@@ -5099,7 +5099,7 @@ public class LDAPConnection
                           LDAPEntry entry,
                           LDAPAttribute attr,
                           /* result */
-                          Vector results
+                          Vector<Object> results
         ) throws LDAPException {
 
         LDAPUrl refURL = null;
@@ -5210,7 +5210,7 @@ public class LDAPConnection
                           String filter, String types[], boolean attrsOnly,
                           LDAPModification mods[], LDAPEntry entry,
                           LDAPAttribute attr,
-                          Vector results) throws LDAPException {
+                          Vector<Object> results) throws LDAPException {
 
         LDAPSearchResults res = null;
         try {
