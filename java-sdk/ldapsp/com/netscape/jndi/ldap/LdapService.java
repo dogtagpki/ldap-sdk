@@ -37,14 +37,32 @@
  * ***** END LICENSE BLOCK ***** */
 package com.netscape.jndi.ldap;
 
-import javax.naming.*;
-import javax.naming.directory.*;
-import javax.naming.ldap.*;
-import netscape.ldap.*;
-import java.util.*;
-import java.io.*;
-import com.netscape.jndi.ldap.common.*;
+import javax.naming.Binding;
+import javax.naming.NameClassPair;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.SearchControls;
+import javax.naming.directory.SearchResult;
+
+import com.netscape.jndi.ldap.common.Debug;
+import com.netscape.jndi.ldap.common.ExceptionMapper;
 import com.netscape.jndi.ldap.schema.SchemaRoot;
+
+import netscape.ldap.LDAPAttributeSet;
+import netscape.ldap.LDAPConnection;
+import netscape.ldap.LDAPControl;
+import netscape.ldap.LDAPEntry;
+import netscape.ldap.LDAPException;
+import netscape.ldap.LDAPModificationSet;
+import netscape.ldap.LDAPReferralException;
+import netscape.ldap.LDAPSSLSocketFactory;
+import netscape.ldap.LDAPSearchConstraints;
+import netscape.ldap.LDAPSearchResults;
+import netscape.ldap.LDAPUrl;
+import netscape.ldap.LDAPv2;
+import netscape.ldap.LDAPv3;
 
 /**
  * Ldap Service encapsulates a Ldap connection and Ldap operations over the
@@ -64,12 +82,12 @@ class LdapService {
     public static final String DEFAULT_FILTER = "(objectclass=*)";
     public static final int    DEFAULT_SCOPE = LDAPv3.SCOPE_SUB;
     public static final String DEFAULT_HOST = "localhost";
-    public static final int    DEFAULT_PORT = LDAPv2.DEFAULT_PORT;    
+    public static final int    DEFAULT_PORT = LDAPv2.DEFAULT_PORT;
     public static final int    DEFAULT_SSL_PORT = 636;
-    
+
     private LDAPConnection m_ld;
     private EventService m_eventSvc;
-    
+
     /**
      * The number of contexts that are currently sharing this LdapService.
      * Essentially, a reference counter. Incremented in the LdapContextImpl
@@ -77,8 +95,8 @@ class LdapService {
      * When the count reaches zero, the LDAPConnection is released.
      */
     private int m_clientCount;
-    
-        
+
+
     public LdapService() {
         m_ld = new LDAPConnection();
         m_clientCount = 1;
@@ -96,7 +114,7 @@ class LdapService {
         if (m_ld.isConnected()) {
             return; //already connected
         }
-        
+
         LDAPUrl url = ctx.m_ctxEnv.getDirectoryServerURL();
         String host = (url != null) ? url.getHost() : DEFAULT_HOST;
         int    port = (url != null) ? url.getPort() : DEFAULT_PORT;
@@ -116,10 +134,10 @@ class LdapService {
         }
 
         // SSL is enabled but no Socket factory specified. Use the
-        // ldapjdk default one        
+        // ldapjdk default one
         if (isSSLEnabled && socketFactory == null) {
             m_ld = new LDAPConnection(new LDAPSSLSocketFactory());
-        }    
+        }
 
         // Set the socket factory and cipher suite if cpecified
         if (socketFactory != null) {
@@ -131,7 +149,7 @@ class LdapService {
                 }
                 else {
                     sf = new LDAPSSLSocketFactory(socketFactory);
-                }    
+                }
                 m_ld = new LDAPConnection(sf);
                 Debug.println(1, "SSL CONNECTION");
             }
@@ -141,16 +159,16 @@ class LdapService {
             }
         }
 
-        // Enable tracing 
+        // Enable tracing
         if (traceOut != null) {
             setTraceOutput(traceOut);
         }
-        
+
         try {
             if (ldCtrls != null) {
                 m_ld.setOption(LDAPv3.SERVERCONTROLS, ldCtrls);
             }
-            
+
             if (saslMechanisms != null) { // sasl Auth
                 m_ld.authenticate(ctx.m_ctxEnv.getSaslAuthId(),
                                   saslMechanisms,
@@ -159,9 +177,9 @@ class LdapService {
             }
             else { // simple auth
                 m_ld.connect(ldapVersion, host, port, user, passwd);
-            }                
+            }
         }
-        catch (LDAPException e) {            
+        catch (LDAPException e) {
            // If ldapVersion is not specified in ctx env
            // fallback to ldap v2 if v3 is bot supported
             if (e.getLDAPResultCode() == e.PROTOCOL_ERROR &&
@@ -169,7 +187,7 @@ class LdapService {
                 saslMechanisms == null &&
                 ctx.m_ctxEnv.getProperty(
                      ctx.m_ctxEnv.P_LDAP_VERSION) == null) {
-                
+
                 try {
                     m_ld.connect(2, host, port, user, passwd);
                 }
@@ -179,7 +197,7 @@ class LdapService {
             }
             else {
                 throw ExceptionMapper.getNamingException(e);
-            }                
+            }
         }
     }
 
@@ -193,7 +211,7 @@ class LdapService {
     boolean isConnected() {
         return (m_ld.isConnected());
     }
-    
+
 
     /**
      * Physically disconect only if the client count is zero
@@ -202,13 +220,13 @@ class LdapService {
         try {
             if (m_clientCount > 0) {
                 m_clientCount--;
-            }    
+            }
             if (m_clientCount == 0 && isConnected()) {
                 m_ld.disconnect();
             }
         }
         catch (Exception e) {}
-    }    
+    }
 
     /**
      * Increment client count
@@ -216,17 +234,17 @@ class LdapService {
     synchronized void incrementClientCount() {
         m_clientCount++;
     }
-        
+
     /**
      * LDAP search operation
      */
-    NamingEnumeration search (LdapContextImpl ctx, String name, String filter, String[] attrs, SearchControls jndiCtrls) throws NamingException{
+    NamingEnumeration<SearchResult> search (LdapContextImpl ctx, String name, String filter, String[] attrs, SearchControls jndiCtrls) throws NamingException{
         Debug.println(1, "SEARCH");
         String base = ctx.getDN();
         int scope  = LDAPConnection.SCOPE_SUB;
         LDAPSearchConstraints cons=ctx.getSearchConstraints();
         boolean returnObjs = false;
-                
+
         connect(ctx); // Lazy Connect
 
         // Create DN by appending the name to the current context
@@ -238,48 +256,48 @@ class LdapService {
                 base = name;
             }
         }
-                
+
         // Map JNDI SearchControls to ldapjdk LDAPSearchConstraints
         if (jndiCtrls != null) {
             int maxResults = (int)jndiCtrls.getCountLimit();
             int timeLimitInMsec = jndiCtrls.getTimeLimit();
-            // Convert timeLimit in msec to sec 
+            // Convert timeLimit in msec to sec
             int timeLimit = timeLimitInMsec/1000;
             if (timeLimitInMsec > 0 && timeLimitInMsec < 1000) {
                 timeLimit = 1; //sec
             }
-            
+
             // Clone cons if maxResults or timeLimit is different from the default one
             if (cons.getServerTimeLimit() != timeLimit || cons.getMaxResults() != maxResults) {
                 cons = (LDAPSearchConstraints)cons.clone();
                 cons.setMaxResults(maxResults);
                 cons.setServerTimeLimit(timeLimit);
-            }    
-            
+            }
+
             // TODO The concept of links is not well described in JNDI docs.
             // We can only specify dereferencing of Aliases, but Links and
             // Aliases are not the same; IGNORE jndiCtrls.getDerefLinkFlag()
-        
+
             // Attributes to return
             attrs = jndiCtrls.getReturningAttributes();
             if (attrs != null && attrs.length==0) {
                 //return no attributes
                 attrs = new String[] { "1.1" };
-               
+
                // TODO check whether ldap compare operation should be performed
                // That's the case if: (1) scope is OBJECT_SCOPE, (2) no attrs
                // are requested to return (3) filter has the form (name==value)
                // where no wildcards ()&|!=~><* are used.
-                
-            }            
-            
+
+            }
+
             // Search scope
             scope = ProviderUtils.jndiSearchScopeToLdap(jndiCtrls.getSearchScope());
 
             // return obj flag
             returnObjs = jndiCtrls.getReturningObjFlag();
-        }    
-            
+        }
+
         try {
             // Perform Search
             boolean attrsOnly  = ctx.m_ctxEnv.getAttrsOnlyFlag();
@@ -293,16 +311,16 @@ class LdapService {
             throw ExceptionMapper.getNamingException(e);
         }
     }
-    
+
     /**
      * List child entries using LDAP lookup operation
      */
-    NamingEnumeration listEntries(LdapContextImpl ctx, String name, boolean returnBindings) throws NamingException{
-        Debug.println(1, "LIST " + (returnBindings ? "BINDINGS" : ""));
+    NamingEnumeration<NameClassPair> list(LdapContextImpl ctx, String name) throws NamingException{
+        Debug.println(1, "LIST");
         String base = ctx.getDN();
 
         connect(ctx); // Lazy Connect
-        
+
         // Create DN by appending the name to the current context
         if (name.length() > 0) {
             if (base.length() > 0) {
@@ -312,21 +330,47 @@ class LdapService {
                 base = name;
             }
         }
-            
+
         try {
             // Perform One Level Search
-            String[] attrs = null; // return all attributes if Bindings are requested 
-            if (!returnBindings) { // for ClassNamePairs
-                attrs = new String[]{"javaclassname"}; //attr names must be in lowercase
-            }
+            String[] attrs = new String[]{"javaclassname"}; //attr names must be in lowercase
             LDAPSearchConstraints cons=ctx.getSearchConstraints();
             LDAPSearchResults res = m_ld.search( base, LDAPConnection.SCOPE_ONE, DEFAULT_FILTER, attrs, /*attrsOnly=*/false, cons);
-            if (returnBindings) {
-                return new BindingEnum(res, ctx);
+            return new NameClassPairEnum(res, ctx);
+        }
+        catch (LDAPReferralException e) {
+            throw new LdapReferralException(ctx, e);
+        }
+        catch (LDAPException e) {
+            throw ExceptionMapper.getNamingException(e);
+        }
+    }
+
+    /**
+     * List child bindings using LDAP lookup operation
+     */
+    NamingEnumeration<Binding> listBindings(LdapContextImpl ctx, String name) throws NamingException{
+        Debug.println(1, "LIST BINDINGS");
+        String base = ctx.getDN();
+
+        connect(ctx); // Lazy Connect
+
+        // Create DN by appending the name to the current context
+        if (name.length() > 0) {
+            if (base.length() > 0) {
+                base = name + "," + base;
             }
             else {
-                return new NameClassPairEnum(res, ctx);
+                base = name;
             }
+        }
+
+        try {
+            // Perform One Level Search
+            String[] attrs = null; // return all attributes if Bindings are requested
+            LDAPSearchConstraints cons=ctx.getSearchConstraints();
+            LDAPSearchResults res = m_ld.search( base, LDAPConnection.SCOPE_ONE, DEFAULT_FILTER, attrs, /*attrsOnly=*/false, cons);
+            return new BindingEnum(res, ctx);
         }
         catch (LDAPReferralException e) {
             throw new LdapReferralException(ctx, e);
@@ -340,7 +384,7 @@ class LdapService {
      * Lookup an entry using LDAP search operation
      */
     Object lookup(LdapContextImpl ctx, String name) throws NamingException{
-        Debug.println(1, "LOOKUP");        
+        Debug.println(1, "LOOKUP");
         String base = ctx.getDN();
 
         connect(ctx); // Lazy Connect
@@ -354,7 +398,7 @@ class LdapService {
                 base = name;
             }
         }
-            
+
         try {
             // Perform Base Search
             String[] attrs = null; // return all attrs
@@ -382,7 +426,7 @@ class LdapService {
         Debug.println(1, "READ ATTRS");
         String base = ctx.getDN();
         int scope  = LDAPConnection.SCOPE_BASE;
-        
+
         connect(ctx); // Lazy Connect
 
         // Create DN by appending the name to the current context
@@ -420,7 +464,7 @@ class LdapService {
     void modifyEntry(LdapContextImpl ctx, String name, LDAPModificationSet mods) throws NamingException{
         Debug.println(1, "MODIFY");
         String base = ctx.getDN();
-        
+
         if (mods.size() == 0) {
             return;
         }
@@ -435,7 +479,7 @@ class LdapService {
                 base = name;
             }
         }
-        
+
         try {
             // Perform Modify
             m_ld.modify(base, mods);
@@ -452,22 +496,22 @@ class LdapService {
      * Create a new LDAP entry
      */
     LdapContextImpl addEntry(LdapContextImpl ctx, String name, LDAPAttributeSet attrs) throws NamingException{
-        Debug.println(1, "ADD");        
+        Debug.println(1, "ADD");
         String dn = ctx.getDN();
-        
+
         connect(ctx); // Lazy Connect
 
         // Create DN by appending the name to the current context
         if (name.length() == 0) {
             throw new IllegalArgumentException("Name can not be empty");
-        }    
+        }
         if (dn.length() > 0) {
             dn = name + "," + dn;
         }
         else {
             dn = name;
         }
-        
+
         try {
             // Add a new entry
             m_ld.add(new LDAPEntry(dn, attrs));
@@ -487,20 +531,20 @@ class LdapService {
     void delEntry(LdapContextImpl ctx, String name) throws NamingException{
         Debug.println(1, "DELETE");
         String dn = ctx.getDN();
-        
+
         connect(ctx); // Lazy Connect
 
         // Create DN by appending the name to the current context
         if (name.length() == 0) {
             throw new IllegalArgumentException("Name can not be empty");
-        }    
+        }
         if (dn.length() > 0) {
             dn = name + "," + dn;
         }
         else {
             dn = name;
         }
-        
+
         try {
             // Perform Delete
             m_ld.delete(dn);
@@ -519,13 +563,13 @@ class LdapService {
     void changeRDN(LdapContextImpl ctx, String name, String newRDN) throws NamingException{
         Debug.println(1, "RENAME");
         String dn = ctx.getDN();
-        
+
         connect(ctx); // Lazy Connect
 
         // Create DN by appending the name to the current context
         if (name.length() == 0 || newRDN.length() == 0) {
             throw new IllegalArgumentException("Name can not be empty");
-        }    
+        }
         if (dn.length() > 0) {
             dn = name + "," + dn;
         }
@@ -535,7 +579,7 @@ class LdapService {
 
         try {
             // Rename
-            m_ld.rename(dn, newRDN, ctx.m_ctxEnv.getDeleteOldRDNFlag());            
+            m_ld.rename(dn, newRDN, ctx.m_ctxEnv.getDeleteOldRDNFlag());
         }
         catch (LDAPReferralException e) {
             throw new LdapReferralException(ctx, e);
@@ -548,8 +592,8 @@ class LdapService {
     /**
      * Schema Operations
      */
-    DirContext getSchema(LdapContextImpl ctx, String name) throws NamingException {        
-        connect(ctx); // Lazy Connect        
+    DirContext getSchema(LdapContextImpl ctx, String name) throws NamingException {
+        connect(ctx); // Lazy Connect
         return new SchemaRoot(m_ld);
     }
 
@@ -560,10 +604,10 @@ class LdapService {
         connect(ctx); // Lazy Connect
         if (m_eventSvc == null) {
             m_eventSvc = new EventService(this);
-        }    
+        }
         return m_eventSvc;
     }
-    
+
     /**
      * Enable/Disable ldap message trace.
      * @param out Trace output or null (disable trace). Output can
@@ -577,6 +621,6 @@ class LdapService {
         }
         catch (Exception e) {
             throw new IllegalArgumentException("Can not open trace output " + e);
-        }            
+        }
     }
 }

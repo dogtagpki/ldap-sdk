@@ -480,20 +480,20 @@ public class LdapContextImpl implements EventDirContext, LdapContext {
 
     public NamingEnumeration<NameClassPair> list(String name) throws NamingException {
         name = checkLdapUrlAsName(name);
-        return m_ldapSvc.listEntries(this, name, /*returnBindings=*/false);
+        return m_ldapSvc.list(this, name);
     }
 
     public NamingEnumeration<NameClassPair> list(Name name) throws NamingException {
-        return m_ldapSvc.listEntries(this, name.toString(), /*returnBindings=*/false);
+        return m_ldapSvc.list(this, name.toString());
     }
 
     public NamingEnumeration<Binding> listBindings(String name) throws NamingException {
         name = checkLdapUrlAsName(name);
-        return m_ldapSvc.listEntries(this, name, /*returnBindings=*/true);
+        return m_ldapSvc.listBindings(this, name);
     }
 
     public NamingEnumeration<Binding> listBindings(Name name) throws NamingException {
-        return m_ldapSvc.listEntries(this, name.toString(), /*returnBindings=*/true);
+        return m_ldapSvc.listBindings(this, name.toString());
     }
 
     /**
