@@ -49,7 +49,7 @@ import javax.security.auth.callback.CallbackHandler;
  */
 public class ClientFactory implements SaslClientFactory {
     public ClientFactory() {
-        _mechanismTable = new Hashtable();
+        _mechanismTable = new Hashtable<>();
         for( int i = 0; i < _mechanismNames.length; i++ ) {
             _mechanismTable.put( _mechanismNames[i].toLowerCase(),
                                  PACKAGENAME + '.' +
@@ -98,7 +98,7 @@ public class ClientFactory implements SaslClientFactory {
         }
         for( int i = 0; (mechName == null) &&
                         (i < mechanisms.length); i++ ) {
-            mechName = (String)_mechanismTable.get( mechanisms[i].toLowerCase() );
+            mechName = _mechanismTable.get( mechanisms[i].toLowerCase() );
         }
         if ( mechName != null ) {
             try {
@@ -140,5 +140,5 @@ public class ClientFactory implements SaslClientFactory {
     private final String PACKAGENAME = "com.netscape.sasl.mechanisms";
     private final String[] _mechanismNames = { "EXTERNAL" };
     private final String[] _mechanismClasses = { "SaslExternal" };
-    private Hashtable _mechanismTable;
+    private Hashtable<String, String> _mechanismTable;
 }
