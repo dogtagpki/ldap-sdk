@@ -37,14 +37,13 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap;
 
-import java.util.*;
-import netscape.ldap.client.*;
-import netscape.ldap.client.opers.*;
-import netscape.ldap.ber.stream.*;
-import netscape.ldap.util.*;
-import java.io.*;
-import java.net.*;
-//import javax.security.auth.callback.CallbackHandler;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Hashtable;
+
+import netscape.ldap.client.opers.JDAPBindRequest;
+import netscape.ldap.client.opers.JDAPBindResponse;
+import netscape.ldap.client.opers.JDAPProtocolOp;
 
 /**
  * Authenticates to a server using SASL
@@ -69,7 +68,7 @@ public class LDAPSaslBind implements LDAPBind, java.io.Serializable {
     public LDAPSaslBind( String dn,
                          String[] mechanisms,
                          String packageName,
-                         Hashtable props,
+                         Hashtable<Object, Object> props,
                          /*CallbackHandler*/ Object cbh ) {
         _dn = dn;
         _mechanisms = mechanisms;
@@ -105,7 +104,7 @@ public class LDAPSaslBind implements LDAPBind, java.io.Serializable {
      */
     public void bind( LDAPConnection ldc ) throws LDAPException {
         if ( _props == null ) {
-            _props = new Hashtable();
+            _props = new Hashtable<>();
         }
         if ( (!_props.containsKey( CLIENTPKGS )) &&
              (System.getProperty( CLIENTPKGS ) == null) ) {
@@ -301,7 +300,7 @@ public class LDAPSaslBind implements LDAPBind, java.io.Serializable {
     private String _dn;
     private String[] _mechanisms;
     private String _packageName;
-    private Hashtable _props;
+    private Hashtable<Object, Object> _props;
     private /*CallbackHandler*/ Object _cbh;
     private Object _saslClient = null;
 }
