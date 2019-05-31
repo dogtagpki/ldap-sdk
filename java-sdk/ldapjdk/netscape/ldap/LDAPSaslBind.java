@@ -108,14 +108,14 @@ public class LDAPSaslBind implements LDAPBind, java.io.Serializable {
         }
         if ( (!_props.containsKey( CLIENTPKGS )) &&
              (System.getProperty( CLIENTPKGS ) == null) ) {
-            _props.put( CLIENTPKGS, ldc.DEFAULT_SASL_PACKAGE );
+            _props.put( CLIENTPKGS, LDAPConnection.DEFAULT_SASL_PACKAGE );
         }
         _saslClient = getClient( ldc, _packageName );
         if ( _saslClient != null ) {
             bind( ldc, true );
             return;
         } else {
-            ldc.printDebug( "LDAPSaslBind.bind: getClient " +
+            LDAPConnection.printDebug( "LDAPSaslBind.bind: getClient " +
                             "returned null" );
         }
     }
@@ -154,7 +154,7 @@ public class LDAPSaslBind implements LDAPBind, java.io.Serializable {
                                                args, argNames);
 
         } catch (Exception e) {
-            ldc.printDebug( "LDAPSaslBind.getClient: " +
+            LDAPConnection.printDebug( "LDAPSaslBind.getClient: " +
                             packageName+".Sasl.createSaslClient: " +
                             e );
             throw new LDAPException(e.toString(), LDAPException.OTHER);
@@ -169,7 +169,7 @@ public class LDAPSaslBind implements LDAPBind, java.io.Serializable {
             try {
                 // Get the initial request to start authentication
                 String className = _saslClient.getClass().getName();
-                ldc.printDebug( "LDAPSaslBind.bind: calling " +
+                LDAPConnection.printDebug( "LDAPSaslBind.bind: calling " +
                                 className+".createInitialResponse" );
                 byte[] outVals =
                     (byte[])DynamicInvoker.invokeMethod(
@@ -182,18 +182,18 @@ public class LDAPSaslBind implements LDAPBind, java.io.Serializable {
                         _saslClient,
                         className,
                         "getMechanismName", null, null);
-                ldc.printDebug( "LDAPSaslBind.bind: mechanism " +
+                LDAPConnection.printDebug( "LDAPSaslBind.bind: mechanism " +
                                 "name is " +
                                 mechanismName );
                 boolean isExternal = isExternalMechanism(mechanismName);
                 int resultCode = LDAPException.SASL_BIND_IN_PROGRESS;
                 JDAPBindResponse response = null;
                 while (!checkForSASLBindCompletion(resultCode)) {
-                    ldc.printDebug( "LDAPSaslBind.bind: calling " +
+                    LDAPConnection.printDebug( "LDAPSaslBind.bind: calling " +
                                     "saslBind" );
                     response = saslBind(ldc, mechanismName, outVals);
                     resultCode = response.getResultCode();
-                    ldc.printDebug( "LDAPSaslBind.bind: saslBind " +
+                    LDAPConnection.printDebug( "LDAPSaslBind.bind: saslBind " +
                                     "returned " + resultCode );
                     if (isExternal) {
                         continue;
