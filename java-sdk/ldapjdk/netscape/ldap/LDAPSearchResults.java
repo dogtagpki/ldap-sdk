@@ -37,10 +37,8 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap;
 
-import java.util.*;
-import netscape.ldap.client.*;
-import netscape.ldap.client.opers.*;
-import java.io.*;
+import java.util.Enumeration;
+import java.util.Vector;
 
 /**
  * The results of an LDAP search operation, represented as an enumeration.
@@ -73,7 +71,7 @@ public class LDAPSearchResults implements Enumeration, java.io.Serializable {
     private String[] currAttrs;
     private boolean currAttrsOnly;
     private Vector referralResults = new Vector();
-    private Vector exceptions;
+    private Vector<LDAPException> exceptions;
     private int msgID = -1;
 
     // only used for the persistent search
@@ -149,11 +147,11 @@ public class LDAPSearchResults implements Enumeration, java.io.Serializable {
             String urls[] = ((LDAPSearchResultReference)msg).getUrls();
             if (urls != null) {
                 if (exceptions == null) {
-                    exceptions = new Vector();
-                }                    
+                    exceptions = new Vector<>();
+                }
                 exceptions.addElement(new LDAPReferralException(null, 0, urls));
             }
-        }            
+        }
     }
 
     /**
@@ -162,7 +160,7 @@ public class LDAPSearchResults implements Enumeration, java.io.Serializable {
      */
     void add(LDAPException e) {
         if (exceptions == null) {
-            exceptions = new Vector();
+            exceptions = new Vector<>();
         }
         exceptions.addElement(e);
     }
@@ -245,7 +243,7 @@ public class LDAPSearchResults implements Enumeration, java.io.Serializable {
     void setMsgID(int msgID) {
         this.msgID = msgID;
     }
-    
+
     /**
      * Returns the controls returned with this search result. If any control
      * is registered with <CODE>LDAPControl</CODE>, an attempt is made to
@@ -304,9 +302,9 @@ public class LDAPSearchResults implements Enumeration, java.io.Serializable {
                 if ((obj=nextReferralElement()) != null) {
                     if (obj instanceof LDAPException) {
                         add((LDAPException)obj); // put it back
-                    }                    
+                    }
                     else {
-                        entries.addElement(obj);                      
+                        entries.addElement(obj);
                     }
                 }
             }
@@ -332,7 +330,7 @@ public class LDAPSearchResults implements Enumeration, java.io.Serializable {
 
     /**
      * Returns the next LDAP entry from the search results
-     * and throws an exception if the next result is a referral, or 
+     * and throws an exception if the next result is a referral, or
      * if a sizelimit or timelimit error occurred.
      * <P>
      *
@@ -353,16 +351,16 @@ public class LDAPSearchResults implements Enumeration, java.io.Serializable {
      *     }
      *     continue;
      *   } catch ( LDAPException e ) {
-     *     // Your code for handling errors on limits exceeded 
-     *     continue; 
-     *   } 
+     *     // Your code for handling errors on limits exceeded
+     *     continue;
+     *   }
      *   ...
      * }
      * </PRE>
      * @return the next LDAP entry in the search results.
      * @exception LDAPReferralException A referral (thrown
-     * if the next result is a referral), or LDAPException 
-     * if a limit on the number of entries or the time was 
+     * if the next result is a referral), or LDAPException
+     * if a limit on the number of entries or the time was
      * exceeded.
      * @see netscape.ldap.LDAPSearchResults#hasMoreElements()
      */
@@ -391,20 +389,20 @@ public class LDAPSearchResults implements Enumeration, java.io.Serializable {
      *                         LDAPConnection.SCOPE_BASE, MY_FILTER,
      *                         null, false );
      * while ( res.hasMoreElements() ) {
-     *   Object o = res.nextElement(); 
-     *   if ( o instanceof LDAPEntry ) { 
-     *     LDAPEntry findEntry = (LDAPEntry)o; 
-     *     ... 
-     *   } else if ( o instanceof LDAPReferralException ) { 
-     *     LDAPReferralException e = (LDAPReferralException)o; 
-     *     LDAPUrl refUrls[] = e.getURLs(); 
-     *     ... 
-     *   } else if ( o instanceof LDAPException ) { 
-     *     LDAPException e = (LDAPException)o; 
-     *     ... 
-     *   } 
-     * } 
-     * </PRE> 
+     *   Object o = res.nextElement();
+     *   if ( o instanceof LDAPEntry ) {
+     *     LDAPEntry findEntry = (LDAPEntry)o;
+     *     ...
+     *   } else if ( o instanceof LDAPReferralException ) {
+     *     LDAPReferralException e = (LDAPReferralException)o;
+     *     LDAPUrl refUrls[] = e.getURLs();
+     *     ...
+     *   } else if ( o instanceof LDAPException ) {
+     *     LDAPException e = (LDAPException)o;
+     *     ...
+     *   }
+     * }
+     * </PRE>
      * @return the next element in the search results.
      * @see netscape.ldap.LDAPSearchResults#hasMoreElements()
      */
@@ -420,7 +418,7 @@ public class LDAPSearchResults implements Enumeration, java.io.Serializable {
         }
 
         if ((exceptions != null) && (exceptions.size() > 0)) {
-            Object obj = exceptions.elementAt(0);
+            LDAPException obj = exceptions.elementAt(0);
             exceptions.removeElementAt(0);
             return obj;
         }
@@ -431,7 +429,7 @@ public class LDAPSearchResults implements Enumeration, java.io.Serializable {
     Object nextReferralElement() {
         LDAPSearchResults res =
           (LDAPSearchResults)referralResults.elementAt(0);
-        if ((!res.persistentSearch && res.hasMoreElements()) || 
+        if ((!res.persistentSearch && res.hasMoreElements()) ||
           (res.persistentSearch)) {
             Object obj = res.nextElement();
             if (obj != null) {
@@ -472,7 +470,7 @@ public class LDAPSearchResults implements Enumeration, java.io.Serializable {
             fetchResult();
         }
 
-        if ((entries.size() == 0) && 
+        if ((entries.size() == 0) &&
           ((exceptions == null) || (exceptions.size() == 0))) {
             while (referralResults.size() > 0) {
                 LDAPSearchResults res =
@@ -484,7 +482,7 @@ public class LDAPSearchResults implements Enumeration, java.io.Serializable {
             }
         }
 
-        return ((entries.size() > 0) || 
+        return ((entries.size() > 0) ||
           ((exceptions != null) && (exceptions.size() > 0)));
     }
 
@@ -503,16 +501,16 @@ public class LDAPSearchResults implements Enumeration, java.io.Serializable {
         }
 
         int count = entries.size();
-        
+
         for ( int i = 0; i < referralResults.size(); i++ ) {
             LDAPSearchResults res =
                 (LDAPSearchResults)referralResults.elementAt(i);
             count += res.getCount();
-        } 
+        }
 
         if ( exceptions != null ) {
             count += exceptions.size();
-        } 
+        }
 
         return count;
     }
@@ -550,12 +548,12 @@ public class LDAPSearchResults implements Enumeration, java.io.Serializable {
                     searchComplete = true;
                     return;
                 }
-                    
+
 
                 if (msg == null) { // Request abandoned
                     searchComplete = true;
-                    currConn.releaseSearchListener(resultSource); 
-                    return; 
+                    currConn.releaseSearchListener(resultSource);
+                    return;
 
                 } else if (msg instanceof LDAPResponse) {
                     try {
