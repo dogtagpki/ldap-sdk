@@ -37,18 +37,36 @@
  * ***** END LICENSE BLOCK ***** */
 package com.netscape.jndi.ldap;
 
-import javax.naming.*;
-import javax.naming.directory.*;
-import javax.naming.ldap.*;
-import javax.naming.event.*;
+import java.util.Hashtable;
 
-import netscape.ldap.*;
-import netscape.ldap.controls.*;
+import javax.naming.Binding;
+import javax.naming.Context;
+import javax.naming.InvalidNameException;
+import javax.naming.Name;
+import javax.naming.NameAlreadyBoundException;
+import javax.naming.NameClassPair;
+import javax.naming.NameParser;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.OperationNotSupportedException;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.ModificationItem;
+import javax.naming.directory.SearchControls;
+import javax.naming.directory.SearchResult;
+import javax.naming.event.EventDirContext;
+import javax.naming.event.NamingListener;
+import javax.naming.ldap.Control;
+import javax.naming.ldap.ExtendedRequest;
+import javax.naming.ldap.ExtendedResponse;
+import javax.naming.ldap.LdapContext;
 
-import com.netscape.jndi.ldap.controls.NetscapeControlFactory;
 import com.netscape.jndi.ldap.common.Debug;
+import com.netscape.jndi.ldap.controls.NetscapeControlFactory;
 
-import java.util.*;
+import netscape.ldap.LDAPControl;
+import netscape.ldap.LDAPSearchConstraints;
+import netscape.ldap.LDAPUrl;
 
 /**
  * Implementation for the DirContext. The context also supports controls
@@ -60,10 +78,10 @@ import java.util.*;
  * (m_ldapSvc). Each context also maintains a set of environment properties
  * (m_ctxEnv). A context environment is shared among mutiple contexts using a
  * variation of copy-on-write algorithm (see common.ShareableEnv class).
- * 
+ *
  * Each context also maintains a set of LDAPSearchConstraints, as search
  * constrainsts like e.g. server controls, or max number of returned search
- * search results, are context specific. The LdapService reads the 
+ * search results, are context specific. The LdapService reads the
  * LDAPSearchConstraints from a context that makes a service request.
  */
 public class LdapContextImpl implements EventDirContext, LdapContext {
@@ -91,7 +109,7 @@ public class LdapContextImpl implements EventDirContext, LdapContext {
     protected LDAPSearchConstraints m_searchCons;
 
     // TODO Should have a constructor that accepts attributes
-    
+
     /**
      * Constructor
      */
@@ -107,14 +125,14 @@ public class LdapContextImpl implements EventDirContext, LdapContext {
      * Copy Constructor
      */
     public LdapContextImpl(String ctxDN, LdapContextImpl cloneCtx) throws NamingException{
-        
+
         m_ctxEnv = (ContextEnv)cloneCtx.m_ctxEnv.clone();
 
         // An instance of ldapService is shared among multiple contexts.
         // Increment the client reference count
         m_ldapSvc = cloneCtx.m_ldapSvc;
         cloneCtx.m_ldapSvc.incrementClientCount();
-        
+
         if (cloneCtx.getSearchConstraints().getServerControls() == null) {
             m_searchCons = cloneCtx.getSearchConstraints();
         }
@@ -122,8 +140,8 @@ public class LdapContextImpl implements EventDirContext, LdapContext {
             // In LdapContext Context Controls are not inherited by derived contexts
             m_searchCons = (LDAPSearchConstraints) cloneCtx.getSearchConstraints().clone();
             m_searchCons.setServerControls((LDAPControl[])null);
-        }    
-        
+        }
+
         m_ctxDN = ctxDN;
     }
 
@@ -137,8 +155,8 @@ public class LdapContextImpl implements EventDirContext, LdapContext {
             close();
         }
         catch (Exception e) {}
-    }    
-    
+    }
+
     /**
      * Disconnect the Ldap Connection if close is requested
      * LDAP operations can not be performed any more ones
@@ -151,13 +169,13 @@ public class LdapContextImpl implements EventDirContext, LdapContext {
 
     /**
      * Return LdapJdk search constraints for this context
-     */ 
+     */
     LDAPSearchConstraints getSearchConstraints() throws NamingException{
         if (m_searchCons == null) {
             LDAPSearchConstraints cons = new LDAPSearchConstraints();
             m_ctxEnv.updateSearchCons(cons);
             m_searchCons = cons;
-        }    
+        }
         return m_searchCons;
     }
 
@@ -166,7 +184,7 @@ public class LdapContextImpl implements EventDirContext, LdapContext {
      */
     String getDN() throws NamingException{
         if (m_ctxDN == null) {
-            LDAPUrl url = m_ctxEnv.getDirectoryServerURL();  
+            LDAPUrl url = m_ctxEnv.getDirectoryServerURL();
             if (url != null && url.getDN() != null) {
                 m_ctxDN = url.getDN();
             }
@@ -176,40 +194,40 @@ public class LdapContextImpl implements EventDirContext, LdapContext {
         }
         return m_ctxDN;
     }
-    
+
     /**
      * Return reference to the context environment
      */
     ContextEnv getEnv() {
         return m_ctxEnv;
-    } 
-    
+    }
+
     /**
      * Conver object to String
      */
     public String toString() {
         return this.getClass().getName() + ": " + m_ctxDN;
     }
-    
+
     /**
      * Check if LdapURL is passed as the name paremetr to a method
      * If that's the case, craete environment for the ldap url
      */
     String checkLdapUrlAsName(String name) throws NamingException{
         if (name.startsWith("ldap://")) {
-            m_ctxEnv.setProperty(ContextEnv.P_PROVIDER_URL, name);            
+            m_ctxEnv.setProperty(ContextEnv.P_PROVIDER_URL, name);
             close(); // Force reconnect
             m_ldapSvc = new LdapService();
             // Return New name relative to the context
             return "";
         }
         return name;
-    }    
-     
+    }
+
     /**
      * Environment operatins (javax.naming.Context interface)
      */
-      
+
     public Hashtable getEnvironment() throws NamingException {
         return m_ctxEnv.getAllProperties();
     }
@@ -217,7 +235,7 @@ public class LdapContextImpl implements EventDirContext, LdapContext {
     public Object addToEnvironment(String propName, Object propValue) throws NamingException {
         if (propName.equalsIgnoreCase(m_ctxEnv.P_TRACE)) {
             m_ldapSvc.setTraceOutput(propValue);
-        }            
+        }
         return m_ctxEnv.updateProperty(propName, propValue, getSearchConstraints());
     }
 
@@ -252,52 +270,52 @@ public class LdapContextImpl implements EventDirContext, LdapContext {
     public NameParser getNameParser(Name name) throws NamingException {
         return LdapNameParser.getParser();
     }
-     
+
     /**
      * Search operations (javax.naming.DirContext interface)
      */
-     
-    public NamingEnumeration search(String name, String filter, SearchControls cons) throws NamingException {
+
+    public NamingEnumeration<SearchResult> search(String name, String filter, SearchControls cons) throws NamingException {
         name = checkLdapUrlAsName(name);
         return m_ldapSvc.search(this, name, filter, /*attrs=*/null, cons);
     }
 
-    public NamingEnumeration search(String name, String filterExpr, Object[] filterArgs, SearchControls cons) throws NamingException {
+    public NamingEnumeration<SearchResult> search(String name, String filterExpr, Object[] filterArgs, SearchControls cons) throws NamingException {
         name = checkLdapUrlAsName(name);
         String filter = ProviderUtils.expandFilterExpr(filterExpr, filterArgs);
         return m_ldapSvc.search(this, name, filter, /*attrs=*/null, cons);
     }
 
-    public NamingEnumeration search(String name, Attributes matchingAttributes) throws NamingException {
+    public NamingEnumeration<SearchResult> search(String name, Attributes matchingAttributes) throws NamingException {
         name = checkLdapUrlAsName(name);
         String filter = ProviderUtils.attributesToFilter(matchingAttributes);
         return m_ldapSvc.search(this, name, filter, /*attrs=*/null, /*jndiCons=*/null);
     }
 
-    public NamingEnumeration search(String name, Attributes matchingAttributes, String[] attributesToReturn) throws NamingException {
+    public NamingEnumeration<SearchResult> search(String name, Attributes matchingAttributes, String[] attributesToReturn) throws NamingException {
         name = checkLdapUrlAsName(name);
         String filter = ProviderUtils.attributesToFilter(matchingAttributes);
         return m_ldapSvc.search(this, name, filter, attributesToReturn, /*jndiCons=*/null);
     }
 
-    public NamingEnumeration search(Name name, String filter, SearchControls cons) throws NamingException {
+    public NamingEnumeration<SearchResult> search(Name name, String filter, SearchControls cons) throws NamingException {
         return m_ldapSvc.search(this, name.toString(), filter, /*attrs=*/null, cons);
     }
 
-    public NamingEnumeration search(Name name, String filterExpr, Object[] filterArgs, SearchControls cons) throws NamingException {
+    public NamingEnumeration<SearchResult> search(Name name, String filterExpr, Object[] filterArgs, SearchControls cons) throws NamingException {
         String filter = ProviderUtils.expandFilterExpr(filterExpr, filterArgs);
         return m_ldapSvc.search(this, name.toString(), filter, /*attrs=*/null, cons);
     }
 
-    public NamingEnumeration search(Name name, Attributes attrs) throws NamingException {
+    public NamingEnumeration<SearchResult> search(Name name, Attributes attrs) throws NamingException {
         String filter = ProviderUtils.attributesToFilter(attrs);
         return m_ldapSvc.search(this, name.toString(), filter, /*attr=*/null, /*jndiCons=*/null);
     }
 
-    public NamingEnumeration search(Name name, Attributes matchingAttributes, String[] attributesToReturn) throws NamingException {
+    public NamingEnumeration<SearchResult> search(Name name, Attributes matchingAttributes, String[] attributesToReturn) throws NamingException {
         String filter = ProviderUtils.attributesToFilter(matchingAttributes);
         return m_ldapSvc.search(this, name.toString(), filter, attributesToReturn, /*jndiCons=*/null);
-    }    
+    }
 
     /**
      * Attribute Operations (javax.naming.DirContext interface)
@@ -381,11 +399,11 @@ public class LdapContextImpl implements EventDirContext, LdapContext {
      * (javax.naming.Context, javax.naming.DirContext interface)
      */
 
-    public void bind(String name, Object obj) throws NamingException {        
+    public void bind(String name, Object obj) throws NamingException {
         name = checkLdapUrlAsName(name);
         m_ldapSvc.addEntry(this, name.toString(),
             ObjectMapper.objectToAttrSet(obj, name, this, /*attrs=*/null));
-    }    
+    }
 
     public void bind(Name name, Object obj) throws NamingException {
         bind(name.toString(), obj);
@@ -433,7 +451,7 @@ public class LdapContextImpl implements EventDirContext, LdapContext {
     }
 
     public void rename(Name oldName, Name newName) throws NamingException {
-        // Can rename only RDN        
+        // Can rename only RDN
         if (newName.size() != oldName.size()) {
             throw new InvalidNameException("Invalid name " + newName);
         }
@@ -460,21 +478,21 @@ public class LdapContextImpl implements EventDirContext, LdapContext {
      * List Operations (javax.naming.Context interface)
      */
 
-    public NamingEnumeration list(String name) throws NamingException {
+    public NamingEnumeration<NameClassPair> list(String name) throws NamingException {
         name = checkLdapUrlAsName(name);
         return m_ldapSvc.listEntries(this, name, /*returnBindings=*/false);
     }
 
-    public NamingEnumeration list(Name name) throws NamingException {
+    public NamingEnumeration<NameClassPair> list(Name name) throws NamingException {
         return m_ldapSvc.listEntries(this, name.toString(), /*returnBindings=*/false);
     }
 
-    public NamingEnumeration listBindings(String name) throws NamingException {
+    public NamingEnumeration<Binding> listBindings(String name) throws NamingException {
         name = checkLdapUrlAsName(name);
         return m_ldapSvc.listEntries(this, name, /*returnBindings=*/true);
     }
 
-    public NamingEnumeration listBindings(Name name) throws NamingException {
+    public NamingEnumeration<Binding> listBindings(Name name) throws NamingException {
         return m_ldapSvc.listEntries(this, name.toString(), /*returnBindings=*/true);
     }
 
@@ -595,8 +613,8 @@ public class LdapContextImpl implements EventDirContext, LdapContext {
                     "Unsupported control type " + reqCtls[i].getClass().getName());
             }
         }
-        
-        getSearchConstraints().setServerControls(ldapCtls);           
+
+        getSearchConstraints().setServerControls(ldapCtls);
     }
 
     public Control[] getResponseControls() throws NamingException {
@@ -631,7 +649,7 @@ public class LdapContextImpl implements EventDirContext, LdapContext {
         }
         m_ldapSvc.connect(this);
     }
-    
+
     public Control[] getConnectControls() {
         return (Control[])m_ctxEnv.getProperty(ContextEnv.P_CONNECT_CTRLS);
     }
