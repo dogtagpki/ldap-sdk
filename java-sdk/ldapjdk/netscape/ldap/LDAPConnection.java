@@ -4552,8 +4552,8 @@ public class LDAPConnection
                 m_responseControlTable.get(caller);
 
             if (rspCtrls != null) {
-                Vector v = rspCtrls.ctrls;
-                controls = (LDAPControl[]) v.elementAt(0);
+                Vector<LDAPControl[]> v = rspCtrls.ctrls;
+                controls = v.elementAt(0);
                 v.removeElementAt(0);
                 if (v.size() == 0) {
                     m_responseControlTable.remove(caller);
@@ -4581,8 +4581,8 @@ public class LDAPConnection
                 ResponseControls rspCtrls = m_responseControlTable.get(client);
 
                 if (msgID == rspCtrls.msgID) {
-                    Vector v = rspCtrls.ctrls;
-                    controls = (LDAPControl[]) v.elementAt(0);
+                    Vector<LDAPControl[]> v = rspCtrls.ctrls;
+                    controls = v.elementAt(0);
                     v.removeElementAt(0);
                     if (v.size() == 0) {
                         m_responseControlTable.remove(client);
@@ -5444,11 +5444,11 @@ public class LDAPConnection
      */
     class ResponseControls {
         int msgID;
-        Vector ctrls;
+        Vector<LDAPControl[]> ctrls;
 
         public ResponseControls(int msgID, LDAPControl[] ctrls) {
             this.msgID = msgID;
-            this.ctrls = new Vector();
+            this.ctrls = new Vector<>();
             this.ctrls.addElement(ctrls);
         }
 
