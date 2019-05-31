@@ -89,7 +89,7 @@ public class ClientFactory implements SaslClientFactory {
         String authorizationId,
         String protocol,
         String serverName,
-        Hashtable props,
+        Hashtable<Object, Object> props,
         CallbackHandler cbh ) throws SaslException {
         String mechName = null;
         if ( Sasl.debug ) {

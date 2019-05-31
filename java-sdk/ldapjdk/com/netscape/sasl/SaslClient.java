@@ -37,8 +37,9 @@
  * ***** END LICENSE BLOCK ***** */
 package com.netscape.sasl;
 
-import java.util.Hashtable;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * Performs SASL authentication as a client.
@@ -49,7 +50,7 @@ import java.io.*;
  * process challenges and create responses according to the SASL
  * mechanism implemented by the <tt>SaslClient</tt>.
  * As the authentication proceeds, the instance
- * encapsulates the state of a SASL client's authentication exchange. 
+ * encapsulates the state of a SASL client's authentication exchange.
  *<p>
  * Here's an example of how an LDAP library might use a <tt>SaslClient</tt>.
  * It first gets an instance of a <tt>SaslClient</tt>:
@@ -121,7 +122,7 @@ public abstract interface SaslClient {
      * @exception SaslException If an error occurred while processing
      * the challenge or generating a response.
      */
-    public abstract byte[] evaluateChallenge(byte[] challenge) 
+    public abstract byte[] evaluateChallenge(byte[] challenge)
 	throws SaslException;
 
     /**

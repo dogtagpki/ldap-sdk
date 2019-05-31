@@ -38,11 +38,12 @@
 package com.netscape.sasl;
 
 import java.util.Hashtable;
+
 import javax.security.auth.callback.CallbackHandler;
 
 /**
  * An interface for creating instances of <tt>SaslClient</tt>.
- * 
+ *
  * @see SaslClient
  * @see Sasl
  */
@@ -54,7 +55,7 @@ public abstract interface SaslClientFactory {
      * IANA-registered name of a SASL mechanism. (e.g. "GSSAPI", "CRAM-MD5").
      * @param authorizationId The possibly null authorization ID to use. When
      * the SASL authentication completes successfully, the entity named
-     * by authorizationId is granted access. 
+     * by authorizationId is granted access.
      * @param protocol The non-null string name of the protocol for which
      * the authentication is being performed (e.g., "ldap").
      * @param serverName The non-null string name of the server to which
@@ -78,7 +79,7 @@ public abstract interface SaslClientFactory {
 	String authorizationId,
 	String protocol,
 	String serverName,
-	Hashtable props,
+	Hashtable<Object, Object> props,
 	CallbackHandler cbh) throws SaslException;
 
     /**

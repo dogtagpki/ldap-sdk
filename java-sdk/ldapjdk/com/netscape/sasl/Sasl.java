@@ -147,7 +147,7 @@ public class Sasl {
         String authorizationId,
         String protocol,
         String serverName,
-        Hashtable props,
+        Hashtable<Object, Object> props,
         CallbackHandler cbh) throws SaslException {
 
         if (debug) {
@@ -192,7 +192,7 @@ public class Sasl {
                                               String authorizationId,
                                               String protocol,
                                               String serverName,
-                                              Hashtable props,
+                                              Hashtable<Object, Object> props,
                                               CallbackHandler cbh)
         throws SaslException {
 
