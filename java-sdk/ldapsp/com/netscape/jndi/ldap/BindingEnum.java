@@ -37,27 +37,24 @@
  * ***** END LICENSE BLOCK ***** */
 package com.netscape.jndi.ldap;
 
-import javax.naming.*;
-import javax.naming.directory.*;
-import javax.naming.ldap.*;
-import com.netscape.jndi.ldap.common.ExceptionMapper;
+import javax.naming.Binding;
+import javax.naming.NamingException;
 
-import netscape.ldap.*;
-
-import java.util.*;
+import netscape.ldap.LDAPEntry;
+import netscape.ldap.LDAPSearchResults;
 
 /**
  * Wrapper for the LDAPSearchResult. Convert each LDAPEntry entry into
  * a JNDI Binding. Bindings are accessed through the NamingEnumeration
  * interface
  */
-class BindingEnum extends BaseSearchEnum {
+class BindingEnum extends BaseSearchEnum<Binding> {
 
     public BindingEnum(LDAPSearchResults res, LdapContextImpl ctx)  throws NamingException {
         super(res, ctx);
     }
 
-    public Object next() throws NamingException{
+    public Binding next() throws NamingException{
         LDAPEntry entry = nextLDAPEntry();
         String name = LdapNameParser.getRelativeName(m_ctxName, entry.getDN());
         Object obj = ObjectMapper.entryToObject(entry, m_ctx);

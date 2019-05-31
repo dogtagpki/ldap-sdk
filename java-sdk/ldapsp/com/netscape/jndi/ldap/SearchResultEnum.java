@@ -37,35 +37,38 @@
  * ***** END LICENSE BLOCK ***** */
 package com.netscape.jndi.ldap;
 
-import javax.naming.*;
-import javax.naming.directory.*;
-import javax.naming.ldap.*;
+import javax.naming.NamingException;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.SearchResult;
+import javax.naming.ldap.Control;
+
 import com.netscape.jndi.ldap.controls.NetscapeControlFactory;
-import com.netscape.jndi.ldap.common.ExceptionMapper;
-import netscape.ldap.*;
-import java.util.*;
+
+import netscape.ldap.LDAPControl;
+import netscape.ldap.LDAPEntry;
+import netscape.ldap.LDAPSearchResults;
 
 /**
  * A wrapper for the LDAPSeatchResults. Convert a LDAPSearchResults enumeration
  * of LDAPEntries into a JNDI NamingEnumeration of JNDI SearchResults.
  */
-class SearchResultEnum extends BaseSearchEnum {
+class SearchResultEnum extends BaseSearchEnum<SearchResult> {
 
     boolean m_returnObjs; // ReturningObjFlag in SearchControls
     String[] m_userBinaryAttrs;
-    
+
     public SearchResultEnum(LDAPSearchResults res, boolean returnObjs, LdapContextImpl ctx) throws NamingException{
         super(res, ctx);
         m_returnObjs = returnObjs;
-        m_userBinaryAttrs = ctx.m_ctxEnv.getUserDefBinaryAttrs();        
+        m_userBinaryAttrs = ctx.m_ctxEnv.getUserDefBinaryAttrs();
     }
 
-    public Object next() throws NamingException{
+    public SearchResult next() throws NamingException{
         LDAPEntry entry = nextLDAPEntry();
         String name = LdapNameParser.getRelativeName(m_ctxName, entry.getDN());
         Object obj = (m_returnObjs) ? ObjectMapper.entryToObject(entry, m_ctx) : null;
         Attributes attrs = new AttributesImpl(entry.getAttributeSet(), m_userBinaryAttrs);
-            
+
         // check for response controls
         LDAPControl[] ldapCtls = m_res.getResponseControls();
         if (ldapCtls != null) {
@@ -78,7 +81,7 @@ class SearchResultEnum extends BaseSearchEnum {
                 }
             }
 
-            SearchResultWithControls searchRes = 
+            SearchResultWithControls searchRes =
                 new SearchResultWithControls(name, obj, attrs);
             searchRes.setControls(ctls);
 
@@ -86,6 +89,6 @@ class SearchResultEnum extends BaseSearchEnum {
         }
         else { // no controls
             return new SearchResult(name, obj, attrs);
-        }    
+        }
     }
 }

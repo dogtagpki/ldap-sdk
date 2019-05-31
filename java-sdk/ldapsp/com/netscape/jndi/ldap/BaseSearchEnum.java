@@ -37,30 +37,32 @@
  * ***** END LICENSE BLOCK ***** */
 package com.netscape.jndi.ldap;
 
-import javax.naming.*;
-import javax.naming.directory.*;
-import javax.naming.ldap.*;
+import javax.naming.Name;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+
 import com.netscape.jndi.ldap.common.ExceptionMapper;
 
-import netscape.ldap.*;
-
-import java.util.*;
+import netscape.ldap.LDAPEntry;
+import netscape.ldap.LDAPException;
+import netscape.ldap.LDAPReferralException;
+import netscape.ldap.LDAPSearchResults;
 
 /**
- * Wrapper for the LDAPSearchResult that implements all NamingEnumeration methods 
+ * Wrapper for the LDAPSearchResult that implements all NamingEnumeration methods
  * except next() (left to be implemented by subclasses). Because LDAPJDK does
  * not provide for capability to ignoral referrals, the class is using hasMore()
  * method to read ahead search results and "ignore" referrals if required.
  * Base class for BindingEnum, NameClassPairEnum and SearchResultEnum
  */
-abstract class BaseSearchEnum implements NamingEnumeration {
+abstract class BaseSearchEnum<T> implements NamingEnumeration<T> {
 
     LDAPSearchResults m_res;
     LdapContextImpl m_ctx;
     Name m_ctxName;
     private LDAPEntry nextEntry;
     private LDAPException nextException;
-    
+
     public BaseSearchEnum(LDAPSearchResults res, LdapContextImpl ctx) throws NamingException{
         m_res = res;
         m_ctx = ctx;
@@ -75,8 +77,8 @@ abstract class BaseSearchEnum implements NamingEnumeration {
     LDAPEntry nextLDAPEntry() throws NamingException{
         if (nextException == null && nextEntry == null) {
             hasMore();
-        }            
-        try {        
+        }
+        try {
             if (nextException != null) {
                 if (nextException instanceof LDAPReferralException) {
                     throw new LdapReferralException(m_ctx,
@@ -91,10 +93,10 @@ abstract class BaseSearchEnum implements NamingEnumeration {
         finally {
             nextException = null;
             nextEntry = null;
-        }       
+        }
     }
 
-    public Object nextElement() {
+    public T nextElement() {
         try {
             return next();
         }
@@ -102,15 +104,15 @@ abstract class BaseSearchEnum implements NamingEnumeration {
             System.err.println( "Error in BaseSearchEnum.nextElement(): " + e.toString() );
             e.printStackTrace(System.err);
             return null;
-        }        
+        }
     }
 
     public boolean hasMore() throws NamingException{
-        
+
         if (nextEntry != null || nextException != null) {
             return true;
         }
-        
+
         if (m_res.hasMoreElements()) {
             try {
                 nextEntry = m_res.next();
@@ -119,9 +121,9 @@ abstract class BaseSearchEnum implements NamingEnumeration {
             catch (LDAPReferralException e) {
                 boolean ignoreReferrals = m_ctx.m_ctxEnv.ignoreReferralsMode();
                 if (ignoreReferrals) {
-                    
+
                     return hasMore();
-                    
+
                     // PARTIAL_SEARCH_RESULT should be thrown according to the
                     // Implmentation Guidelines for LDAPSP, but is not done by
                     // the Sun LDAPSP 1.2, so we not doing it either.
@@ -131,7 +133,7 @@ abstract class BaseSearchEnum implements NamingEnumeration {
                 else {
                     nextException = e;
                     return true;
-                }       
+                }
             }
             catch ( LDAPException e ) {
                 nextException = e;
@@ -149,7 +151,7 @@ abstract class BaseSearchEnum implements NamingEnumeration {
             System.err.println( "Error in BaseSearchEnum.hasMoreElements(): " + e.toString() );
             e.printStackTrace(System.err);
             return false;
-        }        
+        }
 
     }
 

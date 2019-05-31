@@ -37,27 +37,24 @@
  * ***** END LICENSE BLOCK ***** */
 package com.netscape.jndi.ldap;
 
-import javax.naming.*;
-import javax.naming.directory.*;
-import javax.naming.ldap.*;
-import com.netscape.jndi.ldap.common.ExceptionMapper;
+import javax.naming.NameClassPair;
+import javax.naming.NamingException;
 
-import netscape.ldap.*;
-
-import java.util.*;
+import netscape.ldap.LDAPEntry;
+import netscape.ldap.LDAPSearchResults;
 
 /**
  * Wrapper for the LDAPSearchResult. Convert each LDAPEntry entry into
  * a JNDI NameClassPair. NameClassPairs are accessed through the NamingEnumeration
  * interface
  */
-class NameClassPairEnum extends BaseSearchEnum {
+class NameClassPairEnum extends BaseSearchEnum<NameClassPair> {
 
     public NameClassPairEnum(LDAPSearchResults res, LdapContextImpl ctx) throws NamingException{
         super(res, ctx);
     }
 
-    public Object next() throws NamingException{
+    public NameClassPair next() throws NamingException{
         LDAPEntry entry = nextLDAPEntry();
         String name = LdapNameParser.getRelativeName(m_ctxName, entry.getDN());
         String className = ObjectMapper.getClassName(entry);
