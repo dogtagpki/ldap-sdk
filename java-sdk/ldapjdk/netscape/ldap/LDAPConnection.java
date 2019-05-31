@@ -1330,7 +1330,7 @@ public class LDAPConnection
      * additional required information
      * @exception LDAPException Failed to authenticate to the LDAP server.
      */
-    public void authenticate(String dn, Hashtable props,
+    public void authenticate(String dn, Hashtable<Object, Object> props,
                              /*CallbackHandler*/ Object cbh)
         throws LDAPException {
 
@@ -1367,7 +1367,7 @@ public class LDAPConnection
      * java.util.Hashtable, java.lang.Object)
      */
     public void authenticate(String dn, String[] mechanisms,
-                             Hashtable props, /*CallbackHandler*/ Object cbh)
+                             Hashtable<Object, Object> props, /*CallbackHandler*/ Object cbh)
         throws LDAPException {
 
         authenticate( dn, mechanisms, DEFAULT_SASL_PACKAGE, props, cbh );
@@ -1395,7 +1395,7 @@ public class LDAPConnection
      * instead.
      */
     public void authenticate(String dn, String mechanism, String packageName,
-                             Hashtable props, /*CallbackHandler*/ Object cbh)
+                             Hashtable<Object, Object> props, /*CallbackHandler*/ Object cbh)
         throws LDAPException {
 
         authenticate( dn, new String[] {mechanism}, packageName, props, cbh );
@@ -1425,7 +1425,7 @@ public class LDAPConnection
      */
     public void authenticate(String dn, String[] mechanisms,
                              String packageName,
-                             Hashtable props, /*CallbackHandler*/ Object cbh)
+                             Hashtable<Object, Object> props, /*CallbackHandler*/ Object cbh)
         throws LDAPException {
 
         forceNonSharedConnection();
@@ -1433,7 +1433,7 @@ public class LDAPConnection
         m_boundDN = null;
         m_protocolVersion = 3; // Must be 3 for SASL
         if ( props == null ) {
-            props = new Hashtable();
+            props = new Hashtable<>();
         }
         m_saslBinder = new LDAPSaslBind( dn, mechanisms, packageName,
                                          props, cbh );
@@ -1666,7 +1666,7 @@ public class LDAPConnection
      * java.util.Hashtable, java.lang.Object)
      */
     public void bind(String dn, String[] mechanisms,
-                     Hashtable props, /*CallbackHandler*/ Object cbh)
+                     Hashtable<Object, Object> props, /*CallbackHandler*/ Object cbh)
         throws LDAPException {
         authenticate(dn, mechanisms, props, cbh);
     }
