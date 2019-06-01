@@ -37,14 +37,16 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap;
 
-import java.util.*;
-import java.io.*;
-import netscape.ldap.client.*;
-import netscape.ldap.util.*;
+import java.io.Serializable;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
 import java.util.zip.CRC32;
 
+import netscape.ldap.util.DN;
+
 /**
- * <CODE>LDAPCache</CODE> represents an in-memory cache that you can use 
+ * <CODE>LDAPCache</CODE> represents an in-memory cache that you can use
  * to reduce the number of search requests sent to the LDAP server.
  * <P>
  *
@@ -102,11 +104,11 @@ import java.util.zip.CRC32;
  * All clones of an <CODE>LDAPConnection</CODE> object share
  * the same <CODE>LDAPCache</CODE> object.
  * <P>
- * 
- * Note that <CODE>LDAPCache</CODE> does not maintain consistency 
+ *
+ * Note that <CODE>LDAPCache</CODE> does not maintain consistency
  * with the directory, so that cached search results may no longer be
- * valid after a directory update. If the same application is performing 
- * both cached searches and directory updates, then the 
+ * valid after a directory update. If the same application is performing
+ * both cached searches and directory updates, then the
  * application should flush the corresponding cache entries after an update.
  * To do this use the <CODE>flushEntries</CODE> method.
  * <P>
@@ -124,16 +126,16 @@ import java.util.zip.CRC32;
  */
 public class LDAPCache implements Serializable {
     static final long serialVersionUID = 6275167993337814294L;
-    
+
     /**
      * A hashtable of search results. The key is created from the search
      * request parameters (see createKey() method). The value is a Vector
      * where the first element is a Long integer representing the size
      * of all entries, followed by the actual search result entries (of type
      * LDAPEntry).
-     */    
-    private Hashtable m_cache;
-    
+     */
+    private Hashtable<Long, Vector<Object>> m_cache;
+
     /**
      * A list of cached entries ordered by time (augments m_cache). Each
      * element in the list is a 2 element Vector where the element at index
@@ -144,7 +146,7 @@ public class LDAPCache implements Serializable {
      * exceeds the cache available space, the extra space is made by removing
      * existing cached results in the order of their entry in the cache.
      */
-    private Vector m_orderedStruct;
+    private Vector<Vector<Long>> m_orderedStruct;
 
     private long m_timeToLive;
     private long m_maxSize;
@@ -164,7 +166,7 @@ public class LDAPCache implements Serializable {
     private long m_hits = 0;
     private long m_flushes = 0;
 
-    // Debug can be activated by defining debug.cache property    
+    // Debug can be activated by defining debug.cache property
     private static boolean m_debug = false;
     static {
         try {
@@ -175,7 +177,7 @@ public class LDAPCache implements Serializable {
             ;// In browser access to property might not be allowed
         }
     }
-    
+
     /**
      * Constructs a new <CODE>LDAPCache</CODE> object, using the
      * specified maximum size of the cache (in bytes) and the maximum
@@ -299,11 +301,11 @@ public class LDAPCache implements Serializable {
 
         DN dn2 = new DN(dn);
 
-        Enumeration e = m_cache.keys();
+        Enumeration<Long> e = m_cache.keys();
 
         while(e.hasMoreElements()) {
-            Long key = (Long)e.nextElement();
-            Vector val = (Vector)m_cache.get(key);
+            Long key = e.nextElement();
+            Vector<Object> val = m_cache.get(key);
 
             // LDAPEntries start at idx 1, at idx 0 is a Long
             // (size of all LDAPEntries returned by search())
@@ -330,13 +332,13 @@ public class LDAPCache implements Serializable {
 
             if (j < size2) {
                 for (int k=0; k<m_orderedStruct.size(); k++) {
-                    Vector v = (Vector)m_orderedStruct.elementAt(k);
-                    if (key.equals((Long)v.elementAt(0))) {
+                    Vector<Long> v = m_orderedStruct.elementAt(k);
+                    if (key.equals(v.elementAt(0))) {
                         m_orderedStruct.removeElementAt(k);
                         break;
                     }
                 }
-                Vector entry = (Vector)m_cache.remove(key);
+                Vector<Object> entry = m_cache.remove(key);
                 m_remainingSize += ((Long)entry.firstElement()).longValue();
                 if (m_debug)
                     System.out.println("DEBUG: Successfully removed entry ->"+key);
@@ -521,7 +523,7 @@ public class LDAPCache implements Serializable {
      */
     synchronized void flushEntries()
     {
-        Vector v = null;
+        Vector<Long> v = null;
         boolean delete = false;
 
         long currTime = System.currentTimeMillis();
@@ -531,14 +533,14 @@ public class LDAPCache implements Serializable {
             if (m_orderedStruct.size() <= 0)
                 break;
 
-            v = (Vector)m_orderedStruct.firstElement();
-            long diff = currTime-((Long)v.elementAt(1)).longValue();
+            v = m_orderedStruct.firstElement();
+            long diff = currTime-v.elementAt(1).longValue();
             if (diff >= m_timeToLive) {
-                Long key = (Long)v.elementAt(0);
+                Long key = v.elementAt(0);
 
                 if (m_debug)
                     System.out.println("DEBUG: Timer flush entry whose key is "+key);
-                Vector entry = (Vector)m_cache.remove(key);
+                Vector<Object> entry = m_cache.remove(key);
                 m_remainingSize += ((Long)entry.firstElement()).longValue();
 
                 // always delete the first one
@@ -569,13 +571,13 @@ public class LDAPCache implements Serializable {
         if (m_cache.get(key) != null)
             return false;
 
-        Vector v = (Vector)value;
+        Vector<Object> v = (Vector<Object>)value;
         long size = ((Long)v.elementAt(0)).longValue();
 
         if (size > m_maxSize) {
             if (m_debug) {
                 System.out.println("Failed to add an entry to the cache since the new entry exceeds the cache size");
-            }    
+            }
             return false;
         }
 
@@ -583,9 +585,9 @@ public class LDAPCache implements Serializable {
         // cache
         if (size > m_remainingSize) {
             while (true) {
-                Vector element = (Vector)m_orderedStruct.firstElement();
-                Long str = (Long)element.elementAt(0);
-                Vector val = (Vector)m_cache.remove(str);
+                Vector<Long> element = m_orderedStruct.firstElement();
+                Long str = element.elementAt(0);
+                Vector<Object> val = m_cache.remove(str);
                 if (m_debug)
                     System.out.println("DEBUG: The spare size of the cache is not big enough "+
                         "to hold the new entry, deleting the entry whose key -> "+str);
@@ -600,7 +602,7 @@ public class LDAPCache implements Serializable {
 
         m_remainingSize -= size;
         m_cache.put(key, v);
-        Vector element = new Vector(2);
+        Vector<Long> element = new Vector<>(2);
         element.addElement(key);
         element.addElement(new Long(System.currentTimeMillis()));
         m_orderedStruct.addElement(element);
@@ -608,8 +610,8 @@ public class LDAPCache implements Serializable {
         // Start TTL Timer if first entry is added
         if (m_orderedStruct.size() == 1) {
             scheduleTTLTimer();
-        }            
-            
+        }
+
         if (m_debug)
         {
             System.out.println("DEBUG: Adding a new entry whose key -> "+key);
@@ -629,13 +631,13 @@ public class LDAPCache implements Serializable {
                 return;
         }
 
-        if (m_timer == null) {            
+        if (m_timer == null) {
             m_timer = new TTLTimer(this);
         }
 
-        Vector v = (Vector)m_orderedStruct.firstElement();        
+        Vector<Long> v = m_orderedStruct.firstElement();
         long currTime = System.currentTimeMillis();
-        long creationTime = ((Long)v.elementAt(1)).longValue();
+        long creationTime = v.elementAt(1).longValue();
         long timeout = creationTime + m_timeToLive - currTime;
         if (timeout > 0) {
             m_timer.start(timeout);
@@ -644,9 +646,9 @@ public class LDAPCache implements Serializable {
             flushEntries();
             scheduleTTLTimer();
         }
-    }        
-        
-    
+    }
+
+
     /**
      * Gets the number of entries being cached.
      * @return the number of entries being cached.
@@ -708,12 +710,12 @@ public class LDAPCache implements Serializable {
      */
     private void init(long ttl, long size)
     {
-        m_cache = new Hashtable();
+        m_cache = new Hashtable<>();
         m_timeToLive = ttl*1000;
         m_maxSize = size;
         m_remainingSize = size;
         m_dns = null;
-        m_orderedStruct = new Vector();
+        m_orderedStruct = new Vector<>();
     }
 
     /**
@@ -818,7 +820,7 @@ class TTLTimer implements Runnable{
         m_timeout = timeout;
         if (Thread.currentThread() != t) {
             stop();
-        }            
+        }
         t = new Thread(this, "LDAPCache-TTLTimer");
         t.setDaemon(true);
         t.start();
