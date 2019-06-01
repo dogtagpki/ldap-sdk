@@ -36,7 +36,8 @@
  *
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap.util;
-import java.util.*;
+import java.util.Hashtable;
+import java.util.Vector;
 
 /**
  * This class is similar to the <CODE>getopt()</CODE> function in
@@ -146,10 +147,10 @@ public class GetOpt implements java.io.Serializable {
     private int m_pos;
     private String optarg;
     private String m_control;
-    private Vector m_option;
-    private Vector m_ParameterList;
-    private Hashtable m_optionHashTable;
-    private Hashtable m_optionParamHashTable;
+    private Vector<String> m_option;
+    private Vector<String> m_ParameterList;
+    private Hashtable<String, String> m_optionHashTable;
+    private Hashtable<String, String> m_optionParamHashTable;
     static final long serialVersionUID = -2570196909939660248L;
 
     /**
@@ -163,11 +164,11 @@ public class GetOpt implements java.io.Serializable {
      * array passed into Main).
      */
     public GetOpt(String strControl, String args[]) {
-        m_option = new Vector();
+        m_option = new Vector<>();
         m_control = strControl;
-        m_optionHashTable = new Hashtable();
-        m_optionParamHashTable = new Hashtable();
-        m_ParameterList = new Vector();
+        m_optionHashTable = new Hashtable<>();
+        m_optionParamHashTable = new Hashtable<>();
+        m_ParameterList = new Vector<>();
 
         for (int i=0;i<args.length ;i++ ) {
             String sOpt = args[i];
@@ -240,7 +241,7 @@ public class GetOpt implements java.io.Serializable {
         char cOption[] = new char[1];
         cOption[0]=c;
         String s = new String(cOption);
-        String sReturn=(String)m_optionParamHashTable.get(s);
+        String sReturn=m_optionParamHashTable.get(s);
         return(sReturn);
     }
 
@@ -249,7 +250,7 @@ public class GetOpt implements java.io.Serializable {
      * (not including the arguments for any options).
      * @return a list of the additional parameters.
      */
-    public Vector getParameters() {
+    public Vector<String> getParameters() {
         return(m_ParameterList);
     }
 }
