@@ -130,7 +130,7 @@ class ContextEnv extends ShareableEnv  {
      *
      * @param initialEnv a hashtable with environemnt properties
      */
-    public ContextEnv(Hashtable initialEnv) {
+    public ContextEnv(Hashtable<Object, Object> initialEnv) {
         super(initialEnv);
     }
 
@@ -597,12 +597,12 @@ class ContextEnv extends ShareableEnv  {
      * directly as parameters to authenticate()
      *
      */
-    Hashtable getSaslProps() {
-        Hashtable props = getAllProperties();
-        Hashtable saslProps = new Hashtable();
+    Hashtable<Object, Object> getSaslProps() {
+        Hashtable<Object, Object> props = getAllProperties();
+        Hashtable<Object, Object> saslProps = new Hashtable<>();
         String prefixUpperCase = SASL_PROP_PREFIX.toUpperCase();
 
-        for (Enumeration e = props.keys(); e.hasMoreElements();) {
+        for (Enumeration<Object> e = props.keys(); e.hasMoreElements();) {
             String key = (String) e.nextElement();
             if (key.startsWith(SASL_PROP_PREFIX) ||
                 key.startsWith(prefixUpperCase)) {
