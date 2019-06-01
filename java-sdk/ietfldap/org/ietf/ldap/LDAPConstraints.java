@@ -58,7 +58,7 @@ public class LDAPConstraints implements Cloneable, Serializable {
     private boolean referrals = false;
     private int _time_limit = 0;
     private LDAPControl[] _serverControls = null;
-    private Hashtable _properties = null;
+    private Hashtable<String, Object> _properties = null;
 
     /**
      * Constructs an <CODE>LDAPConstraints</CODE> object that specifies
@@ -87,7 +87,7 @@ public class LDAPConstraints implements Cloneable, Serializable {
      * sequence when attempting to resolve a request
      * @see org.ietf.ldap.LDAPConnection#setOption(int, java.lang.Object)
      */
-    public LDAPConstraints( int msLimit, boolean doReferrals, 
+    public LDAPConstraints( int msLimit, boolean doReferrals,
                             LDAPReferralHandler handler,
                             int hop_limit ) {
         _time_limit = msLimit;
@@ -96,7 +96,7 @@ public class LDAPConstraints implements Cloneable, Serializable {
         _hop_limit = hop_limit;
         _serverControls = null;
     }
-    
+
     /**
      * Returns the maximum number of milliseconds to wait for any operation
      * under these constraints. If 0, there is no maximum time limit
@@ -111,10 +111,10 @@ public class LDAPConstraints implements Cloneable, Serializable {
     /**
      * Specifies whether nor not referrals are followed automatically.
      * Returns <CODE>true</CODE> if referrals are to be followed automatically,
-     * or <CODE>false</CODE> if referrals throw an 
+     * or <CODE>false</CODE> if referrals throw an
      * <CODE>LDAPReferralException</CODE>.
-     * @return <CODE>true</CODE> if referrals are followed automatically, 
-     * <CODE>false</CODE> if referrals throw an 
+     * @return <CODE>true</CODE> if referrals are followed automatically,
+     * <CODE>false</CODE> if referrals throw an
      * <CODE>LDAPReferralException</CODE>.
      */
     public boolean getReferralFollowing() {
@@ -122,7 +122,7 @@ public class LDAPConstraints implements Cloneable, Serializable {
     }
 
     /**
-     * Returns the object that provides the mechanism for authenticating to the 
+     * Returns the object that provides the mechanism for authenticating to the
      * server on referrals. This object must implement the
      * <CODE>LDAPReferralHandler</CODE> interface.
      * @return object to use to authenticate to the server on referrals
@@ -153,7 +153,7 @@ public class LDAPConstraints implements Cloneable, Serializable {
     }
 
     /**
-     * Gets a property of a constraints object which has been assigned with 
+     * Gets a property of a constraints object which has been assigned with
      * setProperty. Null is returned if the property is not defined.
      *
      * @param name Name of the property to retrieve
@@ -172,7 +172,7 @@ public class LDAPConstraints implements Cloneable, Serializable {
      * an LDAPException with the result code <CODE>LDAPException.TIME_LIMIT
      * </CODE> is thrown.
      * @param msLimit Maximum number of milliseconds to wait for operation
-     * results (0 by default, which means that there is no maximum time 
+     * results (0 by default, which means that there is no maximum time
      * limit.)
      * @see org.ietf.ldap.LDAPException#LDAP_TIMEOUT
      */
@@ -184,22 +184,22 @@ public class LDAPConstraints implements Cloneable, Serializable {
     /**
      * Specifies whether or not referrals are followed automatically.
      * Specify <CODE>true</CODE> if referrals are to be followed automatically,
-     * or <CODE>false</CODE> if referrals are to throw an 
-     * <CODE>LDAPReferralException</CODE>. 
+     * or <CODE>false</CODE> if referrals are to throw an
+     * <CODE>LDAPReferralException</CODE>.
      * (By default, this is set to <CODE>false</CODE>.)
      * <P>
-     * If you set this to <CODE>true</CODE>, you need to create an object of 
-     * this class that implements either the <CODE>LDAPAuthHandler</CODE> or 
-     * <CODE>LDAPBind</CODE> interface. The <CODE>LDAPAuthProvider</CODE> object 
+     * If you set this to <CODE>true</CODE>, you need to create an object of
+     * this class that implements either the <CODE>LDAPAuthHandler</CODE> or
+     * <CODE>LDAPBind</CODE> interface. The <CODE>LDAPAuthProvider</CODE> object
      * identifies the method for retrieving authentication information which
-     * will be used when connecting to other LDAP servers during referrals. 
+     * will be used when connecting to other LDAP servers during referrals.
      * This object should be passed to the <CODE>setReferralHandler</CODE> method.
-     * Alternatively, the <CODE>LDAPBind</CODE> object identifies an 
-     * authentication mechanism to be used instead of the default 
-     * authentication mechanism when following referrals. This 
+     * Alternatively, the <CODE>LDAPBind</CODE> object identifies an
+     * authentication mechanism to be used instead of the default
+     * authentication mechanism when following referrals. This
      * object should be passed to the <CODE>setBindHandler</CODE> method.
-     * @param doReferrals set to <CODE>true</CODE> if referrals should be 
-     * followed automatically, or <CODE>False</CODE> if referrals should throw 
+     * @param doReferrals set to <CODE>true</CODE> if referrals should be
+     * followed automatically, or <CODE>False</CODE> if referrals should throw
      * an <CODE>LDAPReferralException</CODE>
      * @see org.ietf.ldap.LDAPBindHandler
      * @see org.ietf.ldap.LDAPAuthHandler
@@ -213,8 +213,8 @@ public class LDAPConstraints implements Cloneable, Serializable {
      * Specifies the object that provides the method for getting
      * authentication information.  This object must belong to a class
      * that implements the <CODE>LDAPReferralHandler</CODE> interface.
-     * (By default, this is <CODE>null</CODE>.) This method sets the 
-     * <CODE>LDAPReferralHandler</CODE> object to null for this constraint. 
+     * (By default, this is <CODE>null</CODE>.) This method sets the
+     * <CODE>LDAPReferralHandler</CODE> object to null for this constraint.
      * @param handler object to use to obtain information for
      * authenticating to other LDAP servers during referrals
      */
@@ -251,9 +251,9 @@ public class LDAPConstraints implements Cloneable, Serializable {
     }
 
     /**
-     * Sets a property of the constraints object. 
-     * No property names have been defined at this time, but the mechanism 
-     * is in place in order to support revisional as well as dynamic and 
+     * Sets a property of the constraints object.
+     * No property names have been defined at this time, but the mechanism
+     * is in place in order to support revisional as well as dynamic and
      * proprietary extensions to operation modifiers.
      *
      * @param name Name of the property to set
@@ -261,7 +261,7 @@ public class LDAPConstraints implements Cloneable, Serializable {
      */
     public void setProperty( String name, Object value ) throws LDAPException {
         if ( _properties == null ) {
-            _properties = new Hashtable();
+            _properties = new Hashtable<>();
         }
         _properties.put( name, value );
     }
@@ -303,11 +303,11 @@ public class LDAPConstraints implements Cloneable, Serializable {
         o.referrals = this.referrals;
         o._referralHandler = this._referralHandler;
         o._hop_limit = this._hop_limit;
-        if ( (this._serverControls != null) && 
+        if ( (this._serverControls != null) &&
              (this._serverControls.length > 0) ) {
             o._serverControls = new LDAPControl[this._serverControls.length];
             for( int i = 0; i < this._serverControls.length; i++ )
-                o._serverControls[i] = 
+                o._serverControls[i] =
                     (LDAPControl)this._serverControls[i].clone();
         }
         return o;
