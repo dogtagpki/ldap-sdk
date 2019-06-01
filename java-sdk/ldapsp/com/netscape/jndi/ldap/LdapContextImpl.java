@@ -113,7 +113,7 @@ public class LdapContextImpl implements EventDirContext, LdapContext {
     /**
      * Constructor
      */
-    public LdapContextImpl(Hashtable env) throws NamingException{
+    public LdapContextImpl(Hashtable<Object, Object> env) throws NamingException{
         m_ctxEnv = new ContextEnv(env); // no need to clone (Hashtable)env.clone());
         m_ldapSvc = new LdapService();
         m_ldapSvc.connect(this); // BLITS but to be removed, hurts lazy resource usage
@@ -228,19 +228,19 @@ public class LdapContextImpl implements EventDirContext, LdapContext {
      * Environment operatins (javax.naming.Context interface)
      */
 
-    public Hashtable getEnvironment() throws NamingException {
+    public Hashtable<Object, Object> getEnvironment() throws NamingException {
         return m_ctxEnv.getAllProperties();
     }
 
     public Object addToEnvironment(String propName, Object propValue) throws NamingException {
-        if (propName.equalsIgnoreCase(m_ctxEnv.P_TRACE)) {
+        if (propName.equalsIgnoreCase(ContextEnv.P_TRACE)) {
             m_ldapSvc.setTraceOutput(propValue);
         }
         return m_ctxEnv.updateProperty(propName, propValue, getSearchConstraints());
     }
 
     public Object removeFromEnvironment(String propName) throws NamingException {
-        if (propName.equalsIgnoreCase(m_ctxEnv.P_TRACE)) {
+        if (propName.equalsIgnoreCase(ContextEnv.P_TRACE)) {
             m_ldapSvc.setTraceOutput(null);
         }
         return m_ctxEnv.removeProperty(propName);
