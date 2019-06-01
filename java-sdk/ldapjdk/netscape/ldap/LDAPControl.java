@@ -308,7 +308,7 @@ public class LDAPControl implements Cloneable, java.io.Serializable {
 
         // 3. check if the hash table exists
         if (m_controlClassHash == null) {
-            m_controlClassHash = new Hashtable();
+            m_controlClassHash = new Hashtable<>();
 	}
 
 	// 4. add the controlClass
@@ -328,7 +328,7 @@ public class LDAPControl implements Cloneable, java.io.Serializable {
 	    return null;
         }
 
-	return (Class<?>)m_controlClassHash.get(oid);
+	return m_controlClassHash.get(oid);
     }
 
     /**
@@ -521,7 +521,7 @@ public class LDAPControl implements Cloneable, java.io.Serializable {
     private String m_oid;
     protected boolean m_critical = false;
     protected byte[] m_value = null;
-    static private Hashtable m_controlClassHash = null;
+    static private Hashtable<String, Class<?>> m_controlClassHash = null;
     static {
         try {
             LDAPControl.register( LDAPPasswordExpiringControl.EXPIRING,
