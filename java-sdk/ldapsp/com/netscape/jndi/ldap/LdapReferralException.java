@@ -37,52 +37,52 @@
  * ***** END LICENSE BLOCK ***** */
 package com.netscape.jndi.ldap;
 
-import javax.naming.*;
-import javax.naming.directory.*;
-import javax.naming.ldap.*;
+import java.util.Hashtable;
 
-import netscape.ldap.*;
+import javax.naming.Context;
+import javax.naming.NamingException;
+import javax.naming.ldap.Control;
 
-import java.util.*;
+import netscape.ldap.LDAPReferralException;
 
 /**
  * A wrapper for the ldapjdk LDAPReferralException
  *
  */
 class LdapReferralException extends javax.naming.ldap.LdapReferralException {
-    
+
     LDAPReferralException m_ldapEx;
     LdapContextImpl m_srcCtx;
     int m_referralIdx = 0;
-    
+
     public LdapReferralException(LdapContextImpl srcCtx, LDAPReferralException ldapEx) {
         m_srcCtx = srcCtx;
         m_ldapEx = ldapEx;
     }
-    
+
     public Object getReferralInfo() {
         return m_ldapEx.getURLs()[m_referralIdx].toString();
     }
-    
+
     public Context getReferralContext() throws NamingException{
-        Hashtable env = m_srcCtx.getEnv().getAllProperties();
+        Hashtable<Object, Object> env = m_srcCtx.getEnv().getAllProperties();
         env.put(ContextEnv.P_PROVIDER_URL, m_ldapEx.getURLs()[m_referralIdx].toString());
         return new LdapContextImpl(env);
     }
 
-    public Context getReferralContext(Hashtable env) throws NamingException{
+    public Context getReferralContext(Hashtable<?, ?> env) throws NamingException{
         return getReferralContext(env, null);
     }
-    
-    public Context getReferralContext(Hashtable env, Control[] reqCtls) throws NamingException{
-        
-        env.put(ContextEnv.P_PROVIDER_URL, m_ldapEx.getURLs()[m_referralIdx].toString());
+
+    public Context getReferralContext(Hashtable<?, ?> env, Control[] reqCtls) throws NamingException{
+
+        ((Hashtable<Object, Object>)env).put(ContextEnv.P_PROVIDER_URL, m_ldapEx.getURLs()[m_referralIdx].toString());
         if (reqCtls != null) {
-             env.put(ContextEnv.P_CONNECT_CTRLS, reqCtls);
-        }             
-        return new LdapContextImpl(env);
+            ((Hashtable<Object, Object>)env).put(ContextEnv.P_CONNECT_CTRLS, reqCtls);
+        }
+        return new LdapContextImpl((Hashtable<Object, Object>)env);
     }
-    
+
 
     /**
      * Skip the referral to be processed
@@ -94,8 +94,8 @@ class LdapReferralException extends javax.naming.ldap.LdapReferralException {
             return true;
         }
         return false;
-    }    
+    }
 
     public void retryReferral() {
-    }        
+    }
 }
