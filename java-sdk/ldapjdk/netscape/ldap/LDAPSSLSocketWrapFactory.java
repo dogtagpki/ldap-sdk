@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Hashtable;
@@ -326,7 +327,7 @@ class LDAPSSLSocket extends Socket {
     private Object invokeMethod(Object obj, String name, Object[] args) throws
       LDAPException {
         try {
-            java.lang.reflect.Method m = getMethod(name);
+            Method m = getMethod(name);
             if (m != null) {
                 return (m.invoke(obj, args));
             }
@@ -338,16 +339,15 @@ class LDAPSSLSocket extends Socket {
         return null;
     }
 
-    private java.lang.reflect.Method getMethod(String name) throws
+    private Method getMethod(String name) throws
       LDAPException {
         try {
-            java.lang.reflect.Method method = null;
-            if ((method = (java.lang.reflect.Method)(m_methodLookup.get(name)))
-              != null)
+            Method method = null;
+            if ((method = m_methodLookup.get(name)) != null)
                 return method;
 
             Class<?> c = Class.forName(m_packageName);
-            java.lang.reflect.Method[] m = c.getMethods();
+            Method[] m = c.getMethods();
             for (int i = 0; i < m.length; i++ ) {
                 if (m[i].getName().equals(name)) {
                     m_methodLookup.put(name, m[i]);
@@ -369,7 +369,7 @@ class LDAPSSLSocket extends Socket {
 
     private final boolean m_debug = true;
     private Object m_socket;
-    private Hashtable m_methodLookup = new Hashtable();
+    private Hashtable<String, Method> m_methodLookup = new Hashtable<>();
     private String m_packageName = null;
 }
 
