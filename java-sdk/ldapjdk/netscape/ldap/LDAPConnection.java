@@ -1988,6 +1988,10 @@ public class LDAPConnection
         m_useTLS = false;
     }
 
+    public void close() {
+        m_thread.close();
+    }
+
     /**
      * Reads the entry for the specified distiguished name (DN) and retrieves all
      * attributes for the entry.

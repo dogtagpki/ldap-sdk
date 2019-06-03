@@ -76,6 +76,8 @@ import netscape.ldap.client.opers.JDAPUnbindRequest;
  */
 class LDAPConnThread implements Runnable {
 
+    public static org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(LDAPConnThread.class);
+
     /**
      * Constants
      */
@@ -400,6 +402,52 @@ class LDAPConnThread implements Runnable {
         }
     }
 
+    public void close() {
+
+        logger.info("LDAPConnThread: Closing connection");
+
+        if (m_serverOutput != null) {
+            try {
+                m_serverOutput.close();
+            } catch (Exception e) {
+                logger.warn("LDAPConnThread: Unable to close output stream: " + e.getMessage(), e);
+            } finally {
+                m_serverOutput = null;
+            }
+        }
+
+        if (m_serverInput != null) {
+            try {
+                m_serverInput.close();
+            } catch (Exception e) {
+                logger.warn("LDAPConnThread: Unable to close input stream: " + e.getMessage(), e);
+            } finally {
+                m_serverInput = null;
+            }
+        }
+
+        if (m_origServerInput != null) {
+            try {
+                m_origServerInput.close();
+            } catch (Exception e) {
+                logger.warn("LDAPConnThread: Unable to close original input stream: " + e.getMessage(), e);
+            } finally {
+                m_origServerInput = null;
+            }
+        }
+
+        if (m_origServerOutput != null) {
+            try {
+                m_origServerOutput.close();
+            } catch (Exception e) {
+                logger.warn("LDAPConnThread: Unable to close original output stream: " + e.getMessage(), e);
+            } finally {
+                m_origServerOutput = null;
+            }
+        }
+
+        m_connMgr.closeConnection();
+    }
 
     /**
      * Clean up after the thread shutdown.
