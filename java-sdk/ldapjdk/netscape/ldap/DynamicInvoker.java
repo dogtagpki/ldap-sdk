@@ -37,6 +37,7 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap;
 
+import java.lang.reflect.Method;
 import java.util.Hashtable;
 
 /**
@@ -48,7 +49,7 @@ class DynamicInvoker {
       String methodName, Object[] args, String[] argNames)
       throws LDAPException {
         try {
-            java.lang.reflect.Method m = getMethod(packageName, methodName,
+            Method m = getMethod(packageName, methodName,
               argNames);
             if (m != null) {
                 return (m.invoke(obj, args));
@@ -61,24 +62,23 @@ class DynamicInvoker {
         return null;
     }
 
-    static java.lang.reflect.Method getMethod(String packageName,
+    static Method getMethod(String packageName,
       String methodName, String[] args) throws LDAPException {
         try {
-            java.lang.reflect.Method method = null;
+            Method method = null;
             String suffix = "";
             if (args != null)
                 for (int i=0; i<args.length; i++)
                     suffix = suffix+args[i].getClass().getName();
             String key = packageName+"."+methodName+"."+suffix;
-            if ((method = (java.lang.reflect.Method)(m_methodLookup.get(key)))
-              != null)
+            if ((method = m_methodLookup.get(key)) != null)
                 return method;
 
             Class<?> c = Class.forName(packageName);
-            java.lang.reflect.Method[] m = c.getMethods();
+            Method[] m = c.getMethods();
             for (int i = 0; i < m.length; i++ ) {
                 Class<?>[] params = m[i].getParameterTypes();
-                if ((m[i].getName().equals(methodName)) &&
+                if (m[i].getName().equals(methodName) &&
                     signatureCorrect(params, args)) {
                     m_methodLookup.put(key, m[i]);
                     return m[i];
@@ -103,5 +103,5 @@ class DynamicInvoker {
         return true;
     }
 
-    private static Hashtable m_methodLookup = new Hashtable();
+    private static Hashtable<String, Method> m_methodLookup = new Hashtable<>();
 }

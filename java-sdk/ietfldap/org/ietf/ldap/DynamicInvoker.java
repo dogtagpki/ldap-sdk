@@ -52,7 +52,7 @@ class DynamicInvoker {
                                 String[] argNames )
         throws LDAPException {
         try {
-            java.lang.reflect.Method m = getMethod( packageName,
+            Method m = getMethod( packageName,
                                                     methodName,
                                                     argNames );
             if ( m != null ) {
@@ -83,7 +83,7 @@ class DynamicInvoker {
                 }
             }
             String key = packageName + "." + methodName + "." + suffix;
-            if ( (method = (Method)(m_methodLookup.get(key))) != null ) {
+            if ((method = m_methodLookup.get(key)) != null) {
                 return method;
             }
 
@@ -91,8 +91,8 @@ class DynamicInvoker {
             Method[] m = c.getMethods();
             for ( int i = 0; i < m.length; i++ ) {
                 Class<?>[] params = m[i].getParameterTypes();
-                if ( m[i].getName().equals(methodName) &&
-                     signatureCorrect( params, args ) ) {
+                if (m[i].getName().equals(methodName) &&
+                    signatureCorrect(params, args)) {
                     m_methodLookup.put( key, m[i] );
                     return m[i];
                 }
@@ -127,5 +127,5 @@ class DynamicInvoker {
         return true;
     }
 
-    private static Hashtable m_methodLookup = new Hashtable();
+    private static Hashtable<String, Method> m_methodLookup = new Hashtable<>();
 }
