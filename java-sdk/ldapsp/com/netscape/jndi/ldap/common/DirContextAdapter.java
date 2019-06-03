@@ -37,10 +37,21 @@
  * ***** END LICENSE BLOCK ***** */
 package com.netscape.jndi.ldap.common;
 
-import javax.naming.*;
-import javax.naming.directory.*;
-
 import java.util.Hashtable;
+
+import javax.naming.Binding;
+import javax.naming.Context;
+import javax.naming.Name;
+import javax.naming.NameClassPair;
+import javax.naming.NameParser;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.OperationNotSupportedException;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.ModificationItem;
+import javax.naming.directory.SearchControls;
+import javax.naming.directory.SearchResult;
 
 public class DirContextAdapter implements DirContext {
 
@@ -86,7 +97,7 @@ public class DirContextAdapter implements DirContext {
         throw new OperationNotSupportedException();
     }
 
-    public Hashtable getEnvironment() throws NamingException {
+    public Hashtable<?, ?> getEnvironment() throws NamingException {
         throw new OperationNotSupportedException();
     }
 
@@ -102,19 +113,19 @@ public class DirContextAdapter implements DirContext {
         throw new OperationNotSupportedException();
     }
 
-    public NamingEnumeration list(String name) throws NamingException {
+    public NamingEnumeration<NameClassPair> list(String name) throws NamingException {
         throw new OperationNotSupportedException();
     }
 
-    public NamingEnumeration list(Name name) throws NamingException {
+    public NamingEnumeration<NameClassPair> list(Name name) throws NamingException {
         throw new OperationNotSupportedException();
     }
 
-    public NamingEnumeration listBindings(String name) throws NamingException {
+    public NamingEnumeration<Binding> listBindings(String name) throws NamingException {
         throw new OperationNotSupportedException();
     }
 
-    public NamingEnumeration listBindings(Name name) throws NamingException {
+    public NamingEnumeration<Binding> listBindings(Name name) throws NamingException {
         throw new OperationNotSupportedException();
     }
 
@@ -237,35 +248,35 @@ public class DirContextAdapter implements DirContext {
         throw new OperationNotSupportedException();
     }
 
-    public NamingEnumeration search(String name, String filter, SearchControls cons) throws NamingException {
+    public NamingEnumeration<SearchResult> search(String name, String filter, SearchControls cons) throws NamingException {
         throw new OperationNotSupportedException();
     }
 
-    public NamingEnumeration search(String name, String filterExpr, Object[] filterArgs, SearchControls cons) throws NamingException {
+    public NamingEnumeration<SearchResult> search(String name, String filterExpr, Object[] filterArgs, SearchControls cons) throws NamingException {
         throw new OperationNotSupportedException();
     }
 
-    public NamingEnumeration search(String name, Attributes matchingAttributes) throws NamingException {
+    public NamingEnumeration<SearchResult> search(String name, Attributes matchingAttributes) throws NamingException {
         throw new OperationNotSupportedException();
     }
 
-    public NamingEnumeration search(String name, Attributes matchingAttributes, String[] attributesToReturn) throws NamingException {
+    public NamingEnumeration<SearchResult> search(String name, Attributes matchingAttributes, String[] attributesToReturn) throws NamingException {
         throw new OperationNotSupportedException();
     }
 
-    public NamingEnumeration search(Name name, String filter, SearchControls cons) throws NamingException {
+    public NamingEnumeration<SearchResult> search(Name name, String filter, SearchControls cons) throws NamingException {
         throw new OperationNotSupportedException();
     }
 
-    public NamingEnumeration search(Name name, String filterExpr, Object[] filterArgs, SearchControls cons) throws NamingException {
+    public NamingEnumeration<SearchResult> search(Name name, String filterExpr, Object[] filterArgs, SearchControls cons) throws NamingException {
         throw new OperationNotSupportedException();
     }
 
-    public NamingEnumeration search(Name name, Attributes attrs) throws NamingException {
+    public NamingEnumeration<SearchResult> search(Name name, Attributes attrs) throws NamingException {
         throw new OperationNotSupportedException();
     }
 
-    public NamingEnumeration search(Name name, Attributes matchingAttributes, String[] attributesToReturn) throws NamingException {
+    public NamingEnumeration<SearchResult> search(Name name, Attributes matchingAttributes, String[] attributesToReturn) throws NamingException {
         throw new OperationNotSupportedException();
     }
 }
