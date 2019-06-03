@@ -37,7 +37,8 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap;
 
-import java.util.*;
+import java.util.Enumeration;
+import java.util.Vector;
 
 /**
  * The definition of an object class in the schema.
@@ -92,7 +93,7 @@ import java.util.*;
  * <CODE>LDAPSchemaElement</CODE>. Optional and custom qualifiers are
  * accessed with <CODE>getQualifier</CODE> and <CODE>getQualifierNames</CODE>
  * from <CODE>LDAPSchemaElement</CODE>.
- 
+
  * <P>
  *
  * To add or remove this object class definition from the
@@ -231,7 +232,7 @@ public class LDAPObjectClassSchema extends LDAPSchemaElement {
         Object o = properties.get( "MAY" );
         if ( o != null ) {
             if ( o instanceof Vector ) {
-                may = (Vector)o;
+                may = (Vector<Object>)o;
             } else {
                 may.addElement( o );
             }
@@ -239,7 +240,7 @@ public class LDAPObjectClassSchema extends LDAPSchemaElement {
         o = properties.get( "MUST" );
         if ( o != null ) {
             if ( o instanceof Vector ) {
-                must = (Vector)o;
+                must = (Vector<Object>)o;
             } else {
                 must.addElement( o );
             }
@@ -275,7 +276,7 @@ public class LDAPObjectClassSchema extends LDAPSchemaElement {
      * @return an enumeration of the names of the required attributes
      * for this object class.
      */
-    public Enumeration getRequiredAttributes() {
+    public Enumeration<Object> getRequiredAttributes() {
         return must.elements();
     }
 
@@ -285,7 +286,7 @@ public class LDAPObjectClassSchema extends LDAPSchemaElement {
      * @return an enumeration of the names of optional attributes
      * allowed in this object class.
      */
-    public Enumeration getOptionalAttributes() {
+    public Enumeration<Object> getOptionalAttributes() {
         return may.elements();
     }
 
@@ -360,7 +361,7 @@ public class LDAPObjectClassSchema extends LDAPSchemaElement {
         }
         s += "; Description: " + description + "; Required: ";
         int i = 0;
-        Enumeration e = getRequiredAttributes();
+        Enumeration<Object> e = getRequiredAttributes();
         while( e.hasMoreElements() ) {
             if ( i > 0 )
                 s += ", ";
@@ -394,7 +395,7 @@ public class LDAPObjectClassSchema extends LDAPSchemaElement {
      * @param vals values for list
      * @return a String with a list of values.
      */
-    protected String vectorToList( Vector vals ) {
+    protected String vectorToList( Vector<Object> vals ) {
         String val = "( ";
         for( int i = 0; i < vals.size(); i++ ) {
             val += (String)vals.elementAt(i) + ' ';
@@ -425,8 +426,8 @@ public class LDAPObjectClassSchema extends LDAPSchemaElement {
     public static final int ABSTRACT = 1;
     public static final int AUXILIARY = 2;
 
-    private Vector must = new Vector();
-    private Vector may = new Vector();
+    private Vector<Object> must = new Vector<>();
+    private Vector<Object> may = new Vector<>();
     private int type = STRUCTURAL;
 
     // Qualifiers known to not have values; prepare a Hashtable
