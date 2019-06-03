@@ -37,37 +37,41 @@
  * ***** END LICENSE BLOCK ***** */
 package com.netscape.jndi.ldap.schema;
 
-import javax.naming.*;
-import javax.naming.directory.*;
-import javax.naming.ldap.*;
+import java.util.Enumeration;
 
-import netscape.ldap.*;
+import javax.naming.Binding;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.directory.DirContext;
 
-import java.util.*;
+import netscape.ldap.LDAPAttributeSchema;
+import netscape.ldap.LDAPMatchingRuleSchema;
+import netscape.ldap.LDAPObjectClassSchema;
+import netscape.ldap.LDAPSchemaElement;
 
-class SchemaElementBindingEnum implements NamingEnumeration {
+class SchemaElementBindingEnum implements NamingEnumeration<Binding> {
 
     /**
      * Enumeration of schema name-object bindings packaged into Binding object.
      */
-    Enumeration m_schemaElementEnum;
-    
+    Enumeration<? extends LDAPSchemaElement> m_schemaElementEnum;
+
     SchemaManager m_schemaMgr;
 
     static final String _className = "javax.naming.directory.DirContext"; // for class name is bindings
 
-    public SchemaElementBindingEnum(Enumeration schemaElementEnum, SchemaManager schemaMgr) {
+    public SchemaElementBindingEnum(Enumeration<? extends LDAPSchemaElement> schemaElementEnum, SchemaManager schemaMgr) {
         m_schemaElementEnum = schemaElementEnum;
         m_schemaMgr = schemaMgr;
     }
 
-    public Object next() throws NamingException{
+    public Binding next() throws NamingException{
         return nextElement();
     }
 
-    public Object nextElement() {
+    public Binding nextElement() {
         DirContext obj = null;
-        LDAPSchemaElement schemaElement = (LDAPSchemaElement) m_schemaElementEnum.nextElement();
+        LDAPSchemaElement schemaElement = m_schemaElementEnum.nextElement();
         if (schemaElement instanceof LDAPObjectClassSchema) {
             obj = new SchemaObjectClass((LDAPObjectClassSchema) schemaElement, m_schemaMgr);
         }

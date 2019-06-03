@@ -37,6 +37,7 @@
  * ***** END LICENSE BLOCK ***** */
 package com.netscape.jndi.ldap.schema;
 
+import javax.naming.Binding;
 import javax.naming.NameClassPair;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingEnumeration;
@@ -88,7 +89,7 @@ public class SchemaObjectClassContainer extends SchemaElementContainer {
         }
     }
 
-    public NamingEnumeration getBindingsList(String name) throws NamingException {
+    public NamingEnumeration<Binding> getBindingsList(String name) throws NamingException {
         SchemaDirContext schemaObj = (SchemaDirContext)lookup(name);
         if (schemaObj == this) {
             return new SchemaElementBindingEnum(m_schemaMgr.getObjectClasses(), m_schemaMgr);
