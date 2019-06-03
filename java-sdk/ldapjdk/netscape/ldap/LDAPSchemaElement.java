@@ -37,7 +37,10 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap;
 
-import java.util.*;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
 /**
  *
@@ -347,7 +350,7 @@ public abstract class LDAPSchemaElement implements java.io.Serializable {
      */
     protected void parseValue( String raw ) {
         if ( properties == null ) {
-            properties = new Hashtable();
+            properties = new Hashtable<>();
         }
         int l = raw.length();
         // Processing is faster in char array than in String
@@ -431,7 +434,7 @@ public abstract class LDAPSchemaElement implements java.io.Serializable {
             }
             if ( (ind < last) && (last <= l) ) {
                 if ( list ) {
-                    Vector v = new Vector();
+                    Vector<String> v = new Vector<>();
                     if ( ch[ind] == ' ' ) {
                         ind++;
                     }
@@ -562,9 +565,9 @@ public abstract class LDAPSchemaElement implements java.io.Serializable {
      */
     protected String getCustomValues() {
         String s = "";
-        Enumeration en = properties.keys();
+        Enumeration<String> en = properties.keys();
         while( en.hasMoreElements() ) {
-            String key = (String)en.nextElement();
+            String key = en.nextElement();
             if ( !key.startsWith( "X-" ) ) {
                 continue;
             }
@@ -608,12 +611,12 @@ public abstract class LDAPSchemaElement implements java.io.Serializable {
             }
         } else {
             s += key + " ( ";
-            Vector v = (Vector)o;
+            Vector<String> v = (Vector<String>)o;
             for( int i = 0; i < v.size(); i++ ) {
                 if ( doQuote ) {
                     s += '\'';
                 }
-                s += (String)v.elementAt(i);
+                s += v.elementAt(i);
                 if ( doQuote ) {
                     s += '\'';
                 }
@@ -650,7 +653,7 @@ public abstract class LDAPSchemaElement implements java.io.Serializable {
      */
     public void setQualifier( String name, String value ) {
         if ( properties == null ) {
-            properties = new Hashtable();
+            properties = new Hashtable<>();
         }
         if ( value != null ) {
             properties.put( name, value );
@@ -669,9 +672,9 @@ public abstract class LDAPSchemaElement implements java.io.Serializable {
             return;
         }
         if ( properties == null ) {
-            properties = new Hashtable();
+            properties = new Hashtable<>();
         }
-        Vector v = new Vector();
+        Vector<String> v = new Vector<>();
         for( int i = 0; i < values.length; i++ ) {
             v.addElement( values[i] );
         }
@@ -693,7 +696,7 @@ public abstract class LDAPSchemaElement implements java.io.Serializable {
             return null;
         }
         if ( o instanceof Vector ) {
-            Vector v = (Vector)o;
+            Vector<String> v = (Vector<String>)o;
             String[] vals = new String[v.size()];
             v.copyInto( vals );
             return vals;
@@ -710,7 +713,7 @@ public abstract class LDAPSchemaElement implements java.io.Serializable {
      * Gets an enumeration of all qualifiers which are not predefined.
      * @return enumeration of qualifiers.
      */
-    public Enumeration getQualifierNames() {
+    public Enumeration<String> getQualifierNames() {
         return properties.keys();
     }
 
@@ -730,17 +733,17 @@ public abstract class LDAPSchemaElement implements java.io.Serializable {
      * @return a String with any known qualifiers.
      */
     String getQualifierString( String[] ignore ) {
-        Hashtable toIgnore = null;
+        Hashtable<String, String> toIgnore = null;
         if ( ignore != null ) {
-            toIgnore = new Hashtable();
+            toIgnore = new Hashtable<String, String>();
             for( int i = 0; i < ignore.length; i++ ) {
                 toIgnore.put( ignore[i], ignore[i] );
             }
         }
         String s = "";
-        Enumeration en = getQualifierNames();
+        Enumeration<String> en = getQualifierNames();
         while( en.hasMoreElements() ) {
-            String qualifier = (String)en.nextElement();
+            String qualifier = en.nextElement();
             if ( (toIgnore != null) && toIgnore.containsKey( qualifier ) ) {
                 continue;
             }
@@ -814,7 +817,7 @@ public abstract class LDAPSchemaElement implements java.io.Serializable {
     protected String rawValue = null;
     protected String[] aliases = null;
     // Additional qualifiers
-    protected Hashtable properties = null;
+    protected Hashtable<String, Object> properties = null;
     // Qualifiers known to not have values
-    static protected Hashtable novalsTable = new Hashtable();
+    static protected Hashtable<String, String> novalsTable = new Hashtable<>();
 }
