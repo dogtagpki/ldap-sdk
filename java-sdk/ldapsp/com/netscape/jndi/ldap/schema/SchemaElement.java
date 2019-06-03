@@ -39,7 +39,9 @@ package com.netscape.jndi.ldap.schema;
 
 import java.util.Vector;
 
+import javax.naming.Binding;
 import javax.naming.Name;
+import javax.naming.NameClassPair;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
@@ -150,7 +152,7 @@ public class SchemaElement extends SchemaDirContext {
     /**
      * Convert string vector to an array
      */
-    static String[] vectorToStringAry(Vector v) {
+    static String[] vectorToStringAry(Vector<Object> v) {
         String[] ary = new String[v.size()];
         for(int i=0; i<v.size(); i++) {
             ary[i] = (String) v.elementAt(i);
@@ -162,20 +164,20 @@ public class SchemaElement extends SchemaDirContext {
      * List Operations
      */
 
-    public NamingEnumeration list(String name) throws NamingException {
-        return new EmptyNamingEnumeration();
+    public NamingEnumeration<NameClassPair> list(String name) throws NamingException {
+        return new EmptyNamingEnumeration<NameClassPair>();
     }
 
-    public NamingEnumeration list(Name name) throws NamingException {
-        return new EmptyNamingEnumeration();
+    public NamingEnumeration<NameClassPair> list(Name name) throws NamingException {
+        return new EmptyNamingEnumeration<NameClassPair>();
     }
 
-    public NamingEnumeration listBindings(String name) throws NamingException {
-        return new EmptyNamingEnumeration();
+    public NamingEnumeration<Binding> listBindings(String name) throws NamingException {
+        return new EmptyNamingEnumeration<Binding>();
     }
 
-    public NamingEnumeration listBindings(Name name) throws NamingException {
-        return new EmptyNamingEnumeration();
+    public NamingEnumeration<Binding> listBindings(Name name) throws NamingException {
+        return new EmptyNamingEnumeration<Binding>();
     }
 
     /**

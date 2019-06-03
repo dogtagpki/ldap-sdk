@@ -37,22 +37,24 @@
  * ***** END LICENSE BLOCK ***** */
 package com.netscape.jndi.ldap.schema;
 
-import javax.naming.*;
-import javax.naming.directory.*;
-import javax.naming.ldap.*;
+import java.util.NoSuchElementException;
 
-import netscape.ldap.*;
-import netscape.ldap.controls.*;
+import javax.naming.Name;
+import javax.naming.NameAlreadyBoundException;
+import javax.naming.NameParser;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.OperationNotSupportedException;
+import javax.naming.directory.DirContext;
+
 import com.netscape.jndi.ldap.common.DirContextAdapter;
-
-import java.util.*;
 
 public class SchemaDirContext extends DirContextAdapter {
 
     public static final String CLASSDEF = "ClassDefinition";
     public static final String ATTRDEF = "AttributeDefinition";
     public static final String MRULEDEF = "MatchingRule";
-    
+
 
     String m_path;
 
@@ -85,7 +87,7 @@ public class SchemaDirContext extends DirContextAdapter {
         return SchemaNameParser.getParser();
     }
 
-     
+
     /**
      * Naming Bind operations
      */
@@ -96,7 +98,7 @@ public class SchemaDirContext extends DirContextAdapter {
         }
         else {
             throw new IllegalArgumentException("Can not bind this type of object");
-        }    
+        }
     }
 
     public void bind(Name name, Object obj) throws NamingException {
@@ -138,14 +140,14 @@ public class SchemaDirContext extends DirContextAdapter {
     /**
      * Empty enumeration for list operations
      */
-    class EmptyNamingEnumeration implements NamingEnumeration {
+    class EmptyNamingEnumeration<T> implements NamingEnumeration<T> {
 
-        public Object next() throws NamingException{
-            throw new NoSuchElementException("EmptyNamingEnumeration");                
+        public T next() throws NamingException{
+            throw new NoSuchElementException("EmptyNamingEnumeration");
         }
 
-        public Object nextElement() {
-            throw new NoSuchElementException("EmptyNamingEnumeration");                
+        public T nextElement() {
+            throw new NoSuchElementException("EmptyNamingEnumeration");
         }
 
         public boolean hasMore() throws NamingException{
@@ -158,16 +160,16 @@ public class SchemaDirContext extends DirContextAdapter {
 
         public void close() {}
     }
-    
+
     static class SchemaObjectSubordinateNamePair {
         SchemaDirContext schemaObj;
         String subordinateName;
-        
+
         public SchemaObjectSubordinateNamePair(SchemaDirContext object, String subordinateName) {
             this.schemaObj = object;
             this.subordinateName = subordinateName;
         }
-        
+
         public String toString() {
             StringBuffer str = new StringBuffer("SchemaObjectSubordinateNamePair{obj:");
             str.append(((schemaObj == null) ? "null" : schemaObj.toString()));
@@ -176,5 +178,5 @@ public class SchemaDirContext extends DirContextAdapter {
             str.append("}");
             return str.toString();
         }
-    }    
+    }
 }
