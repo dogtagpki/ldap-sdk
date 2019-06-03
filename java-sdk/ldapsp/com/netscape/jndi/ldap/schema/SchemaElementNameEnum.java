@@ -37,34 +37,32 @@
  * ***** END LICENSE BLOCK ***** */
 package com.netscape.jndi.ldap.schema;
 
-import javax.naming.*;
-import javax.naming.directory.*;
-import javax.naming.ldap.*;
+import java.util.Enumeration;
 
-import netscape.ldap.*;
+import javax.naming.NameClassPair;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
 
-import java.util.*;
-
-class SchemaElementNameEnum implements NamingEnumeration {
+class SchemaElementNameEnum implements NamingEnumeration<NameClassPair> {
 
     /**
      * Enumeration of schema object names packaged into NameClassPair.
      * The class in NameClassPair is DirContext
      */
-    Enumeration m_nameEnum; 
-    
+    Enumeration<String> m_nameEnum;
+
     static final String _className = "javax.naming.directory.DirContext"; // for class name is bindings";
 
-    public SchemaElementNameEnum(Enumeration nameEnum) {
+    public SchemaElementNameEnum(Enumeration<String> nameEnum) {
         m_nameEnum = nameEnum;
     }
 
-    public Object next() throws NamingException{
+    public NameClassPair next() throws NamingException{
         return nextElement();
     }
 
-    public Object nextElement() {
-        String name = (String) m_nameEnum.nextElement();
+    public NameClassPair nextElement() {
+        String name = m_nameEnum.nextElement();
         return new NameClassPair(name, _className, /*isRelative=*/true);
     }
 

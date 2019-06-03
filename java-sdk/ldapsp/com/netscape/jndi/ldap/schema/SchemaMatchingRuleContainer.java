@@ -37,21 +37,22 @@
  * ***** END LICENSE BLOCK ***** */
 package com.netscape.jndi.ldap.schema;
 
-import javax.naming.*;
-import javax.naming.directory.*;
-import javax.naming.ldap.*;
+import javax.naming.NameClassPair;
+import javax.naming.NameNotFoundException;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.NotContextException;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.DirContext;
 
-import netscape.ldap.*;
-import netscape.ldap.controls.*;
-
-import java.util.*;
+import netscape.ldap.LDAPMatchingRuleSchema;
 
 public class SchemaMatchingRuleContainer extends SchemaElementContainer {
 
     public SchemaMatchingRuleContainer(SchemaManager schemaMgr) throws NamingException{
         super(schemaMgr, MRULEDEF);
     }
-    
+
     /**
      * Ldap entry operations
      */
@@ -69,7 +70,7 @@ public class SchemaMatchingRuleContainer extends SchemaElementContainer {
     public void removeSchemaElement(String name) throws NamingException {
         if (name.length() == 0) {
             throw new NamingException("Can not delete schema object container");
-        }    
+        }
         m_schemaMgr.removeMatchingRule(name);
     }
 
@@ -77,7 +78,7 @@ public class SchemaMatchingRuleContainer extends SchemaElementContainer {
      * List Operations
      */
 
-    public NamingEnumeration getNameList(String name) throws NamingException {
+    public NamingEnumeration<NameClassPair> getNameList(String name) throws NamingException {
         SchemaDirContext schemaObj = (SchemaDirContext)lookup(name);
         if (schemaObj == this) {
             return new SchemaElementNameEnum(m_schemaMgr.getMatchingRuleNames());
@@ -101,11 +102,11 @@ public class SchemaMatchingRuleContainer extends SchemaElementContainer {
      * Lookup Operations
      */
 
-    public Object lookupSchemaElement(String name) throws NamingException {    
+    public Object lookupSchemaElement(String name) throws NamingException {
         if (name.length() == 0) {
             return this;
         }
-        
+
         // No caching; Always create a new object
         LDAPMatchingRuleSchema mrule = m_schemaMgr.getMatchingRule(name);
         if (mrule == null) {

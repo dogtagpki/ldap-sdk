@@ -137,7 +137,7 @@ class SchemaManager {
         return m_schema.getObjectClassNames();
     }
 
-    Enumeration getAttributeNames() throws NamingException {
+    Enumeration<String> getAttributeNames() throws NamingException {
         if (!m_isLoaded || m_isAttributeDirty) {
             load();
         }
