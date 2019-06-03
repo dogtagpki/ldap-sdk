@@ -112,7 +112,7 @@ public class DSMLWriter extends LDAPWriter {
             printString( "      <dsml:name>" + s.getNames()[0] + "</dsml:name>" );
             printString( "      <dsml:description>" + s.getDescription() +
                          "</dsml:description>" );
-            Enumeration attrs = s.getRequiredAttributes();
+            Enumeration<Object> attrs = s.getRequiredAttributes();
             while( attrs.hasMoreElements() ) {
                 printString( "      <dsml:attribute ref=\"#" +
                              (String)attrs.nextElement() +
@@ -151,18 +151,18 @@ public class DSMLWriter extends LDAPWriter {
             if ( s.isObsolete() ) {
                 printString( "      obsolete=true" );
             }
-            if ( s.getQualifier( s.NO_USER_MODIFICATION ) != null ) {
+            if ( s.getQualifier( LDAPAttributeSchema.NO_USER_MODIFICATION ) != null ) {
                 printString( "      user-modification=false" );
             }
-            String[] vals = s.getQualifier( s.EQUALITY );
+            String[] vals = s.getQualifier( LDAPAttributeSchema.EQUALITY );
             if ( (vals != null) && (vals.length > 0) ) {
                 printString( "      equality=" + vals[0] );
             }
-            vals = s.getQualifier( s.ORDERING );
+            vals = s.getQualifier( LDAPAttributeSchema.ORDERING );
             if ( (vals != null) && (vals.length > 0) ) {
                 printString( "      ordering=" + vals[0] );
             }
-            vals = s.getQualifier( s.SUBSTR );
+            vals = s.getQualifier( LDAPAttributeSchema.SUBSTR );
             if ( (vals != null) && (vals.length > 0) ) {
                 printString( "      substring=" + vals[0] );
             }
