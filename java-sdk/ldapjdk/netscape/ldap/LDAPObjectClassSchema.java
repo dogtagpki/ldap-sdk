@@ -232,17 +232,17 @@ public class LDAPObjectClassSchema extends LDAPSchemaElement {
         Object o = properties.get( "MAY" );
         if ( o != null ) {
             if ( o instanceof Vector ) {
-                may = (Vector<Object>)o;
+                may = (Vector<String>)o;
             } else {
-                may.addElement( o );
+                may.addElement((String)o);
             }
         }
         o = properties.get( "MUST" );
         if ( o != null ) {
             if ( o instanceof Vector ) {
-                must = (Vector<Object>)o;
+                must = (Vector<String>)o;
             } else {
-                must.addElement( o );
+                must.addElement((String)o);
             }
         }
     }
@@ -276,7 +276,7 @@ public class LDAPObjectClassSchema extends LDAPSchemaElement {
      * @return an enumeration of the names of the required attributes
      * for this object class.
      */
-    public Enumeration<Object> getRequiredAttributes() {
+    public Enumeration<String> getRequiredAttributes() {
         return must.elements();
     }
 
@@ -286,7 +286,7 @@ public class LDAPObjectClassSchema extends LDAPSchemaElement {
      * @return an enumeration of the names of optional attributes
      * allowed in this object class.
      */
-    public Enumeration<Object> getOptionalAttributes() {
+    public Enumeration<String> getOptionalAttributes() {
         return may.elements();
     }
 
@@ -361,12 +361,12 @@ public class LDAPObjectClassSchema extends LDAPSchemaElement {
         }
         s += "; Description: " + description + "; Required: ";
         int i = 0;
-        Enumeration<Object> e = getRequiredAttributes();
+        Enumeration<String> e = getRequiredAttributes();
         while( e.hasMoreElements() ) {
             if ( i > 0 )
                 s += ", ";
             i++;
-            s += (String)e.nextElement();
+            s += e.nextElement();
         }
         s += "; Optional: ";
         e = getOptionalAttributes();
@@ -375,7 +375,7 @@ public class LDAPObjectClassSchema extends LDAPSchemaElement {
             if ( i > 0 )
                 s += ", ";
             i++;
-            s += (String)e.nextElement();
+            s += e.nextElement();
         }
         String[] vals = getQualifier( TYPE );
         if ( (vals != null) && (vals.length > 0) ) {
@@ -395,10 +395,10 @@ public class LDAPObjectClassSchema extends LDAPSchemaElement {
      * @param vals values for list
      * @return a String with a list of values.
      */
-    protected String vectorToList( Vector<Object> vals ) {
+    protected String vectorToList( Vector<String> vals ) {
         String val = "( ";
         for( int i = 0; i < vals.size(); i++ ) {
-            val += (String)vals.elementAt(i) + ' ';
+            val += vals.elementAt(i) + ' ';
             if ( i < (vals.size() - 1) ) {
                 val += "$ ";
             }
@@ -426,8 +426,8 @@ public class LDAPObjectClassSchema extends LDAPSchemaElement {
     public static final int ABSTRACT = 1;
     public static final int AUXILIARY = 2;
 
-    private Vector<Object> must = new Vector<>();
-    private Vector<Object> may = new Vector<>();
+    private Vector<String> must = new Vector<>();
+    private Vector<String> may = new Vector<>();
     private int type = STRUCTURAL;
 
     // Qualifiers known to not have values; prepare a Hashtable

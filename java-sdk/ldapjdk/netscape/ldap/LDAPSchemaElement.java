@@ -816,7 +816,7 @@ public abstract class LDAPSchemaElement implements java.io.Serializable {
     protected String attrName = null;
     protected String rawValue = null;
     protected String[] aliases = null;
-    // Additional qualifiers
+    // Additional qualifiers (elements are String or Vector<String>)
     protected Hashtable<String, Object> properties = null;
     // Qualifiers known to not have values
     static protected Hashtable<String, String> novalsTable = new Hashtable<>();

@@ -112,16 +112,16 @@ public class DSMLWriter extends LDAPWriter {
             printString( "      <dsml:name>" + s.getNames()[0] + "</dsml:name>" );
             printString( "      <dsml:description>" + s.getDescription() +
                          "</dsml:description>" );
-            Enumeration<Object> attrs = s.getRequiredAttributes();
+            Enumeration<String> attrs = s.getRequiredAttributes();
             while( attrs.hasMoreElements() ) {
                 printString( "      <dsml:attribute ref=\"#" +
-                             (String)attrs.nextElement() +
+                             attrs.nextElement() +
                              "\" required=\"true\"/>" );
             }
             attrs = s.getOptionalAttributes();
             while( attrs.hasMoreElements() ) {
                 printString( "      <dsml:attribute ref=\"#" +
-                             (String)attrs.nextElement() +
+                             attrs.nextElement() +
                              "\" required=\"false\"/>" );
             }
             printString( "    </dsml:class>" );
