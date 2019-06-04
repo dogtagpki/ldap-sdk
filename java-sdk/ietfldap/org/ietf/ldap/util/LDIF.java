@@ -37,11 +37,24 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap.util;
 
-import java.util.*;
-import org.ietf.ldap.*;
-import org.ietf.ldap.client.*;
-import java.io.*;
-import java.net.*;
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.StringTokenizer;
+import java.util.Vector;
+
+import org.ietf.ldap.LDAPAttribute;
+import org.ietf.ldap.LDAPControl;
+import org.ietf.ldap.LDAPModification;
 
 /**
  * LDAP Data Interchange Format (LDIF) is a file format used to
@@ -137,7 +150,6 @@ public class LDIF implements Serializable {
           throws IOException {
         String line = null;
         String dn = null;
-        Vector attrs = new Vector();
         LDIFRecord rec = null;
 
         // Skip past any blank lines
@@ -216,17 +228,17 @@ public class LDIF implements Serializable {
         }
 
         /* handles 1*(attrval-spec) */
-        Hashtable ht = new Hashtable();
+        Hashtable<String, LDAPAttribute> ht = new Hashtable<>();
         String newtype = null;
         Object val = null;
         LDAPAttribute newAttr = null;
-        Vector controlVector = null;
+        Vector<LDAPControl> controlVector = null;
 
         /* Read lines until we're past the record */
         while( true ) {
             if (line.startsWith("control:")) {
                 if ( controlVector == null ) {
-                    controlVector = new Vector();
+                    controlVector = new Vector<>();
                 }
                 controlVector.addElement( parse_control_spec( line ) );
             } else {
@@ -266,7 +278,7 @@ public class LDIF implements Serializable {
                     }
                 }
                 /* Is there a previous value for this attribute? */
-                newAttr = (LDAPAttribute)ht.get( newtype );
+                newAttr = ht.get( newtype );
                 if ( newAttr == null ) {
                     newAttr = new LDAPAttribute( newtype );
                 }
@@ -288,9 +300,9 @@ public class LDIF implements Serializable {
         }
         LDIFAttributeContent ac = new LDIFAttributeContent();
         // Copy over the attributes to the record
-        Enumeration en = ht.elements();
+        Enumeration<LDAPAttribute> en = ht.elements();
         while( en.hasMoreElements() ) {
-            ac.addElement( (LDAPAttribute)en.nextElement() );
+            ac.addElement( en.nextElement() );
         }
         ht.clear();
         if( controlVector != null ) {
@@ -326,8 +338,9 @@ public class LDIF implements Serializable {
 
         File file = new File(filename);
         byte[] b = new byte[(int)file.length()];
-        FileInputStream fi = new FileInputStream(filename);
-        fi.read(b);
+        try (FileInputStream fi = new FileInputStream(filename)) {
+            fi.read(b);
+        }
         return b;
     }
 
@@ -355,20 +368,20 @@ public class LDIF implements Serializable {
      */
     private LDIFDeleteContent parse_delete_spec(LineReader d)
           throws IOException {
-        Vector controlVector = null;
+        Vector<LDAPControl> controlVector = null;
         LDIFDeleteContent dc = new LDIFDeleteContent();
         String line = d.readLine();
         while( line != null && !line.equals("") ) {
             if (line.startsWith("control:")) {
                 if ( controlVector == null ) {
-                    controlVector = new Vector();
+                    controlVector = new Vector<>();
                 }
                 controlVector.addElement( parse_control_spec( line ) );
             } else {
                 throwLDIFException("invalid SEP" );
             }
             line = d.readLine();
-        } 
+        }
         if( controlVector != null ) {
             LDAPControl[] controls = new LDAPControl[controlVector.size()];
             controlVector.copyInto( controls );
@@ -386,7 +399,7 @@ public class LDIF implements Serializable {
     private LDIFModifyContent parse_mod_spec(LineReader d)
           throws IOException {
 
-        Vector controlVector = null;
+        Vector<LDAPControl> controlVector = null;
         String line = null;
         line = d.readLine();
         LDIFModifyContent mc = new LDIFModifyContent();
@@ -412,7 +425,7 @@ public class LDIF implements Serializable {
                 LDAPControl[] controls = ac.getControls();
                 if ( controls != null ) {
                     if ( controlVector == null ) {
-                        controlVector = new Vector();
+                        controlVector = new Vector<>();
                     }
                     for( int i = 0; i < controls.length; i++ ) {
                         controlVector.addElement( controls[i] );
@@ -454,7 +467,7 @@ public class LDIF implements Serializable {
      */
     private LDIFModDNContent parse_moddn_spec(LineReader d)
                   throws IOException {
-        Vector controlVector = null;
+        Vector<LDAPControl> controlVector = null;
         String line = null;
         line = d.readLine();
         LDIFModDNContent mc = new LDIFModDNContent();
@@ -482,7 +495,7 @@ public class LDIF implements Serializable {
                     "newparent:".length()).trim());
             } else if (line.startsWith("control:")) {
                 if ( controlVector == null ) {
-                    controlVector = new Vector();
+                    controlVector = new Vector<>();
                 }
                 controlVector.addElement( parse_control_spec( line ) );
             }
@@ -595,8 +608,8 @@ public class LDIF implements Serializable {
      * Returns true if all the bytes in the given array are valid for output as a
      * String according to the LDIF specification. If not, the array should
      * output base64-encoded.
-     * @return <code>true</code> if all the bytes in the given array are valid for 
-     * output as a String according to the LDIF specification; otherwise, 
+     * @return <code>true</code> if all the bytes in the given array are valid for
+     * output as a String according to the LDIF specification; otherwise,
      * <code>false</code>.
      */
     public static boolean isPrintable(byte[] b) {
@@ -662,8 +675,8 @@ public class LDIF implements Serializable {
     protected void throwLDIFException(String msg)throws IOException {
         throw new IOException ("line " +
             (m_currLineNum-m_continuationLength) + ": " + msg);
-    }      
-    
+    }
+
     /**
      * Internal variables
      */
@@ -733,14 +746,14 @@ public class LDIF implements Serializable {
             } while ( true );
 
             m_done = ( line == null );
-            
+
             m_currLineNum += readCnt;
             if (_next != null) {
                 // read one line ahead
                 m_currLineNum--;
-            }            
+            }
             m_continuationLength = continuationLength;
-            
+
             return result;
         }
         private BufferedReader _d;
@@ -764,7 +777,7 @@ public class LDIF implements Serializable {
         } else {
             ByteBuf inBuf = new ByteBuf( b, 0, b.length );
             ByteBuf encodedBuf = new ByteBuf();
-            // Translate to base 64 
+            // Translate to base 64
             MimeBase64Encoder encoder = new MimeBase64Encoder();
             encoder.translate( inBuf, encodedBuf );
             int nBytes = encodedBuf.length();
