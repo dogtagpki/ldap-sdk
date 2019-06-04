@@ -37,10 +37,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap;
 
-import java.util.*;
-import org.ietf.ldap.client.*;
-import org.ietf.ldap.client.opers.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.Hashtable;
+import java.util.Locale;
+import java.util.PropertyResourceBundle;
 
 /**
  * Indicates that an error has occurred.  An <CODE>LDAPException</CODE>
@@ -599,7 +600,7 @@ public class LDAPException extends Exception
     private String matchedDN = null;
     private Throwable rootException = null;
     private Locale m_locale = Locale.getDefault();
-    private static Hashtable cacheResource = new Hashtable();
+    private static Hashtable<String, PropertyResourceBundle> cacheResource = new Hashtable<>();
     private static final String baseName = "org/ietf/ldap/errors/ErrorCodes";
 
     /**
@@ -1056,7 +1057,7 @@ public class LDAPException extends Exception
         try {
             String localeStr = locale.toString();
             PropertyResourceBundle p =
-               (PropertyResourceBundle)cacheResource.get(localeStr);
+               cacheResource.get(localeStr);
 
             if (p == null) {
                 p = LDAPResourceBundle.getBundle(baseName);

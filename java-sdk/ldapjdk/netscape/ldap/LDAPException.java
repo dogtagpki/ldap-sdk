@@ -37,10 +37,10 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap;
 
-import java.util.*;
-import netscape.ldap.client.*;
-import netscape.ldap.client.opers.*;
-import java.io.*;
+import java.io.IOException;
+import java.util.Hashtable;
+import java.util.Locale;
+import java.util.PropertyResourceBundle;
 
 /**
  * Indicates that an error has occurred.  An <CODE>LDAPException</CODE>
@@ -139,7 +139,7 @@ import java.io.*;
  *  95     <A HREF="#MORE_RESULTS_TO_RETURN">MORE_RESULTS_TO_RETURN</A>
  *  96     <A HREF="#CLIENT_LOOP">CLIENT_LOOP</A>
  *  97     <A HREF="#REFERRAL_LIMIT_EXCEEDED">REFERRAL_LIMIT_EXCEEDED</A>
- * 112     <A HREF="#TLS_NOT_SUPPORTED">TLS_NOT_SUPPORTED</A> (LDAP v3) 
+ * 112     <A HREF="#TLS_NOT_SUPPORTED">TLS_NOT_SUPPORTED</A> (LDAP v3)
  * </PRE>
  * <P>
  *
@@ -590,7 +590,7 @@ public class LDAPException extends java.lang.Exception
     private String extraMessage = null;
     private String matchedDN = null;
     private Locale m_locale = Locale.getDefault();
-    private static Hashtable cacheResource = new Hashtable();
+    private static Hashtable<String, PropertyResourceBundle> cacheResource = new Hashtable<>();
     private static final String baseName = "netscape/ldap/errors/ErrorCodes";
 
     /**
@@ -760,7 +760,7 @@ public class LDAPException extends java.lang.Exception
     public String getLDAPErrorMessage () {
         return errorMessage;
     }
-   
+
 
     /**
      * Adds additional explanation to the error message
@@ -777,7 +777,7 @@ public class LDAPException extends java.lang.Exception
     /**
      * Returns the maximal subset of a DN which could be matched by the
      * server.
-     * 
+     *
      * The method should be used if the server returned one of the
      * following errors:
      * <UL>
@@ -925,7 +925,7 @@ public class LDAPException extends java.lang.Exception
         try {
             String localeStr = locale.toString();
             PropertyResourceBundle p =
-               (PropertyResourceBundle)cacheResource.get(localeStr);
+               cacheResource.get(localeStr);
 
             if (p == null) {
                 p = LDAPResourceBundle.getBundle(baseName);
