@@ -203,7 +203,7 @@ public class LDAPDITContentRuleSchema extends LDAPSchemaElement {
             if ( o instanceof Vector ) {
                 may = (Vector<String>)o;
             } else {
-                may.addElement( o );
+                may.addElement((String)o);
             }
         }
         o = properties.get( MUST );
@@ -211,7 +211,7 @@ public class LDAPDITContentRuleSchema extends LDAPSchemaElement {
             if ( o instanceof Vector ) {
                 must = (Vector<String>)o;
             } else {
-                must.addElement( o );
+                must.addElement((String)o);
             }
         }
         o = properties.get( NOT );
@@ -219,7 +219,7 @@ public class LDAPDITContentRuleSchema extends LDAPSchemaElement {
             if ( o instanceof Vector ) {
                 not = (Vector<String>)o;
             } else {
-                not.addElement( o );
+                not.addElement((String)o);
             }
         }
         o = properties.get( AUX );
@@ -227,7 +227,7 @@ public class LDAPDITContentRuleSchema extends LDAPSchemaElement {
             if ( o instanceof Vector ) {
                 aux = (Vector<String>)o;
             } else {
-                aux.addElement( o );
+                aux.addElement((String)o);
             }
         }
     }
@@ -330,10 +330,10 @@ public class LDAPDITContentRuleSchema extends LDAPSchemaElement {
      * @param vals values for list
      * @return a String with a list of values.
      */
-    protected String vectorToList( Vector vals ) {
+    protected String vectorToList( Vector<String> vals ) {
         String val = "( ";
         for( int i = 0; i < vals.size(); i++ ) {
-            val += (String)vals.elementAt(i) + ' ';
+            val += vals.elementAt(i) + ' ';
             if ( i < (vals.size() - 1) ) {
                 val += "$ ";
             }
@@ -372,8 +372,8 @@ public class LDAPDITContentRuleSchema extends LDAPSchemaElement {
                                          NOT
                                        };
 
-    private Vector must = new Vector();
-    private Vector may = new Vector();
-    private Vector aux = new Vector();
-    private Vector not = new Vector();
+    private Vector<String> must = new Vector<>();
+    private Vector<String> may = new Vector<>();
+    private Vector<String> aux = new Vector<>();
+    private Vector<String> not = new Vector<>();
 }

@@ -37,14 +37,15 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap;
 
-import java.util.*;
+import java.util.Enumeration;
+import java.util.Vector;
 
 /**
  * The definition of a DIT content rule in the schema.
  * <A HREF="http://www.ietf.org/rfc/rfc2252.txt"
  * TARGET="_blank">RFC 2252, Lightweight Directory Access Protocol (v3):
  * DIT Content Rule Description</A> covers the types of information
- * to specify when defining a DIT content rule. According to the RFC, 
+ * to specify when defining a DIT content rule. According to the RFC,
  * the description of a DIT content rule can include the following:
  * <P>
  *
@@ -199,33 +200,33 @@ public class LDAPDITContentRuleSchema extends LDAPSchemaElement {
         Object o = properties.get( MAY );
         if ( o != null ) {
             if ( o instanceof Vector ) {
-                may = (Vector)o;
+                may = (Vector<String>)o;
             } else {
-                may.addElement( o );
+                may.addElement((String)o);
             }
         }
         o = properties.get( MUST );
         if ( o != null ) {
             if ( o instanceof Vector ) {
-                must = (Vector)o;
+                must = (Vector<String>)o;
             } else {
-                must.addElement( o );
+                must.addElement((String)o);
             }
         }
         o = properties.get( NOT );
         if ( o != null ) {
             if ( o instanceof Vector ) {
-                not = (Vector)o;
+                not = (Vector<String>)o;
             } else {
-                not.addElement( o );
+                not.addElement((String)o);
             }
         }
         o = properties.get( AUX );
         if ( o != null ) {
             if ( o instanceof Vector ) {
-                aux = (Vector)o;
+                aux = (Vector<String>)o;
             } else {
-                aux.addElement( o );
+                aux.addElement((String)o);
             }
         }
     }
@@ -320,10 +321,10 @@ public class LDAPDITContentRuleSchema extends LDAPSchemaElement {
      * @param vals values for list
      * @return a String with a list of values.
      */
-    protected String vectorToList( Vector vals ) {
+    protected String vectorToList( Vector<String> vals ) {
         String val = "( ";
         for( int i = 0; i < vals.size(); i++ ) {
-            val += (String)vals.elementAt(i) + ' ';
+            val += vals.elementAt(i) + ' ';
             if ( i < (vals.size() - 1) ) {
                 val += "$ ";
             }
@@ -342,12 +343,12 @@ public class LDAPDITContentRuleSchema extends LDAPSchemaElement {
         String s = "Name: " + name + "; OID: " + oid;
         s += "; Description: " + description + "; Required: ";
         int i = 0;
-        Enumeration e = must.elements();
+        Enumeration<String> e = must.elements();
         while( e.hasMoreElements() ) {
             if ( i > 0 )
                 s += ", ";
             i++;
-            s += (String)e.nextElement();
+            s += e.nextElement();
         }
         s += "; Optional: ";
         e = may.elements();
@@ -356,7 +357,7 @@ public class LDAPDITContentRuleSchema extends LDAPSchemaElement {
             if ( i > 0 )
                 s += ", ";
             i++;
-            s += (String)e.nextElement();
+            s += e.nextElement();
         }
         s += "; Auxiliary: ";
         e = aux.elements();
@@ -365,7 +366,7 @@ public class LDAPDITContentRuleSchema extends LDAPSchemaElement {
             if ( i > 0 )
                 s += ", ";
             i++;
-            s += (String)e.nextElement();
+            s += e.nextElement();
         }
         s += "; Precluded: ";
         e = not.elements();
@@ -374,7 +375,7 @@ public class LDAPDITContentRuleSchema extends LDAPSchemaElement {
             if ( i > 0 )
                 s += ", ";
             i++;
-            s += (String)e.nextElement();
+            s += e.nextElement();
         }
         if ( isObsolete() ) {
             s += "; OBSOLETE";
@@ -404,8 +405,8 @@ public class LDAPDITContentRuleSchema extends LDAPSchemaElement {
                                          NOT
                                        };
 
-    private Vector must = new Vector();
-    private Vector may = new Vector();
-    private Vector aux = new Vector();
-    private Vector not = new Vector();
+    private Vector<String> must = new Vector<>();
+    private Vector<String> may = new Vector<>();
+    private Vector<String> aux = new Vector<>();
+    private Vector<String> not = new Vector<>();
 }
