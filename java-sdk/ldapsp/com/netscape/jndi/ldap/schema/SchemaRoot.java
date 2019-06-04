@@ -37,23 +37,30 @@
  * ***** END LICENSE BLOCK ***** */
 package com.netscape.jndi.ldap.schema;
 
-import javax.naming.*;
-import javax.naming.directory.*;
-import javax.naming.ldap.*;
+import java.util.NoSuchElementException;
 
-import netscape.ldap.*;
-import netscape.ldap.controls.*;
+import javax.naming.Binding;
+import javax.naming.Context;
+import javax.naming.Name;
+import javax.naming.NameClassPair;
+import javax.naming.NameNotFoundException;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.OperationNotSupportedException;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.ModificationItem;
 
-import java.util.*;
+import netscape.ldap.LDAPConnection;
 
 public class SchemaRoot extends SchemaDirContext {
 
     static final String m_className = "javax.naming.directory.DirContext"; // for class name is bindings
-    
+
     SchemaDirContext m_classContainer, m_attrContainer, m_matchRuleContainer;
-    
+
     SchemaManager m_schemaMgr;
-    
+
     public SchemaRoot(LDAPConnection ld) throws NamingException{
         m_path = "";
         m_schemaMgr = new SchemaManager(ld);
@@ -63,42 +70,42 @@ public class SchemaRoot extends SchemaDirContext {
     }
 
     SchemaObjectSubordinateNamePair resolveSchemaObject(String name) throws NamingException{
-        
+
         SchemaDirContext obj = null;
-        
+
         if (name.length() == 0) {
             obj = this;
         }
         else if (name.startsWith(CLASSDEF) || name.startsWith(CLASSDEF.toLowerCase())) {
             name = name.substring(CLASSDEF.length());
             obj = m_classContainer;
-        }    
+        }
         else if (name.startsWith(ATTRDEF) || name.startsWith(ATTRDEF.toLowerCase())) {
             name = name.substring(ATTRDEF.length());
             obj = m_attrContainer;
-        }    
+        }
         else if (name.startsWith(MRULEDEF) || name.startsWith(MRULEDEF.toLowerCase())) {
             name = name.substring(MRULEDEF.length());
             obj = m_matchRuleContainer;
-            
+
         }
         else {
             throw new NameNotFoundException(name);
         }
-        
+
         if (name.length() > 1 && name.startsWith("/")) {
             name = name.substring(1);
-        }    
+        }
         return new SchemaObjectSubordinateNamePair(obj, name);
-    }    
-    
+    }
+
 
     /**
      * Attribute Operations
      */
 
     public Attributes getAttributes(String name) throws NamingException {
-        SchemaObjectSubordinateNamePair objNamePair = resolveSchemaObject(name);        
+        SchemaObjectSubordinateNamePair objNamePair = resolveSchemaObject(name);
         if (objNamePair.schemaObj == this) {
             throw new OperationNotSupportedException();
         }
@@ -108,7 +115,7 @@ public class SchemaRoot extends SchemaDirContext {
     }
 
     public Attributes getAttributes(String name, String[] attrIds) throws NamingException {
-        SchemaObjectSubordinateNamePair objNamePair = resolveSchemaObject(name);        
+        SchemaObjectSubordinateNamePair objNamePair = resolveSchemaObject(name);
         if (objNamePair.schemaObj == this) {
             throw new OperationNotSupportedException();
         }
@@ -193,7 +200,7 @@ public class SchemaRoot extends SchemaDirContext {
         }
         else {
             throw new IllegalArgumentException("Can not bind this type of object");
-        }    
+        }
     }
 
     public void bind(Name name, Object obj) throws NamingException {
@@ -231,7 +238,7 @@ public class SchemaRoot extends SchemaDirContext {
      * List Operations
      */
 
-    public NamingEnumeration list(String name) throws NamingException {
+    public NamingEnumeration<NameClassPair> list(String name) throws NamingException {
         SchemaObjectSubordinateNamePair objNamePair = resolveSchemaObject(name);
         if (objNamePair.schemaObj == this) {
             return new SchemaRootNameClassPairEnum();
@@ -241,11 +248,11 @@ public class SchemaRoot extends SchemaDirContext {
         }
     }
 
-    public NamingEnumeration list(Name name) throws NamingException {
+    public NamingEnumeration<NameClassPair> list(Name name) throws NamingException {
         return list(name.toString());
     }
 
-    public NamingEnumeration listBindings(String name) throws NamingException {
+    public NamingEnumeration<Binding> listBindings(String name) throws NamingException {
         SchemaObjectSubordinateNamePair objNamePair = resolveSchemaObject(name);
         if (objNamePair.schemaObj == this) {
             return new SchemaRootBindingEnum();
@@ -256,7 +263,7 @@ public class SchemaRoot extends SchemaDirContext {
 
     }
 
-    public NamingEnumeration listBindings(Name name) throws NamingException {
+    public NamingEnumeration<Binding> listBindings(Name name) throws NamingException {
         return listBindings(name.toString());
     }
 
@@ -297,21 +304,21 @@ public class SchemaRoot extends SchemaDirContext {
         }
         catch (Exception e) {
             System.err.println(e);
-        }    
+        }
     }
-    
+
     /**
      * NamigEnumeration of NameClassPairs
      */
-    class SchemaRootNameClassPairEnum implements NamingEnumeration {
+    class SchemaRootNameClassPairEnum implements NamingEnumeration<NameClassPair> {
 
         private int m_idx = -1;
 
-        public Object next() {
+        public NameClassPair next() {
             return nextElement();
         }
 
-        public Object nextElement() {
+        public NameClassPair nextElement() {
             m_idx++;
             if (m_idx == 0 ) {
                 return new NameClassPair(CLASSDEF, m_className);
@@ -324,8 +331,8 @@ public class SchemaRoot extends SchemaDirContext {
             }
             else {
                 throw new NoSuchElementException("SchemaRootEnumerator");
-            }    
-                
+            }
+
         }
 
         public boolean hasMore() {
@@ -342,15 +349,15 @@ public class SchemaRoot extends SchemaDirContext {
     /**
      * NamingEnumeration of Bindings
      */
-    class SchemaRootBindingEnum implements NamingEnumeration {
+    class SchemaRootBindingEnum implements NamingEnumeration<Binding> {
 
         private int m_idx = -1;
 
-        public Object next() {
+        public Binding next() {
             return nextElement();
         }
 
-        public Object nextElement() {
+        public Binding nextElement() {
             m_idx++;
             if (m_idx == 0 ) {
                 return new Binding(CLASSDEF, m_className, m_classContainer);
@@ -363,8 +370,8 @@ public class SchemaRoot extends SchemaDirContext {
             }
             else {
                 throw new NoSuchElementException("SchemaRootEnumerator");
-            }    
-                
+            }
+
         }
 
         public boolean hasMore() {
