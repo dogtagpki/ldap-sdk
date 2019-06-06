@@ -3,7 +3,6 @@
 # Filenames that should be ignored wherever they appear
 .pyc
 TAGS
-Makefile
 now
 
 
@@ -20,3 +19,4 @@ dirver.h
 
 # Ignore Eclipse build directory
 bin
+/build/
