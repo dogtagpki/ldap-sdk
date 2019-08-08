@@ -9,7 +9,7 @@ License:          MPLv1.1 or GPLv2+ or LGPLv2+
 BuildArch:        noarch
 
 Version:          4.21.0
-Release:          1%{?_timestamp}%{?_commit_id}%{?dist}
+Release:          2%{?_timestamp}%{?_commit_id}%{?dist}
 # global           _phase -a1
 
 %global spname		ldapsp
@@ -51,7 +51,7 @@ BuildRequires:    slf4j
 %else
 BuildRequires:    slf4j-jdk14
 %endif
-BuildRequires:    jss >= 4.5.0-1
+BuildRequires:    jss >= 4.6.0
 
 ################################################################################
 # Runtime Dependencies
@@ -64,7 +64,7 @@ Requires:         slf4j
 %else
 Requires:         slf4j-jdk14
 %endif
-Requires:         jss >= 4.5.0-1
+Requires:         jss >= 4.6.0
 
 
 %description
