@@ -122,6 +122,7 @@ pushd $RPM_BUILD_ROOT%{_javadir}-1.3.0
 popd
 
 mkdir -p %{buildroot}%{_mavenpomdir}
+sed -i 's/@VERSION@/%{version}/g' %{name}.pom
 install -pm 644 %{name}.pom %{buildroot}%{_mavenpomdir}/JPP-%{name}.pom
 %add_maven_depmap JPP-%{name}.pom %{name}.jar -a "ldapsdk:ldapsdk"
 
