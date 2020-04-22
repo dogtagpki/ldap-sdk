@@ -1,0 +1,92 @@
+name: Required Tests
+
+on:
+  push:
+    branches:
+      - master
+      - gh-actions
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Build
+    strategy:
+      matrix:
+        os: ['30', '31']
+    runs-on: ubuntu-latest
+    container: fedora:${{ matrix.os }}
+    steps:
+
+    - name: Install required packages
+      run: dnf install -y dnf-plugins-core rpm-build git
+
+    - name: Clone the repository
+      uses: actions/checkout@v2
+    
+    - name: Enable PKI COPR repo
+      run: dnf copr -y enable @pki/master
+
+    - name: Installed build deps
+      run: dnf builddep -y --spec ldapjdk.spec
+
+    - name: Build artifacts
+      run: ./build.sh --with-timestamp --with-commit-id --work-dir=../packages rpm
+    
+    - name: Compress RPMS
+      run: tar -czf ldapjdk-rpms.tar.gz ../packages/RPMS/*
+
+    # upload-artifact runs on host-vm rather than inside the container. Fixed in v2 (unreleased)
+    # Bug: https://github.com/actions/upload-artifact/issues/13#issuecomment-532936650
+    - name: Upload RPM artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: ldapjdk-build-${{ matrix.os }}
+        path: ldapjdk-rpms.tar.gz
+
+  test:
+    name: Tests
+    needs: build
+    strategy:
+      matrix:
+        os: ['30', '31']
+    runs-on: ubuntu-latest
+    env:
+      LDAPJDKDIR: /tmp/workdir/ldapjdk
+      CONTAINER: ldapjdk-test
+    steps:
+      - name: Clone the repository
+        uses: actions/checkout@v2
+
+      - name: Download ldapjdk binaries from Build job
+        uses: actions/download-artifact@v1
+        with:
+          name: ldapjdk-build-${{ matrix.os }}
+
+      - name: Extract tar.gz for rpms
+        run: tar -xzf ldapjdk-build-${{ matrix.os }}/ldapjdk-rpms.tar.gz
+
+      - name: Setup required test environment
+        run: IMAGE=fedora:${{ matrix.os }} travis/container-init.sh
+
+      - name: Install required packages
+        run: |
+             docker exec -i ${CONTAINER} rm -f /var/cache/dnf/metadata_lock.pid
+             docker exec -i ${CONTAINER} bash -c "dnf update -y && dnf clean all"
+             docker exec -i ${CONTAINER} dnf install -y 389-ds-base-legacy-tools findutils dnf-plugins-core sudo 389-ds-base
+
+      - name: Enable PKI COPR repo
+        run: docker exec -i ${CONTAINER} dnf copr -y enable @pki/master
+
+      - name: Install ldapjdk packages from Build job
+        run: docker exec -i ${CONTAINER} bash -c "find ${LDAPJDKDIR}/packages/ -name '*.rpm' | xargs dnf -y install"
+    
+      - name: Create DS instance
+        run: docker exec -i ${CONTAINER} ${LDAPJDKDIR}/travis/ds-create.sh
+
+      - name: Run ldapjdk Tests
+        run: docker exec -i ${CONTAINER} ${LDAPJDKDIR}/travis/tools-test.sh
+
+      - name: Remove DS instance
+        run: docker exec -i ${CONTAINER} ${LDAPJDKDIR}/travis/ds-remove.sh

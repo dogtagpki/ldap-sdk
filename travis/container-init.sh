@@ -1,7 +1,16 @@
-#!/bin/bash -e
+#!/bin/bash -ex
 
-# workaround for
-# [Errno 2] No such file or directory: '/var/cache/dnf/metadata_lock.pid'
-rm -f /var/cache/dnf/metadata_lock.pid
-dnf clean all
-dnf makecache || :
+docker pull registry.fedoraproject.org/${IMAGE}
+
+docker run \
+    --name ${CONTAINER} \
+    --hostname server.example.com \
+    --tmpfs /tmp \
+    --tmpfs /run \
+    --volume /sys/fs/cgroup:/sys/fs/cgroup:ro \
+    --volume ${GITHUB_WORKSPACE}:${LDAPJDKDIR} \
+    -e LDAPJDKDIR="${LDAPJDKDIR}" \
+    --detach \
+    -i \
+    registry.fedoraproject.org/${IMAGE} \
+    "/usr/sbin/init"
