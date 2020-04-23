@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - gh-actions
   pull_request:
     branches:
       - master
@@ -68,7 +67,7 @@ jobs:
         run: tar -xzf ldapjdk-build-${{ matrix.os }}/ldapjdk-rpms.tar.gz
 
       - name: Setup required test environment
-        run: IMAGE=fedora:${{ matrix.os }} travis/container-init.sh
+        run: IMAGE=fedora:${{ matrix.os }} ci/container-init.sh
 
       - name: Install required packages
         run: |
@@ -83,10 +82,10 @@ jobs:
         run: docker exec -i ${CONTAINER} bash -c "find ${LDAPJDKDIR}/packages/ -name '*.rpm' | xargs dnf -y install"
     
       - name: Create DS instance
-        run: docker exec -i ${CONTAINER} ${LDAPJDKDIR}/travis/ds-create.sh
+        run: docker exec -i ${CONTAINER} ${LDAPJDKDIR}/ci/ds-create.sh
 
       - name: Run ldapjdk Tests
-        run: docker exec -i ${CONTAINER} ${LDAPJDKDIR}/travis/tools-test.sh
+        run: docker exec -i ${CONTAINER} ${LDAPJDKDIR}/ci/tools-test.sh
 
       - name: Remove DS instance
-        run: docker exec -i ${CONTAINER} ${LDAPJDKDIR}/travis/ds-remove.sh
+        run: docker exec -i ${CONTAINER} ${LDAPJDKDIR}/ci/ds-remove.sh
