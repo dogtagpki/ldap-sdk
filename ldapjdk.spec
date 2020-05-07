@@ -71,6 +71,8 @@ Requires:         jss >= 4.6.0
 The Mozilla LDAP SDKs enable you to write applications which access,
 manage, and update the information stored in an LDAP directory.
 
+%license docs/ldapjdk/license.txt
+
 ################################################################################
 %package javadoc
 ################################################################################
