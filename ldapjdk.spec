@@ -8,8 +8,8 @@ License:          MPLv1.1 or GPLv2+ or LGPLv2+
 
 BuildArch:        noarch
 
-Version:          4.21.0
-Release:          2%{?_timestamp}%{?_commit_id}%{?dist}
+Version:          4.22.0
+Release:          1%{?_timestamp}%{?_commit_id}%{?dist}
 # global           _phase -a1
 
 %global spname		ldapsp
