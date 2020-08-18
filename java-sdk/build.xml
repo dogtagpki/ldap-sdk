@@ -187,14 +187,20 @@
         <javac srcdir="${basedir}/ldapjdk/com" destdir="${jdk.dist}"
             excludes="cvs/**"
             classpath="${jsselibs}:${slf4j.lib}"
+            source="1.8"
+            target="1.8"
         />
         <javac srcdir="${basedir}/ldapjdk/netscape" destdir="${jdk.dist}"
             excludes="cvs/**"
             classpath="${jsselibs}:${slf4j.lib}"
+            source="1.8"
+            target="1.8"
         />
         <javac srcdir="${basedir}/tools" destdir="${jdk.dist}"
             excludes="cvs/**"
             classpath="${jsselibs}:${slf4j.lib}"
+            source="1.8"
+            target="1.8"
         />
       </target>
 
@@ -202,6 +208,8 @@
         <javac srcdir="${basedir}/ldapfilter" destdir="${filter.dist}"
             excludes="cvs/**"
             classpath="${jdk.dist}:${jsselibs}:${slf4j.lib}"
+            source="1.8"
+            target="1.8"
         />
       </target>
 
@@ -210,6 +218,8 @@
         <javac srcdir="${basedir}/ldapbeans" destdir="${jdk.dist}"
             excludes="cvs/**"
             classpath="${jsselibs}:${slf4j.lib}"
+            source="1.8"
+            target="1.8"
         />
       </target>
 
@@ -218,6 +228,8 @@
         <javac srcdir="${basedir}/ldapsp" destdir="${jndi.dist}"
             excludes="cvs/**"
             classpath="${jsselibs}:${basedir}/ldapsp/lib/jndi.jar:${slf4j.lib}"
+            source="1.8"
+            target="1.8"
         />
       </target>
 
