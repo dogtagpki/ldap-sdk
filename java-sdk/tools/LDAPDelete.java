@@ -36,11 +36,20 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import netscape.ldap.*;
-import netscape.ldap.util.*;
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Enumeration;
+import java.util.Vector;
+
+import netscape.ldap.LDAPConnection;
+import netscape.ldap.LDAPConstraints;
+import netscape.ldap.LDAPControl;
+import netscape.ldap.LDAPException;
+import netscape.ldap.util.GetOpt;
 
 /**
  * Executes the delete command to delete an LDAP entry.
@@ -66,7 +75,7 @@ import netscape.ldap.util.*;
  */
 
 public class LDAPDelete extends LDAPTool { /* LDAPDelete */
- 
+
     public static void main(String args[]) { /* main */
 
 		if ( args.length < 1 ) {
@@ -87,7 +96,7 @@ public class LDAPDelete extends LDAPTool { /* LDAPDelete */
 				System.err.println("Error: client connection failed!");
 				System.exit(1);
 			}
-	
+
 			/* perform an LDAP bind operation */
 			try {
 				m_client.authenticate( m_version, m_binddn, m_passwd );
@@ -151,7 +160,7 @@ public class LDAPDelete extends LDAPTool { /* LDAPDelete */
 			doUsage();
 			System.exit(0);
 		} /* Help */
-      
+
 		/* -c continuous mode */
 		if (options.hasOption('c')) {
 			m_cont = true;
@@ -164,25 +173,23 @@ public class LDAPDelete extends LDAPTool { /* LDAPDelete */
 				doUsage();
 				System.exit(0);
 			}
-				
+
 			try {
 				FileInputStream fs = new FileInputStream(filename);
 				DataInputStream ds = new DataInputStream(fs);
 				m_reader = new BufferedReader(new InputStreamReader(ds));
 			} catch (FileNotFoundException e) {
 				System.err.println("File "+filename+" not found");
-			} catch (IOException e) {
-				System.err.println("Error in opening the file "+filename);
 			}
 		} /* input file */
 
-		if (m_reader == null) { 
+		if (m_reader == null) {
 			Enumeration pa = options.getParameters().elements();
 			Vector vec = new Vector();
 			while (pa.hasMoreElements()) { /* while */
 				vec.addElement(pa.nextElement());
 			}
-			
+
 			if (vec.size() <= 0) {
 				doUsage();
 				System.exit(0);
@@ -223,7 +230,7 @@ public class LDAPDelete extends LDAPTool { /* LDAPDelete */
 	private static void dodelete(LDAPConstraints cons) {
 		try {
 		  if (m_reader == null) {
-			for (int i=0; i<m_delete_dn.length; i++) 
+			for (int i=0; i<m_delete_dn.length; i++)
 				if (!deleteEntry(m_delete_dn[i], cons) && !m_cont)
 					return;
 		  } else {
@@ -239,7 +246,7 @@ public class LDAPDelete extends LDAPTool { /* LDAPDelete */
 	}
 
 	private static boolean deleteEntry(String dn, LDAPConstraints cons) {
-		if (m_verbose) 
+		if (m_verbose)
 			System.err.println("Deleting entry: "+dn);
 		if (!m_justShow) {
 			try {
