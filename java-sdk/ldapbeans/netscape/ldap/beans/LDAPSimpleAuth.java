@@ -57,7 +57,6 @@ import java.awt.event.*;
  * form called "input":
  * <PRE>
  * <XMP>
- * <SCRIPT LANGUAGE="JavaScript">
  * function checkAuthentication() {
  *     auth = new Packages.netscape.ldap.beans.LDAPSimpleAuth();
  *     auth.setHost( document.input.host.value );
@@ -67,7 +66,6 @@ import java.awt.event.*;
  *     result = auth.authenticate();
  *     alert( "The response is: " + result );
  * }
- * </SCRIPT>
  * </XMP>
  *</PRE>
  */
