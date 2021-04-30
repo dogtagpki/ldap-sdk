@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry excluding="tools/" kind="src" path="java-sdk/ietfldap"/>
 	<classpathentry kind="src" path="java-sdk/ldapbeans"/>
 	<classpathentry kind="src" path="java-sdk/ldapfilter"/>
-	<classpathentry kind="src" path="java-sdk/ldapjdk"/>
+	<classpathentry kind="src" path="java-sdk/ldapjdk/src/main/java"/>
 	<classpathentry kind="src" path="java-sdk/ldapsp"/>
 	<classpathentry kind="src" path="java-sdk/tools"/>
 	<classpathentry kind="lib" path="/usr/lib/java/jss4.jar"/>

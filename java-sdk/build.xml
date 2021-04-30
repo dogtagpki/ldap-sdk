@@ -133,7 +133,7 @@
     <!-- copy errors property files in to dist area for jarfile inclusion -->
     <mkdir dir="${jdk.dist}/netscape/ldap/errors"/>
     <copy todir="${jdk.dist}/netscape/ldap/errors">
-      <fileset dir="${basedir}/ldapjdk/netscape/ldap/errors">
+      <fileset dir="${basedir}/ldapjdk/src/main/resources/netscape/ldap/errors">
         <include name="*.props"/>
       </fileset>
     </copy>
@@ -184,13 +184,7 @@
 
     <target name="build-jdk" depends="init">
         <!-- Compile the java jdk code from ${src} into ${dest} -->
-        <javac srcdir="${basedir}/ldapjdk/com" destdir="${jdk.dist}"
-            excludes="cvs/**"
-            classpath="${jsselibs}:${slf4j.lib}"
-            source="1.8"
-            target="1.8"
-        />
-        <javac srcdir="${basedir}/ldapjdk/netscape" destdir="${jdk.dist}"
+        <javac srcdir="${basedir}/ldapjdk/src/main/java" destdir="${jdk.dist}"
             excludes="cvs/**"
             classpath="${jsselibs}:${slf4j.lib}"
             source="1.8"
@@ -238,7 +232,7 @@
         
         <javadoc 
                 packagenames="netscape.ldap.*,netscape.ldap.beans.*,netscape.ldap.controls.*,netscape.ldap.util.*,netscape.ldap.factory.*,com.netscape.sasl.*,com.netscape.sasl.mechanisms.*,netscape.ldap.ber.stream.*"
-                 sourcepath="${basedir}/ldapbeans:${basedir}/ldapjdk"
+                 sourcepath="${basedir}/ldapbeans:${basedir}/ldapjdk/src/main/java"
                  sourcefiles="${basedir}/tools/LDAPDelete.java,${basedir}/tools/LDAPModify.java,${basedir}/tools/LDAPSearch.java,${basedir}/tools/LDAPTool.java"
                  destdir="${doc.dist}"
                  author="true"
