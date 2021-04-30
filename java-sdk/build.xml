@@ -190,12 +190,6 @@
             source="1.8"
             target="1.8"
         />
-        <javac srcdir="${basedir}/tools" destdir="${jdk.dist}"
-            excludes="cvs/**"
-            classpath="${jsselibs}:${slf4j.lib}"
-            source="1.8"
-            target="1.8"
-        />
       </target>
 
     <target name="build-filter" depends="init,build-jdk">
@@ -233,7 +227,7 @@
         <javadoc 
                 packagenames="netscape.ldap.*,netscape.ldap.beans.*,netscape.ldap.controls.*,netscape.ldap.util.*,netscape.ldap.factory.*,com.netscape.sasl.*,com.netscape.sasl.mechanisms.*,netscape.ldap.ber.stream.*"
                  sourcepath="${basedir}/ldapbeans:${basedir}/ldapjdk/src/main/java"
-                 sourcefiles="${basedir}/tools/LDAPDelete.java,${basedir}/tools/LDAPModify.java,${basedir}/tools/LDAPSearch.java,${basedir}/tools/LDAPTool.java"
+                 sourcefiles="${basedir}/ldapjdk/src/main/java/LDAPDelete.java,${basedir}/ldapjdk/src/main/java/LDAPModify.java,${basedir}/ldapjdk/src/main/java/LDAPSearch.java,${basedir}/ldapjdk/src/main/java/LDAPTool.java"
                  destdir="${doc.dist}"
                  author="true"
                  version="true"
