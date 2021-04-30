@@ -124,9 +124,15 @@ pushd $RPM_BUILD_ROOT%{_javadir}-1.3.0
 popd
 
 mkdir -p %{buildroot}%{_mavenpomdir}
-sed -i 's/@VERSION@/%{version}/g' %{name}.pom
-install -pm 644 %{name}.pom %{buildroot}%{_mavenpomdir}/JPP-%{name}.pom
-%add_maven_depmap JPP-%{name}.pom %{name}.jar -a "ldapsdk:ldapsdk"
+install -pm 644 java-sdk/ldapjdk/pom.xml %{buildroot}%{_mavenpomdir}/JPP-ldapjdk.pom
+install -pm 644 java-sdk/ldapfilter/pom.xml %{buildroot}%{_mavenpomdir}/JPP-ldapfilter.pom
+install -pm 644 java-sdk/ldapbeans/pom.xml %{buildroot}%{_mavenpomdir}/JPP-ldapbeans.pom
+install -pm 644 java-sdk/ldapsp/pom.xml %{buildroot}%{_mavenpomdir}/JPP-ldapsp.pom
+
+%add_maven_depmap JPP-ldapjdk.pom ldapjdk.jar -a "ldapsdk:ldapsdk"
+%add_maven_depmap JPP-ldapfilter.pom ldapfilt.jar
+%add_maven_depmap JPP-ldapbeans.pom ldapbeans.jar
+%add_maven_depmap JPP-ldapsp.pom ldapsp.jar
 
 install -d -m 755 $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 cp -r java-sdk/dist/doc/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}

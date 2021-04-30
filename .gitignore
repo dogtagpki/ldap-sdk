@@ -5,7 +5,7 @@
 TAGS
 Makefile
 now
-
+target/
 
 # User files that may appear at the root
 **/config/.cache
