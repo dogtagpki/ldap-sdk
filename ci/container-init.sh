@@ -1,7 +1,5 @@
 #!/bin/bash -ex
 
-docker pull registry.fedoraproject.org/${IMAGE}
-
 docker run \
     --name ${CONTAINER} \
     --hostname server.example.com \
@@ -12,5 +10,10 @@ docker run \
     -e LDAPJDKDIR="${LDAPJDKDIR}" \
     --detach \
     -i \
-    registry.fedoraproject.org/${IMAGE} \
-    "/usr/sbin/init"
+    ${IMAGE}
+
+# Pause 5 seconds to let the container start up.
+# The container uses /usr/sbin/init as its entrypoint which requires few seconds
+# to startup. This avoids the following error:
+# [Errno 2] No such file or directory: '/var/cache/dnf/metadata_lock.pid'
+sleep 5

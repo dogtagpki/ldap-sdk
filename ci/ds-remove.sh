@@ -1,3 +1,3 @@
-#!/bin/bash -e
+#!/bin/bash -ex
 
-remove-ds.pl -f -i slapd-localhost
+dsctl slapd-localhost remove --do-it

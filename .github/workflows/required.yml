@@ -1,86 +1,73 @@
 name: Required Tests
 
-on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
+on: [push, pull_request]
 
 jobs:
   build:
     name: Build
     strategy:
       matrix:
-        os: ['30', '31']
+        os: ['32', '33']
     runs-on: ubuntu-latest
-    container: fedora:${{ matrix.os }}
+    env:
+      COPR_REPO: "@pki/master"
     steps:
-
-    - name: Install required packages
-      run: dnf install -y dnf-plugins-core rpm-build git
-
-    - name: Clone the repository
-      uses: actions/checkout@v2
+      - name: Clone the repository
+        uses: actions/checkout@v2
     
-    - name: Enable PKI COPR repo
-      run: dnf copr -y enable @pki/master
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
 
-    - name: Installed build deps
-      run: dnf builddep -y --spec ldapjdk.spec
+      - name: Build runner image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          build-args: |
+            OS_VERSION=${{ matrix.os }}
+            COPR_REPO=${{ env.COPR_REPO }}
+            BUILD_OPTS=--with-timestamp --with-commit-id
+          tags: ldapjdk-runner
+          target: ldapjdk-runner
+          outputs: type=docker,dest=/tmp/ldapjdk-runner.tar
 
-    - name: Build artifacts
-      run: ./build.sh --with-timestamp --with-commit-id --work-dir=../packages rpm
-    
-    - name: Compress RPMS
-      run: tar -czf ldapjdk-rpms.tar.gz ../packages/RPMS/*
-
-    # upload-artifact runs on host-vm rather than inside the container. Fixed in v2 (unreleased)
-    # Bug: https://github.com/actions/upload-artifact/issues/13#issuecomment-532936650
-    - name: Upload RPM artifacts
-      uses: actions/upload-artifact@v1
-      with:
-        name: ldapjdk-build-${{ matrix.os }}
-        path: ldapjdk-rpms.tar.gz
+      - name: Upload runner image
+        uses: actions/upload-artifact@v2
+        with:
+          name: ldapjdk-runner-${{ matrix.os }}
+          path: /tmp/ldapjdk-runner.tar
 
   test:
     name: Tests
     needs: build
     strategy:
       matrix:
-        os: ['30', '31']
+        os: ['32', '33']
     runs-on: ubuntu-latest
     env:
       LDAPJDKDIR: /tmp/workdir/ldapjdk
       CONTAINER: ldapjdk-test
+      COPR_REPO: "@pki/master"
     steps:
       - name: Clone the repository
         uses: actions/checkout@v2
 
-      - name: Download ldapjdk binaries from Build job
-        uses: actions/download-artifact@v1
+      - name: Download runner image
+        uses: actions/download-artifact@v2
         with:
-          name: ldapjdk-build-${{ matrix.os }}
+          name: ldapjdk-runner-${{ matrix.os }}
+          path: /tmp
 
-      - name: Extract tar.gz for rpms
-        run: tar -xzf ldapjdk-build-${{ matrix.os }}/ldapjdk-rpms.tar.gz
+      - name: Load runner image
+        run: docker load --input /tmp/ldapjdk-runner.tar
 
       - name: Setup required test environment
-        run: IMAGE=fedora:${{ matrix.os }} ci/container-init.sh
-
-      - name: Install required packages
         run: |
-             docker exec -i ${CONTAINER} rm -f /var/cache/dnf/metadata_lock.pid
-             docker exec -i ${CONTAINER} bash -c "dnf update -y && dnf clean all"
-             docker exec -i ${CONTAINER} dnf install -y 389-ds-base-legacy-tools findutils dnf-plugins-core sudo 389-ds-base
+          IMAGE=ldapjdk-runner \
+          ci/container-init.sh
 
-      - name: Enable PKI COPR repo
-        run: docker exec -i ${CONTAINER} dnf copr -y enable @pki/master
+      - name: Install dependencies
+        run: docker exec -i ${CONTAINER} dnf install -y 389-ds-base
 
-      - name: Install ldapjdk packages from Build job
-        run: docker exec -i ${CONTAINER} bash -c "find ${LDAPJDKDIR}/packages/ -name '*.rpm' | xargs dnf -y install"
-    
       - name: Create DS instance
         run: docker exec -i ${CONTAINER} ${LDAPJDKDIR}/ci/ds-create.sh
 
