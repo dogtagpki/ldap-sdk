@@ -193,7 +193,7 @@
       </target>
 
     <target name="build-filter" depends="init,build-jdk">
-        <javac srcdir="${basedir}/ldapfilter" destdir="${filter.dist}"
+        <javac srcdir="${basedir}/ldapfilter/src/main/java" destdir="${filter.dist}"
             excludes="cvs/**"
             classpath="${jdk.dist}:${jsselibs}:${slf4j.lib}"
             source="1.8"
