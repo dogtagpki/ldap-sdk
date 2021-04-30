@@ -8,7 +8,7 @@ License:          MPLv1.1 or GPLv2+ or LGPLv2+
 
 BuildArch:        noarch
 
-Version:          4.22.0
+Version:          4.22.1
 Release:          1%{?_timestamp}%{?_commit_id}%{?dist}
 # global           _phase -a1
 
