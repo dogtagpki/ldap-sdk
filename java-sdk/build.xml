@@ -213,7 +213,7 @@
 
     <target name="build-jndi" depends="init,build-jdk">
         <!-- Compile the java code from ${src} into ${dest} -->
-        <javac srcdir="${basedir}/ldapsp" destdir="${jndi.dist}"
+        <javac srcdir="${basedir}/ldapsp/src/main/java" destdir="${jndi.dist}"
             excludes="cvs/**"
             classpath="${jsselibs}:${basedir}/ldapsp/lib/jndi.jar:${slf4j.lib}"
             source="1.8"
@@ -237,7 +237,7 @@
         </javadoc>
 
         <javadoc packagenames="com.netscape.jndi.ldap.controls.*"
-                sourcepath="${basedir}/ldapsp"    
+                sourcepath="${basedir}/ldapsp/src/main/java"
                 destdir="${doc.dist}/ldapsp"
                 classpath="${jndi.dist}:${basedir}/ldapsp:${basedir}/ldapsp/lib/jndi.jar:${slf4j.lib}"
                 author="true"
