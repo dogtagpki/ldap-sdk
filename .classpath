@@ -6,7 +6,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry excluding="tools/" kind="src" path="java-sdk/ietfldap"/>
-	<classpathentry kind="src" path="java-sdk/ldapbeans"/>
+	<classpathentry kind="src" path="java-sdk/ldapbeans/src/main/java"/>
 	<classpathentry kind="src" path="java-sdk/ldapfilter/src/main/java"/>
 	<classpathentry kind="src" path="java-sdk/ldapjdk/src/main/java"/>
 	<classpathentry kind="src" path="java-sdk/ldapsp"/>

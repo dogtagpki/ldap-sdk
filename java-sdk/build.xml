@@ -203,7 +203,7 @@
 
     <target name="build-beans" depends="init">
         <!-- Compile the java jdk bean code from ${src} into ${dest} -->
-        <javac srcdir="${basedir}/ldapbeans" destdir="${jdk.dist}"
+        <javac srcdir="${basedir}/ldapbeans/src/main/java" destdir="${jdk.dist}"
             excludes="cvs/**"
             classpath="${jsselibs}:${slf4j.lib}"
             source="1.8"
@@ -226,7 +226,7 @@
         
         <javadoc 
                 packagenames="netscape.ldap.*,netscape.ldap.beans.*,netscape.ldap.controls.*,netscape.ldap.util.*,netscape.ldap.factory.*,com.netscape.sasl.*,com.netscape.sasl.mechanisms.*,netscape.ldap.ber.stream.*"
-                 sourcepath="${basedir}/ldapbeans:${basedir}/ldapjdk/src/main/java"
+                 sourcepath="${basedir}/ldapbeans/src/main/java:${basedir}/ldapjdk/src/main/java"
                  sourcefiles="${basedir}/ldapjdk/src/main/java/LDAPDelete.java,${basedir}/ldapjdk/src/main/java/LDAPModify.java,${basedir}/ldapjdk/src/main/java/LDAPSearch.java,${basedir}/ldapjdk/src/main/java/LDAPTool.java"
                  destdir="${doc.dist}"
                  author="true"
