@@ -7,7 +7,7 @@ jobs:
     name: Build
     strategy:
       matrix:
-        os: ['32', '33']
+        os: ['33', '34']
     runs-on: ubuntu-latest
     env:
       COPR_REPO: "@pki/master"
@@ -41,7 +41,7 @@ jobs:
     needs: build
     strategy:
       matrix:
-        os: ['32', '33']
+        os: ['33', '34']
     runs-on: ubuntu-latest
     env:
       LDAPJDKDIR: /tmp/workdir/ldapjdk
