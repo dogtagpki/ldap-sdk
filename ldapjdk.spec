@@ -35,9 +35,6 @@ Source: https://github.com/dogtagpki/ldap-sdk/archive/v%{version}%{?_phase}/ldap
 # Build Dependencies
 ################################################################################
 
-# autosetup
-BuildRequires:    git
-
 BuildRequires:    ant
 BuildRequires:    java-devel
 %if 0%{?rhel} && 0%{?rhel} <= 7
@@ -86,7 +83,7 @@ Javadoc for %{name}
 %prep
 ################################################################################
 
-%autosetup -n ldap-sdk-%{version}%{?_phase} -p 1 -S git
+%setup -q -n ldap-sdk-%{version}%{?_phase}
 
 # Remove all bundled jars, we must build against build-system jars
 rm -f ./java-sdk/ldapjdk/lib/{jss32_stub,jsse,jnet,jaas,jndi}.jar
