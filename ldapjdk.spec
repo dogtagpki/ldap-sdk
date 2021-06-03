@@ -32,11 +32,19 @@ Source: https://github.com/dogtagpki/ldap-sdk/archive/v%{version}%{?_phase}/ldap
 # Patch: ldap-sdk-VERSION-RELEASE.patch
 
 ################################################################################
+# Java
+################################################################################
+
+%define java_devel java-11-openjdk-devel
+%define java_headless java-11-openjdk-headless
+%define java_home /usr/lib/jvm/java-11-openjdk
+
+################################################################################
 # Build Dependencies
 ################################################################################
 
 BuildRequires:    ant
-BuildRequires:    java-devel
+BuildRequires:    %{java_devel}
 %if 0%{?rhel} && 0%{?rhel} <= 7
 BuildRequires:	  jpackage-utils >= 0:1.5
 %else
@@ -54,6 +62,7 @@ BuildRequires:    jss >= 4.6.0
 # Runtime Dependencies
 ################################################################################
 
+Requires:         %{java_headless}
 Requires:         jpackage-utils >= 0:1.5
 Requires:         slf4j
 %if 0%{?rhel} && 0%{?rhel} <= 7
@@ -99,7 +108,7 @@ popd
 ln -s /usr/lib/jvm-exports/java/{jsse,jaas,jndi}.jar java-sdk/ldapjdk/lib
 
 pushd java-sdk
-if [ ! -e "$JAVA_HOME" ] ; then export JAVA_HOME="%{_jvmdir}/java" ; fi
+export JAVA_HOME=%{java_home}
 sh -x ant dist
 popd
 
