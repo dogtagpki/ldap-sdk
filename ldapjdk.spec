@@ -95,17 +95,16 @@ rm -f ./java-sdk/ldapjdk/lib/{jss32_stub,jsse,jnet,jaas,jndi}.jar
 %build
 ################################################################################
 
-# Link to build-system BRs
-pwd
-%if 0%{?rhel} && 0%{?rhel} <= 7
-( cd  java-sdk/ldapjdk/lib && build-jar-repository -s -p . jss4 jsse jaas jndi )
-%else
-( cd  java-sdk/ldapjdk/lib && build-jar-repository -s -p . jss4 )
+pushd java-sdk/ldapjdk/lib
+build-jar-repository -s -p . jss4
+popd
+
 ln -s /usr/lib/jvm-exports/java/{jsse,jaas,jndi}.jar java-sdk/ldapjdk/lib
-%endif
-cd java-sdk
+
+pushd java-sdk
 if [ ! -e "$JAVA_HOME" ] ; then export JAVA_HOME="%{_jvmdir}/java" ; fi
 sh -x ant dist
+popd
 
 ################################################################################
 %install
@@ -117,34 +116,27 @@ install -m 644 java-sdk/dist/packages/%{spname}.jar $RPM_BUILD_ROOT%{_javadir}/%
 install -m 644 java-sdk/dist/packages/%{filtname}.jar $RPM_BUILD_ROOT%{_javadir}/%{filtname}.jar
 install -m 644 java-sdk/dist/packages/%{beansname}.jar $RPM_BUILD_ROOT%{_javadir}/%{beansname}.jar
 
-install -d -m 755 $RPM_BUILD_ROOT%{_javadir}-1.3.0
-
-pushd $RPM_BUILD_ROOT%{_javadir}-1.3.0
-	ln -fs ../java/*%{spname}.jar jndi-ldap.jar
-popd
-
 mkdir -p %{buildroot}%{_mavenpomdir}
 install -pm 644 java-sdk/ldapjdk/pom.xml %{buildroot}%{_mavenpomdir}/JPP-ldapjdk.pom
 install -pm 644 java-sdk/ldapfilter/pom.xml %{buildroot}%{_mavenpomdir}/JPP-ldapfilter.pom
 install -pm 644 java-sdk/ldapbeans/pom.xml %{buildroot}%{_mavenpomdir}/JPP-ldapbeans.pom
 install -pm 644 java-sdk/ldapsp/pom.xml %{buildroot}%{_mavenpomdir}/JPP-ldapsp.pom
 
-%add_maven_depmap JPP-ldapjdk.pom ldapjdk.jar -a "ldapsdk:ldapsdk"
-%add_maven_depmap JPP-ldapfilter.pom ldapfilt.jar
-%add_maven_depmap JPP-ldapbeans.pom ldapbeans.jar
-%add_maven_depmap JPP-ldapsp.pom ldapsp.jar
-
 install -d -m 755 $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 cp -r java-sdk/dist/doc/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 
 ################################################################################
-%files -f .mfiles
+%files
 ################################################################################
 
+%{_javadir}/%{name}.jar
 %{_javadir}/%{spname}*.jar
 %{_javadir}/%{filtname}*.jar
 %{_javadir}/%{beansname}*.jar
-%{_javadir}-1.3.0/*.jar
+%{_mavenpomdir}/JPP-ldapjdk.pom
+%{_mavenpomdir}/JPP-ldapsp.pom
+%{_mavenpomdir}/JPP-ldapfilter.pom
+%{_mavenpomdir}/JPP-ldapbeans.pom
 
 ################################################################################
 %files javadoc
