@@ -8,9 +8,11 @@ License:          MPLv1.1 or GPLv2+ or LGPLv2+
 
 BuildArch:        noarch
 
-Version:          4.22.1
-Release:          1%{?_timestamp}%{?_commit_id}%{?dist}
-# global           _phase -a1
+# For development (i.e. unsupported) releases, use x.y.z-0.n.<phase>.
+# For official (i.e. supported) releases, use x.y.z-r where r >=1.
+Version:          4.23.0
+Release:          0.1.alpha1%{?_timestamp}%{?_commit_id}%{?dist}
+%global           _phase -alpha1
 
 %global spname		ldapsp
 %global filtname	ldapfilt
@@ -92,7 +94,7 @@ Javadoc for %{name}
 %prep
 ################################################################################
 
-%setup -q -n ldap-sdk-%{version}%{?_phase}
+%autosetup -n ldap-sdk-%{version}%{?_phase} -p 1
 
 # Remove all bundled jars, we must build against build-system jars
 rm -f ./java-sdk/ldapjdk/lib/{jss32_stub,jsse,jnet,jaas,jndi}.jar
