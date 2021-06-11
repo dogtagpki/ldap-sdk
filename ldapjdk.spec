@@ -37,9 +37,15 @@ Source: https://github.com/dogtagpki/ldap-sdk/archive/v%{version}%{?_phase}/ldap
 # Java
 ################################################################################
 
+%if 0%{?fedora} && 0%{?fedora} <= 32 || 0%{?rhel} && 0%{?rhel} <= 8
+%define java_devel java-1.8.0-openjdk-devel
+%define java_headless java-1.8.0-openjdk-headless
+%define java_home /usr/lib/jvm/java-1.8.0-openjdk
+%else
 %define java_devel java-11-openjdk-devel
 %define java_headless java-11-openjdk-headless
-%define java_home /usr/lib/jvm/jre-11-openjdk
+%define java_home /usr/lib/jvm/java-11-openjdk
+%endif
 
 ################################################################################
 # Build Dependencies
@@ -47,17 +53,9 @@ Source: https://github.com/dogtagpki/ldap-sdk/archive/v%{version}%{?_phase}/ldap
 
 BuildRequires:    ant
 BuildRequires:    %{java_devel}
-%if 0%{?rhel} && 0%{?rhel} <= 7
-BuildRequires:	  jpackage-utils >= 0:1.5
-%else
 BuildRequires:    javapackages-local
-%endif
 BuildRequires:    slf4j
-%if 0%{?rhel} && 0%{?rhel} <= 7
-# no slf4j-jdk14
-%else
 BuildRequires:    slf4j-jdk14
-%endif
 BuildRequires:    jss >= 4.6.0
 
 ################################################################################
@@ -67,13 +65,8 @@ BuildRequires:    jss >= 4.6.0
 Requires:         %{java_headless}
 Requires:         jpackage-utils >= 0:1.5
 Requires:         slf4j
-%if 0%{?rhel} && 0%{?rhel} <= 7
-# no slf4j-jdk14
-%else
 Requires:         slf4j-jdk14
-%endif
 Requires:         jss >= 4.6.0
-
 
 %description
 The Mozilla LDAP SDKs enable you to write applications which access,
