@@ -34,7 +34,7 @@ jobs:
     steps:
       - name: Clone the repository
         uses: actions/checkout@v2
-    
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
@@ -61,8 +61,7 @@ jobs:
     needs: [init, build]
     runs-on: ubuntu-latest
     env:
-      LDAPJDKDIR: /tmp/workdir/ldapjdk
-      CONTAINER: ldapjdk-test
+      SHARED: /tmp/workdir/ldapjdk
       COPR_REPO: "@pki/master"
     strategy:
       matrix: ${{ fromJSON(needs.init.outputs.matrix) }}
@@ -79,19 +78,34 @@ jobs:
       - name: Load runner image
         run: docker load --input /tmp/ldapjdk-runner.tar
 
-      - name: Setup required test environment
+      - name: Run container
         run: |
           IMAGE=ldapjdk-runner \
-          tests/bin/container-init.sh
+          NAME=ds \
+          HOSTNAME=ds.example.com \
+          tests/bin/runner-init.sh
 
-      - name: Install dependencies
-        run: docker exec -i ${CONTAINER} dnf install -y 389-ds-base
+      - name: Install DS package
+        run: docker exec ds dnf install -y 389-ds-base
 
       - name: Create DS instance
-        run: docker exec -i ${CONTAINER} ${LDAPJDKDIR}/tests/bin/ds-create.sh
+        run: docker exec ds ${SHARED}/tests/bin/ds-create.sh
 
-      - name: Run ldapjdk Tests
-        run: docker exec -i ${CONTAINER} ${LDAPJDKDIR}/tests/bin/tools-test.sh
+      - name: Verify LDAP tools
+        run: docker exec ds ${SHARED}/tests/bin/tools-test.sh
+
+      - name: Gather artifacts
+        if: always()
+        run: |
+          tests/bin/ds-artifacts-save.sh ds
 
       - name: Remove DS instance
-        run: docker exec -i ${CONTAINER} ${LDAPJDKDIR}/tests/bin/ds-remove.sh
+        run: docker exec ds ${SHARED}/tests/bin/ds-remove.sh
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: ds-${{ matrix.os }}
+          path: |
+            /tmp/artifacts/ds
