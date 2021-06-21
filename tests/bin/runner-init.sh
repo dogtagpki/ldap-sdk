@@ -1,14 +1,14 @@
 #!/bin/bash -ex
 
 docker run \
-    --name ${CONTAINER} \
-    --hostname server.example.com \
+    --name=${NAME} \
+    --hostname=${HOSTNAME} \
+    --detach \
+    --privileged \
     --tmpfs /tmp \
     --tmpfs /run \
-    --volume /sys/fs/cgroup:/sys/fs/cgroup:ro \
-    --volume ${GITHUB_WORKSPACE}:${LDAPJDKDIR} \
-    -e LDAPJDKDIR="${LDAPJDKDIR}" \
-    --detach \
+    -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
+    -v ${GITHUB_WORKSPACE}:${SHARED} \
     -i \
     ${IMAGE}
 
