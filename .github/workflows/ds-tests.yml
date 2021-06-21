@@ -1,4 +1,4 @@
-name: Required Tests
+name: DS Tests
 
 on: [push, pull_request]
 
@@ -24,7 +24,7 @@ jobs:
           fi
 
   build:
-    name: Build
+    name: Building LDAP SDK
     needs: init
     runs-on: ubuntu-latest
     env:
@@ -56,8 +56,8 @@ jobs:
           name: ldapjdk-runner-${{ matrix.os }}
           path: /tmp/ldapjdk-runner.tar
 
-  test:
-    name: Tests
+  ds-test:
+    name: Testing DS
     needs: [init, build]
     runs-on: ubuntu-latest
     env:
