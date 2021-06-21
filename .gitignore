@@ -19,5 +19,5 @@ sdkver.h
 dirver.h
 
 # Ignore Eclipse build directory
-bin
+/bin
 /build/

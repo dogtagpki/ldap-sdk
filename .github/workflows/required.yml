@@ -82,16 +82,16 @@ jobs:
       - name: Setup required test environment
         run: |
           IMAGE=ldapjdk-runner \
-          ci/container-init.sh
+          tests/bin/container-init.sh
 
       - name: Install dependencies
         run: docker exec -i ${CONTAINER} dnf install -y 389-ds-base
 
       - name: Create DS instance
-        run: docker exec -i ${CONTAINER} ${LDAPJDKDIR}/ci/ds-create.sh
+        run: docker exec -i ${CONTAINER} ${LDAPJDKDIR}/tests/bin/ds-create.sh
 
       - name: Run ldapjdk Tests
-        run: docker exec -i ${CONTAINER} ${LDAPJDKDIR}/ci/tools-test.sh
+        run: docker exec -i ${CONTAINER} ${LDAPJDKDIR}/tests/bin/tools-test.sh
 
       - name: Remove DS instance
-        run: docker exec -i ${CONTAINER} ${LDAPJDKDIR}/ci/ds-remove.sh
+        run: docker exec -i ${CONTAINER} ${LDAPJDKDIR}/tests/bin/ds-remove.sh
