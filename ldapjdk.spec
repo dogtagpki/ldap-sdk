@@ -37,15 +37,9 @@ Source: https://github.com/dogtagpki/ldap-sdk/archive/v%{version}%{?_phase}/ldap
 # Java
 ################################################################################
 
-%if 0%{?fedora} && 0%{?fedora} <= 32 || 0%{?rhel} && 0%{?rhel} <= 8
-%define java_devel java-1.8.0-openjdk-devel
-%define java_headless java-1.8.0-openjdk-headless
-%define java_home /usr/lib/jvm/java-1.8.0-openjdk
-%else
 %define java_devel java-11-openjdk-devel
 %define java_headless java-11-openjdk-headless
 %define java_home /usr/lib/jvm/java-11-openjdk
-%endif
 
 ################################################################################
 # Build Dependencies
