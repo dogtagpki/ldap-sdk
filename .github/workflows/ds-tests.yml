@@ -28,7 +28,7 @@ jobs:
     needs: init
     runs-on: ubuntu-latest
     env:
-      COPR_REPO: "@pki/master"
+      COPR_REPO: "@pki/10.11"
     strategy:
       matrix: ${{ fromJSON(needs.init.outputs.matrix) }}
     steps:
@@ -62,7 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SHARED: /tmp/workdir/ldapjdk
-      COPR_REPO: "@pki/master"
+      COPR_REPO: "@pki/10.11"
     strategy:
       matrix: ${{ fromJSON(needs.init.outputs.matrix) }}
     steps:
