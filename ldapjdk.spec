@@ -48,7 +48,7 @@ BuildRequires:    slf4j
 %else
 BuildRequires:    slf4j-jdk14
 %endif
-BuildRequires:    jss >= 4.6.0
+BuildRequires:    jss >= 4.8.0, jss < 5.0.0
 
 ################################################################################
 # Runtime Dependencies
@@ -61,7 +61,7 @@ Requires:         slf4j
 %else
 Requires:         slf4j-jdk14
 %endif
-Requires:         jss >= 4.6.0
+Requires:         jss >= 4.8.0, jss < 5.0.0
 
 
 %description
