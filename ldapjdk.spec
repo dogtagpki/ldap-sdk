@@ -56,7 +56,7 @@ BuildRequires:    %{java_devel}
 BuildRequires:    javapackages-local
 BuildRequires:    slf4j
 BuildRequires:    slf4j-jdk14
-BuildRequires:    jss >= 4.6.0
+BuildRequires:    jss >= 4.9.0, jss < 5.0.0
 
 ################################################################################
 # Runtime Dependencies
@@ -66,7 +66,7 @@ Requires:         %{java_headless}
 Requires:         jpackage-utils >= 0:1.5
 Requires:         slf4j
 Requires:         slf4j-jdk14
-Requires:         jss >= 4.6.0
+Requires:         jss >= 4.9.0, jss < 5.0.0
 
 %description
 The Mozilla LDAP SDKs enable you to write applications which access,
