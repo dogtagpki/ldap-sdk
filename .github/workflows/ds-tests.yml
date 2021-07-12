@@ -10,7 +10,7 @@ jobs:
         os: ['32', '33']
     runs-on: ubuntu-latest
     env:
-      COPR_REPO: "@pki/master"
+      COPR_REPO: "@pki/10.10"
     steps:
       - name: Clone the repository
         uses: actions/checkout@v2
@@ -46,7 +46,7 @@ jobs:
     env:
       LDAPJDKDIR: /tmp/workdir/ldapjdk
       CONTAINER: ldapjdk-test
-      COPR_REPO: "@pki/master"
+      COPR_REPO: "@pki/10.10"
     steps:
       - name: Clone the repository
         uses: actions/checkout@v2
