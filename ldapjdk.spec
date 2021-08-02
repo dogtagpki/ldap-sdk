@@ -14,10 +14,6 @@ Version:          5.0.0
 Release:          0.1.alpha1%{?_timestamp}%{?_commit_id}%{?dist}
 %global           _phase -alpha1
 
-%global spname		ldapsp
-%global filtname	ldapfilt
-%global beansname	ldapbeans
-
 # To create a tarball from a version tag:
 # $ git archive \
 #     --format=tar.gz \
@@ -72,10 +68,10 @@ manage, and update the information stored in an LDAP directory.
 %package javadoc
 ################################################################################
 
-Summary:        Javadoc for %{name}
+Summary:        Javadoc for LDAP SDK
 
 %description javadoc
-Javadoc for %{name}
+Javadoc for LDAP SDK
 
 ################################################################################
 %prep
@@ -97,10 +93,10 @@ popd
 ################################################################################
 
 install -d -m 755 $RPM_BUILD_ROOT%{_javadir}
-install -m 644 java-sdk/dist/packages/%{name}.jar $RPM_BUILD_ROOT%{_javadir}/%{name}.jar
-install -m 644 java-sdk/dist/packages/%{spname}.jar $RPM_BUILD_ROOT%{_javadir}/%{spname}.jar
-install -m 644 java-sdk/dist/packages/%{filtname}.jar $RPM_BUILD_ROOT%{_javadir}/%{filtname}.jar
-install -m 644 java-sdk/dist/packages/%{beansname}.jar $RPM_BUILD_ROOT%{_javadir}/%{beansname}.jar
+install -m 644 java-sdk/dist/packages/ldapjdk.jar $RPM_BUILD_ROOT%{_javadir}/ldapjdk.jar
+install -m 644 java-sdk/dist/packages/ldapsp.jar $RPM_BUILD_ROOT%{_javadir}/ldapsp.jar
+install -m 644 java-sdk/dist/packages/ldapfilt.jar $RPM_BUILD_ROOT%{_javadir}/ldapfilt.jar
+install -m 644 java-sdk/dist/packages/ldapbeans.jar $RPM_BUILD_ROOT%{_javadir}/ldapbeans.jar
 
 mkdir -p %{buildroot}%{_mavenpomdir}
 install -pm 644 java-sdk/ldapjdk/pom.xml %{buildroot}%{_mavenpomdir}/JPP-ldapjdk.pom
@@ -108,17 +104,17 @@ install -pm 644 java-sdk/ldapfilter/pom.xml %{buildroot}%{_mavenpomdir}/JPP-ldap
 install -pm 644 java-sdk/ldapbeans/pom.xml %{buildroot}%{_mavenpomdir}/JPP-ldapbeans.pom
 install -pm 644 java-sdk/ldapsp/pom.xml %{buildroot}%{_mavenpomdir}/JPP-ldapsp.pom
 
-install -d -m 755 $RPM_BUILD_ROOT%{_javadocdir}/%{name}
-cp -r java-sdk/dist/doc/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}
+install -d -m 755 $RPM_BUILD_ROOT%{_javadocdir}/ldapjdk
+cp -r java-sdk/dist/doc/* $RPM_BUILD_ROOT%{_javadocdir}/ldapjdk
 
 ################################################################################
 %files
 ################################################################################
 
-%{_javadir}/%{name}.jar
-%{_javadir}/%{spname}*.jar
-%{_javadir}/%{filtname}*.jar
-%{_javadir}/%{beansname}*.jar
+%{_javadir}/ldapjdk.jar
+%{_javadir}/ldapsp.jar
+%{_javadir}/ldapfilt.jar
+%{_javadir}/ldapbeans.jar
 %{_mavenpomdir}/JPP-ldapjdk.pom
 %{_mavenpomdir}/JPP-ldapsp.pom
 %{_mavenpomdir}/JPP-ldapfilter.pom
@@ -128,8 +124,8 @@ cp -r java-sdk/dist/doc/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 %files javadoc
 ################################################################################
 
-%dir %{_javadocdir}/%{name}
-%{_javadocdir}/%{name}/*
+%dir %{_javadocdir}/ldapjdk
+%{_javadocdir}/ldapjdk/*
 
 ################################################################################
 %changelog
