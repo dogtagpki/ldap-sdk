@@ -87,12 +87,6 @@ Javadoc for %{name}
 %build
 ################################################################################
 
-pushd java-sdk/ldapjdk/lib
-build-jar-repository -s -p . jss
-popd
-
-ln -s /usr/lib/jvm-exports/java/{jsse,jaas,jndi}.jar java-sdk/ldapjdk/lib
-
 pushd java-sdk
 export JAVA_HOME=%{java_home}
 sh -x ant dist
