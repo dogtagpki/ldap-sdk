@@ -83,9 +83,6 @@ Javadoc for %{name}
 
 %autosetup -n ldap-sdk-%{version}%{?_phase} -p 1
 
-# Remove all bundled jars, we must build against build-system jars
-rm -f ./java-sdk/ldapjdk/lib/{jss32_stub,jsse,jnet,jaas,jndi}.jar
-
 ################################################################################
 %build
 ################################################################################
