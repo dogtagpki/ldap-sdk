@@ -116,7 +116,6 @@
     </copy>
     <jar jarfile="${package.dist}/${sdkjarfilename}"
          basedir="${jdk.dist}"
-         excludes="cvs/**"
          includes="netscape/ldap/*.class,netscape/ldap/client/*.class,netscape/ldap/client/opers/*.class,netscape/ldap/ber/stream/*.class,netscape/ldap/controls/*.class,netscape/ldap/factory/*.class,netscape/ldap/util/*.class,netscape/ldap/errors/*.props,com/netscape/sasl/*.class,com/netscape/sasl/mechanisms/*.class,*.class" 
     />
   </target>
@@ -124,7 +123,6 @@
   <target name="dist-filter" depends="build-filter">
     <jar jarfile="${package.dist}/${filtjarfilename}"
          basedir="${filter.dist}"
-         excludes="cvs/**"
          includes="netscape/ldap/util/*.class" 
     />
   </target>
@@ -132,7 +130,6 @@
   <target name="dist-beans" depends="build-beans">
     <jar jarfile="${package.dist}/${beansjarfilename}"
          basedir="${jdk.dist}"
-         excludes="cvs/**"
          includes="netscape/ldap/beans/*" 
     />
   </target>
@@ -140,7 +137,6 @@
   <target name="dist-jndi" depends="build-jndi">
     <jar jarfile="${package.dist}/${jdnijarfilename}"
          basedir="${jdk.dist}"
-         excludes="cvs/**"
          includes="com/netscape/jndi/ldap/*.class com/netscape/jndi/ldap/common/*.class com/netscape/jndi/ldap/schema/*.class com/netscape/jndi/ldap/controls/*.class"
     />
   </target>
@@ -149,7 +145,6 @@
     <jar jarfile="${package.dist}/${doczipfilename}"
          update="no"
          basedir="${doc.dist}"
-         excludes="cvs/**"
          includes="*.html *.css netscape/ldap/*.html netscape/ldap/beans/*.html netscape/ldap/controls/*.html netscape/ldap/util/*.html netscape/ldap/ber/stream/*.html" 
     />
   </target>
@@ -162,7 +157,6 @@
     <target name="build-jdk" depends="init">
         <!-- Compile the java jdk code from ${src} into ${dest} -->
         <javac srcdir="${basedir}/ldapjdk/src/main/java" destdir="${jdk.dist}"
-            excludes="cvs/**"
             classpath="${jss.lib}:${slf4j.lib}"
             source="1.8"
             target="1.8"
@@ -171,7 +165,6 @@
 
     <target name="build-filter" depends="init,build-jdk">
         <javac srcdir="${basedir}/ldapfilter/src/main/java" destdir="${filter.dist}"
-            excludes="cvs/**"
             classpath="${jdk.dist}:${jss.lib}:${slf4j.lib}"
             source="1.8"
             target="1.8"
@@ -181,7 +174,6 @@
     <target name="build-beans" depends="init">
         <!-- Compile the java jdk bean code from ${src} into ${dest} -->
         <javac srcdir="${basedir}/ldapbeans/src/main/java" destdir="${jdk.dist}"
-            excludes="cvs/**"
             classpath="${jss.lib}:${slf4j.lib}"
             source="1.8"
             target="1.8"
@@ -191,7 +183,6 @@
     <target name="build-jndi" depends="init,build-jdk">
         <!-- Compile the java code from ${src} into ${dest} -->
         <javac srcdir="${basedir}/ldapsp/src/main/java" destdir="${jndi.dist}"
-            excludes="cvs/**"
             classpath="${jss.lib}:${basedir}/ldapsp/lib/jndi.jar:${slf4j.lib}"
             source="1.8"
             target="1.8"
