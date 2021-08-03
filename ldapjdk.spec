@@ -83,29 +83,24 @@ Javadoc for LDAP SDK
 %build
 ################################################################################
 
-pushd java-sdk
 export JAVA_HOME=%{java_home}
-sh -x ant dist
-popd
+
+./build.sh \
+    %{?_verbose:-v} \
+    --work-dir=%{_vpath_builddir} \
+    dist
 
 ################################################################################
 %install
 ################################################################################
 
-install -d -m 755 $RPM_BUILD_ROOT%{_javadir}
-install -m 644 java-sdk/dist/packages/ldapjdk.jar $RPM_BUILD_ROOT%{_javadir}/ldapjdk.jar
-install -m 644 java-sdk/dist/packages/ldapsp.jar $RPM_BUILD_ROOT%{_javadir}/ldapsp.jar
-install -m 644 java-sdk/dist/packages/ldapfilt.jar $RPM_BUILD_ROOT%{_javadir}/ldapfilt.jar
-install -m 644 java-sdk/dist/packages/ldapbeans.jar $RPM_BUILD_ROOT%{_javadir}/ldapbeans.jar
-
-mkdir -p %{buildroot}%{_mavenpomdir}
-install -pm 644 java-sdk/ldapjdk/pom.xml %{buildroot}%{_mavenpomdir}/JPP-ldapjdk.pom
-install -pm 644 java-sdk/ldapfilter/pom.xml %{buildroot}%{_mavenpomdir}/JPP-ldapfilter.pom
-install -pm 644 java-sdk/ldapbeans/pom.xml %{buildroot}%{_mavenpomdir}/JPP-ldapbeans.pom
-install -pm 644 java-sdk/ldapsp/pom.xml %{buildroot}%{_mavenpomdir}/JPP-ldapsp.pom
-
-install -d -m 755 $RPM_BUILD_ROOT%{_javadocdir}/ldapjdk
-cp -r java-sdk/dist/doc/* $RPM_BUILD_ROOT%{_javadocdir}/ldapjdk
+./build.sh \
+    %{?_verbose:-v} \
+    --work-dir=%{_vpath_builddir} \
+    --java-lib-dir=%{_javadir} \
+    --javadoc-dir=%{_javadocdir} \
+    --install-dir=%{buildroot} \
+    install
 
 ################################################################################
 %files
