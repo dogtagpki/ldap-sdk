@@ -9,8 +9,8 @@ SCRIPT_PATH="$(readlink -f "$0")"
 SCRIPT_NAME="$(basename "$SCRIPT_PATH")"
 SRC_DIR="$(dirname "$SCRIPT_PATH")"
 
-NAME=
-WORK_DIR=
+NAME=ldapjdk
+WORK_DIR="$HOME/build/$NAME"
 
 SOURCE_TAG=
 SPEC_TEMPLATE=
@@ -26,8 +26,8 @@ usage() {
     echo "Usage: $SCRIPT_NAME [OPTIONS] <target>"
     echo
     echo "Options:"
-    echo "    --name=<name>          Package name (default: ldapjdk)."
-    echo "    --work-dir=<path>      Working directory (default: ~/build/ldapjdk)."
+    echo "    --name=<name>          Package name (default: $NAME)."
+    echo "    --work-dir=<path>      Working directory (default: $WORK_DIR)."
     echo "    --source-tag=<tag>     Generate RPM sources from a source tag."
     echo "    --spec=<file>          Use the specified RPM spec as a template."
     echo "    --with-timestamp       Append timestamp to release number."
@@ -215,6 +215,8 @@ else
 fi
 
 if [ "$DEBUG" = true ] ; then
+    echo "NAME: $NAME"
+    echo "WORK_DIR: $WORK_DIR"
     echo "BUILD_TARGET: $BUILD_TARGET"
 fi
 
@@ -224,22 +226,6 @@ if [ "$BUILD_TARGET" != "src" ] &&
         [ "$BUILD_TARGET" != "rpm" ] ; then
     echo "ERROR: Invalid build target: $BUILD_TARGET" >&2
     exit 1
-fi
-
-if [ "$NAME" = "" ] ; then
-    NAME="ldapjdk"
-fi
-
-if [ "$DEBUG" = true ] ; then
-    echo "NAME: $NAME"
-fi
-
-if [ "$WORK_DIR" = "" ] ; then
-    WORK_DIR="$HOME/build/$NAME"
-fi
-
-if [ "$DEBUG" = true ] ; then
-    echo "WORK_DIR: $WORK_DIR"
 fi
 
 if [ "$SPEC_TEMPLATE" = "" ] ; then
