@@ -11,6 +11,10 @@ SRC_DIR="$(dirname "$SCRIPT_PATH")"
 
 NAME=ldapjdk
 WORK_DIR="$HOME/build/$NAME"
+JAVA_LIB_DIR="/usr/share/java"
+JAVADOC_DIR="/usr/share/javadoc"
+MAVEN_POM_DIR="/usr/share/maven-poms"
+INSTALL_DIR=
 
 SOURCE_TAG=
 SPEC_TEMPLATE=
@@ -28,6 +32,10 @@ usage() {
     echo "Options:"
     echo "    --name=<name>          Package name (default: $NAME)."
     echo "    --work-dir=<path>      Working directory (default: $WORK_DIR)."
+    echo "    --java-lib-dir=<path>  Java library directory (default: $JAVA_LIB_DIR)."
+    echo "    --javadoc-dir=<path>   Javadoc directory (default: $JAVADOC_DIR)."
+    echo "    --maven-pom-dir=<path> Maven POM directory (default: $MAVEN_POM_DIR)."
+    echo "    --install-dir=<path>   Installation directory."
     echo "    --source-tag=<tag>     Generate RPM sources from a source tag."
     echo "    --spec=<file>          Use the specified RPM spec as a template."
     echo "    --with-timestamp       Append timestamp to release number."
@@ -38,10 +46,12 @@ usage() {
     echo "    --help                 Show help message."
     echo
     echo "Target:"
-    echo "    src    Generate RPM sources."
-    echo "    spec   Generate RPM spec."
-    echo "    srpm   Build SRPM package."
-    echo "    rpm    Build RPM packages (default)."
+    echo "    dist     Build LDAP SDK binaries (default)."
+    echo "    install  Install LDAP SDK binaries."
+    echo "    src      Generate RPM sources."
+    echo "    spec     Generate RPM spec."
+    echo "    srpm     Build SRPM package."
+    echo "    rpm      Build RPM packages."
 }
 
 generate_rpm_sources() {
@@ -160,6 +170,18 @@ while getopts v-: arg ; do
         work-dir=?*)
             WORK_DIR="$(readlink -f "$LONG_OPTARG")"
             ;;
+        java-lib-dir=?*)
+            JAVA_LIB_DIR="$(readlink -f "$LONG_OPTARG")"
+            ;;
+        javadoc-dir=?*)
+            JAVADOC_DIR="$(readlink -f "$LONG_OPTARG")"
+            ;;
+        maven-pom-dir=?*)
+            MAVEN_POM_DIR="$(readlink -f "$LONG_OPTARG")"
+            ;;
+        install-dir=?*)
+            INSTALL_DIR="$(readlink -f "$LONG_OPTARG")"
+            ;;
         source-tag=?*)
             SOURCE_TAG="$LONG_OPTARG"
             ;;
@@ -189,7 +211,7 @@ while getopts v-: arg ; do
         '')
             break # "--" terminates argument processing
             ;;
-        name* | work-dir* | source-tag* | spec* | dist*)
+        name* | work-dir* | java-lib-dir* | javadoc-dir* | maven-pom-dir* | install-dir* | source-tag* | spec* | dist*)
             echo "ERROR: Missing argument for --$OPTARG option" >&2
             exit 1
             ;;
@@ -209,7 +231,7 @@ done
 shift $((OPTIND-1))
 
 if [ "$#" -lt 1 ] ; then
-    BUILD_TARGET=rpm
+    BUILD_TARGET=dist
 else
     BUILD_TARGET=$1
 fi
@@ -217,16 +239,79 @@ fi
 if [ "$DEBUG" = true ] ; then
     echo "NAME: $NAME"
     echo "WORK_DIR: $WORK_DIR"
+    echo "JAVA_LIB_DIR: $JAVA_LIB_DIR"
+    echo "JAVADOC_DIR: $JAVADOC_DIR"
+    echo "MAVEN_POM_DIR: $MAVEN_POM_DIR"
+    echo "INSTALL_DIR: $INSTALL_DIR"
     echo "BUILD_TARGET: $BUILD_TARGET"
 fi
 
-if [ "$BUILD_TARGET" != "src" ] &&
+if [ "$BUILD_TARGET" != "dist" ] &&
+        [ "$BUILD_TARGET" != "install" ] &&
+        [ "$BUILD_TARGET" != "src" ] &&
         [ "$BUILD_TARGET" != "spec" ] &&
         [ "$BUILD_TARGET" != "srpm" ] &&
         [ "$BUILD_TARGET" != "rpm" ] ; then
     echo "ERROR: Invalid build target: $BUILD_TARGET" >&2
     exit 1
 fi
+
+mkdir -p $WORK_DIR
+cd $WORK_DIR
+
+if [ "$BUILD_TARGET" = "dist" ] ; then
+
+    if [ "$VERBOSE" = true ] ; then
+        echo "Building $NAME"
+    fi
+
+    pushd $SRC_DIR/java-sdk
+    ant -Ddist=$WORK_DIR dist
+    popd
+
+    echo
+    echo "Build artifacts:"
+    echo "- Java archives:"
+    echo "    $WORK_DIR/packages/ldapjdk.jar"
+    echo "    $WORK_DIR/packages/ldapsp.jar"
+    echo "    $WORK_DIR/packages/ldapfilt.jar"
+    echo "    $WORK_DIR/packages/ldapbeans.jar"
+    echo "- documentation: $WORK_DIR/doc"
+    echo
+    echo "To install the build: $0 install"
+    echo "To create RPM packages: $0 rpm"
+    echo
+
+    exit
+fi
+
+if [ "$BUILD_TARGET" = "install" ] ; then
+
+    if [ "$VERBOSE" = true ] ; then
+        echo "Installing $NAME"
+    fi
+
+    mkdir -p $INSTALL_DIR$JAVA_LIB_DIR
+    cp $WORK_DIR/packages/ldapjdk.jar $INSTALL_DIR$JAVA_LIB_DIR/ldapjdk.jar
+    cp $WORK_DIR/packages/ldapsp.jar $INSTALL_DIR$JAVA_LIB_DIR/ldapsp.jar
+    cp $WORK_DIR/packages/ldapfilt.jar $INSTALL_DIR$JAVA_LIB_DIR/ldapfilt.jar
+    cp $WORK_DIR/packages/ldapbeans.jar $INSTALL_DIR$JAVA_LIB_DIR/ldapbeans.jar
+
+    mkdir -p $INSTALL_DIR$MAVEN_POM_DIR
+    cp $SRC_DIR/java-sdk/ldapjdk/pom.xml $INSTALL_DIR$MAVEN_POM_DIR/JPP-ldapjdk.pom
+    cp $SRC_DIR/java-sdk/ldapfilter/pom.xml $INSTALL_DIR$MAVEN_POM_DIR/JPP-ldapfilter.pom
+    cp $SRC_DIR/java-sdk/ldapbeans/pom.xml $INSTALL_DIR$MAVEN_POM_DIR/JPP-ldapbeans.pom
+    cp $SRC_DIR/java-sdk/ldapsp/pom.xml $INSTALL_DIR$MAVEN_POM_DIR/JPP-ldapsp.pom
+
+    mkdir -p $INSTALL_DIR$JAVADOC_DIR/ldapjdk
+    cp -r $WORK_DIR/doc/* $INSTALL_DIR$JAVADOC_DIR/ldapjdk
+
+    exit
+fi
+
+################################################################################
+# Prepare RPM build
+################################################################################
 
 if [ "$SPEC_TEMPLATE" = "" ] ; then
     SPEC_TEMPLATE="$SRC_DIR/ldapjdk.spec"
@@ -273,17 +358,6 @@ if [ "$DEBUG" = true ] ; then
 fi
 
 echo "Building $NAME-$VERSION-$RELEASE${_TIMESTAMP}${_COMMIT_ID}"
-
-################################################################################
-# Initialize working directory
-################################################################################
-
-if [ "$VERBOSE" = true ] ; then
-    echo "Initializing $WORK_DIR"
-fi
-
-mkdir -p $WORK_DIR
-cd $WORK_DIR
 
 rm -rf BUILD
 rm -rf RPMS
