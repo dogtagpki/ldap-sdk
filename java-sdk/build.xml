@@ -55,14 +55,14 @@
 
   <!-- Build Defaults -->
  
-    <property name="jdk.dist"            value="${basedir}/dist/classes"/>
-    <property name="filter.dist"         value="${basedir}/dist/ldapfilt"/>
-    <property name="jndi.dist"           value="${basedir}/dist/classes"/>
-    <property name="doc.dist"            value="${basedir}/dist/doc"/>
-    <property name="package.dist"        value="${basedir}/dist/packages"/>
+    <property name="dist"                value="dist"/>
+    <property name="jdk.dist"            value="${dist}/classes"/>
+    <property name="filter.dist"         value="${dist}/ldapfilt"/>
+    <property name="jndi.dist"           value="${dist}/classes"/>
+    <property name="doc.dist"            value="${dist}/doc"/>
+    <property name="package.dist"        value="${dist}/packages"/>
     <property name="src"                 value="."/>
     <property name="build"               value="build"/>
-    <property name="dist"                value="dist"/>
     <property name="jss.lib"             value="/usr/lib/java/jss.jar"/>
     <property name="slf4j.lib"           value="/usr/share/java/slf4j/slf4j-api.jar" />
 
@@ -227,7 +227,7 @@
     <target name="clean-builds">
         <!-- Delete the .class and javadoc files built up from builds -->
         <delete includeEmptyDirs="true">
-            <fileset dir="${basedir}/dist" excludes="**/*.jar **/*.zip"/>
+            <fileset dir="${dist}" excludes="**/*.jar **/*.zip"/>
         </delete>
     </target>
 
