@@ -47,7 +47,7 @@ package netscape.ldap;
  *
  * @version 1.0
  */
-public class LDAPSearchConstraints extends LDAPConstraints 
+public class LDAPSearchConstraints extends LDAPConstraints
                                    implements Cloneable {
 
 
@@ -148,7 +148,7 @@ java.lang.String[], boolean, netscape.ldap.LDAPSearchConstraints)
      * @param batchSize specify the number of results to return at a time
      * (1 by default)
      * @param rebind_proc specifies the object that
-     * implements the <CODE>LDAPRebind</CODE> interface. 
+     * implements the <CODE>LDAPRebind</CODE> interface.
      * The object will be used when the client
      * follows referrals automatically.  The object provides the client
      * with a method for getting the distinguished name and password
@@ -318,6 +318,7 @@ java.lang.String[], boolean, netscape.ldap.LDAPSearchConstraints)
      * @param backlog the maximum number of unread entries per listener
      * @deprecated Use <CODE>LDAPConnection.setOption()</CODE>
      */
+    @Deprecated
     public void setMaxBacklog( int backlog ) {
         maxBacklog = backlog;
     }
@@ -328,6 +329,7 @@ java.lang.String[], boolean, netscape.ldap.LDAPSearchConstraints)
      * @return the maximum number of unread entries per listener.
      * @deprecated Use <CODE>LDAPConnection.getOption()</CODE>
      */
+    @Deprecated
     public int getMaxBacklog() {
         return maxBacklog;
     }
@@ -360,19 +362,19 @@ java.lang.String[], boolean, netscape.ldap.LDAPSearchConstraints)
      * references if there is an error following a referral, but the behavior
      * may be changed with <CODE>setReferralErrors</CODE> to throw an exception
      * instead.
-     * 
+     *
      * @return <CODE>REFERRAL_ERROR_CONTINUE</CODE> if remaining results are
      * to be processed when there is an error following a search continuation
      * reference, <CODE>REFERRAL_ERROR_EXCEPTION</CODE> if such an error is to
      * cause an <CODE>LDAPException</CODE>.
-     * 
+     *
      * @see netscape.ldap.LDAPConstraints#setReferrals
      * @since LDAPJDK 4.17
      */
     public int getReferralErrors() {
         return referralErrors;
     }
-    
+
     /**
      * Specifies if errors when following search continuation references are
      * to cause processing of the remaining results to be aborted.
@@ -401,12 +403,12 @@ java.lang.String[], boolean, netscape.ldap.LDAPSearchConstraints)
      * references if there is an error following a referral, but the behavior
      * may be changed with <CODE>setReferralErrors</CODE> to throw an exception
      * instead.
-     * 
+     *
      * @param errorBehavior Either <CODE>REFERRAL_ERROR_CONTINUE</CODE> if
      * remaining results are to be processed when there is an error following a
      * search continuation reference or <CODE>REFERRAL_ERROR_EXCEPTION</CODE>
      * if such an error is to cause an <CODE>LDAPException</CODE>.
-     * 
+     *
      * @see netscape.ldap.LDAPSearchConstraints#getReferralErrors
      * @see netscape.ldap.LDAPSearchResults#next
      * @see netscape.ldap.LDAPSearchResults#nextElement

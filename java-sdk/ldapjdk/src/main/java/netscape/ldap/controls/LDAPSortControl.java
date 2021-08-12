@@ -37,12 +37,19 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.controls;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+
 import netscape.ldap.LDAPControl;
-import netscape.ldap.LDAPSortKey;
-import netscape.ldap.client.JDAPBERTagDecoder;
 import netscape.ldap.LDAPException;
-import netscape.ldap.ber.stream.*;
+import netscape.ldap.LDAPSortKey;
+import netscape.ldap.ber.stream.BERElement;
+import netscape.ldap.ber.stream.BEREnumerated;
+import netscape.ldap.ber.stream.BEROctetString;
+import netscape.ldap.ber.stream.BERSequence;
+import netscape.ldap.ber.stream.BERTag;
+import netscape.ldap.client.JDAPBERTagDecoder;
 
 /**
  * Represents an LDAP v3 server control that specifies that you want
@@ -239,31 +246,31 @@ public class LDAPSortControl extends LDAPControl {
     // Response varibales
     private String m_failedAttribute = null;
     private int m_resultCode = 0;
-    
+
     // Request variables
     private LDAPSortKey[] m_keys;
 
     /**
      * Constructs a sort response <CODE>LDAPSortControl</CODE> object.
-     * This constructor is used by <CODE>LDAPControl.register</CODE> to 
+     * This constructor is used by <CODE>LDAPControl.register</CODE> to
      * instantiate sort response controls.
      * <P>
-     * To retrieve the result code of the sort operation, call 
+     * To retrieve the result code of the sort operation, call
      * <CODE>getResultCode</CODE>.
-     * <P> 
+     * <P>
      * To retrieve the attribute that caused the sort operation to fail, call
      * <CODE>getFailedAttribute</CODE>.
-     * @param oid the oid for this control. This must be 
-     * <CODE>LDAPSortControl.SORTRESPONSE</CODE> or an <CODE>LDAPException</CODE> 
+     * @param oid the oid for this control. This must be
+     * <CODE>LDAPSortControl.SORTRESPONSE</CODE> or an <CODE>LDAPException</CODE>
      * is thrown.
      * @param critical <code>true</code> if this control is critical to the operation
      * @param value the value associated with this control
-     * @exception netscape.ldap.LDAPException If oid is not 
+     * @exception netscape.ldap.LDAPException If oid is not
      * <CODE>LDAPSortControl.SORTRESPONSE</CODE>.
      * @exception java.io.IOException If value contains an invalid BER sequence.
      * @see netscape.ldap.LDAPControl#register
      */
-    public LDAPSortControl( String oid, boolean critical, byte[] value ) 
+    public LDAPSortControl( String oid, boolean critical, byte[] value )
         throws LDAPException, IOException {
 	super( oid, critical, value );
 
@@ -308,7 +315,7 @@ public class LDAPSortControl extends LDAPControl {
     public int getResultCode() {
 	return m_resultCode;
     }
-    
+
     /**
      * Constructs an <CODE>LDAPSortControl</CODE> object with a single
      * sorting key.
@@ -325,7 +332,7 @@ public class LDAPSortControl extends LDAPControl {
         LDAPSortKey[] keys = new LDAPSortKey[1];
         keys[0] = key;
         m_value = createSortSpecification( m_keys = keys );
-        
+
     }
 
     /**
@@ -515,9 +522,10 @@ public class LDAPSortControl extends LDAPControl {
      * @return the attribute that caused the error, or null if the server did
      * not specify which attribute caused the error.
      * @see netscape.ldap.LDAPConnection#getResponseControls
-     * @deprecated LDAPSortControl response controls are now automatically 
+     * @deprecated LDAPSortControl response controls are now automatically
      * instantiated.
      */
+    @Deprecated
     public static String parseResponse( LDAPControl[] controls, int[] results ) {
         String attr = null;
         LDAPControl sort = null;
@@ -586,40 +594,40 @@ public class LDAPSortControl extends LDAPControl {
         /* Suck out the data and return it */
         return flattenBER( ber );
     }
-    
+
     public String toString() {
         return (getID() == SORTREQUEST) ? reqToString() : rspToString();
     }
-    
+
     String reqToString() {
-        
+
         StringBuffer sb = new StringBuffer("{SortCtrl:");
-        
+
         sb.append(" isCritical=");
         sb.append(isCritical());
-        
+
         sb.append(" ");
         for (int i=0; i < m_keys.length; i++) {
             sb.append(m_keys[i]);
-        }            
-        
+        }
+
         sb.append("}");
 
         return sb.toString();
     }
 
     String rspToString() {
-        
+
         StringBuffer sb = new StringBuffer("{SortResponseCtrl:");
-        
+
         sb.append(" isCritical=");
         sb.append(isCritical());
-        
+
         if (m_failedAttribute != null) {
             sb.append(" failedAttr=");
             sb.append(m_failedAttribute);
         }
-        
+
         sb.append(" resultCode=");
         sb.append(m_resultCode);
 

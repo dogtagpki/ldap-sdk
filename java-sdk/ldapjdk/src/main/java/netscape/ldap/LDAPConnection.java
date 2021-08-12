@@ -931,6 +931,7 @@ public class LDAPConnection
      * @deprecated Please use the method signature where <CODE>cons</CODE> is
      * <CODE>LDAPConstraints</CODE> instead of <CODE>LDAPSearchConstraints</CODE>
      */
+    @Deprecated
     public void connect(String host, int port, String dn, String passwd,
         LDAPSearchConstraints cons) throws LDAPException {
         connect(host, port, dn, passwd, (LDAPConstraints)cons);
@@ -1097,6 +1098,7 @@ public class LDAPConnection
      * @deprecated Please use the method signature where <CODE>cons</CODE> is
      * <CODE>LDAPConstraints</CODE> instead of <CODE>LDAPSearchConstraints</CODE>
      */
+    @Deprecated
     public void connect(int version, String host, int port, String dn,
         String passwd, LDAPSearchConstraints cons) throws LDAPException {
 
@@ -1258,6 +1260,7 @@ public class LDAPConnection
      * @deprecated Please use the method signature where <CODE>cons</CODE> is
      * <CODE>LDAPConstraints</CODE> instead of <CODE>LDAPSearchConstraints</CODE>
      */
+    @Deprecated
     public void authenticate(String dn, String passwd,
       LDAPSearchConstraints cons) throws LDAPException {
         authenticate(dn, passwd, (LDAPConstraints)cons);
@@ -1309,6 +1312,7 @@ public class LDAPConnection
      * @deprecated Please use the method signature where <CODE>cons</CODE> is
      * <CODE>LDAPConstraints</CODE> instead of <CODE>LDAPSearchConstraints</CODE>
      */
+    @Deprecated
     public void authenticate(int version, String dn, String passwd,
       LDAPSearchConstraints cons) throws LDAPException {
         authenticate(version, dn, passwd, (LDAPConstraints)cons);
@@ -1394,6 +1398,7 @@ public class LDAPConnection
      * @deprecated Please use authenticate without packageName
      * instead.
      */
+    @Deprecated
     public void authenticate(String dn, String mechanism, String packageName,
                              Hashtable<Object, Object> props, /*CallbackHandler*/ Object cbh)
         throws LDAPException {
@@ -1423,6 +1428,7 @@ public class LDAPConnection
      * @deprecated Please use authenticate without packageName
      * instead.
      */
+    @Deprecated
     public void authenticate(String dn, String[] mechanisms,
                              String packageName,
                              Hashtable<Object, Object> props, /*CallbackHandler*/ Object cbh)
@@ -2806,6 +2812,7 @@ public class LDAPConnection
      * @deprecated Please use the method signature where <CODE>cons</CODE> is
      * <CODE>LDAPConstraints</CODE> instead of <CODE>LDAPSearchConstraints</CODE>
      */
+    @Deprecated
     public boolean compare( String DN, LDAPAttribute attr,
         LDAPSearchConstraints cons) throws LDAPException {
         return compare(DN, attr, (LDAPConstraints) cons);
@@ -2914,6 +2921,7 @@ public class LDAPConnection
      * @deprecated Please use the method signature where <CODE>cons</CODE> is
      * <CODE>LDAPConstraints</CODE> instead of <CODE>LDAPSearchConstraints</CODE>
      */
+    @Deprecated
     public void add( LDAPEntry entry, LDAPSearchConstraints cons )
         throws LDAPException {
         add(entry, (LDAPConstraints) cons);
@@ -2988,6 +2996,7 @@ public class LDAPConnection
      * @deprecated Please use the method signature where <CODE>cons</CODE> is
      * <CODE>LDAPConstraints</CODE> instead of <CODE>LDAPSearchConstraints</CODE>
      */
+    @Deprecated
     public LDAPExtendedOperation extendedOperation( LDAPExtendedOperation op,
                                                     LDAPSearchConstraints cons)
         throws LDAPException {
@@ -3056,6 +3065,7 @@ public class LDAPConnection
      * @deprecated Please use the method signature where <CODE>cons</CODE> is
      * <CODE>LDAPConstraints</CODE> instead of <CODE>LDAPSearchConstraints</CODE>
      */
+    @Deprecated
     public void modify( String DN, LDAPModification mod,
         LDAPSearchConstraints cons ) throws LDAPException {
         modify (DN, mod, (LDAPConstraints)cons);
@@ -3133,6 +3143,7 @@ public class LDAPConnection
      * @deprecated Please use the method signature where <CODE>cons</CODE> is
      * <CODE>LDAPConstraints</CODE> instead of <CODE>LDAPSearchConstraints</CODE>
      */
+     @Deprecated
      public void modify (String DN, LDAPModificationSet mods,
          LDAPSearchConstraints cons) throws LDAPException {
          modify(DN, mods, (LDAPConstraints)cons);
@@ -3200,6 +3211,7 @@ public class LDAPConnection
      * @deprecated Please use the method signature where <CODE>cons</CODE> is
      * <CODE>LDAPConstraints</CODE> instead of <CODE>LDAPSearchConstraints</CODE>
      */
+    @Deprecated
     public void modify (String DN, LDAPModification[] mods,
          LDAPSearchConstraints cons) throws LDAPException {
         modify(DN, mods, (LDAPConstraints)cons);
@@ -3263,6 +3275,7 @@ public class LDAPConnection
      * @deprecated Please use the method signature where <CODE>cons</CODE> is
      * <CODE>LDAPConstraints</CODE> instead of <CODE>LDAPSearchConstraints</CODE>
      */
+    @Deprecated
     public void delete( String DN, LDAPSearchConstraints cons )
         throws LDAPException {
         delete(DN, (LDAPConstraints)cons);
@@ -3348,6 +3361,7 @@ public class LDAPConnection
      * @deprecated Please use the method signature where <CODE>cons</CODE> is
      * <CODE>LDAPConstraints</CODE> instead of <CODE>LDAPSearchConstraints</CODE>
      */
+    @Deprecated
     public void rename (String DN, String newRDN, boolean deleteOldRDN,
                         LDAPSearchConstraints cons )
         throws LDAPException {
@@ -3453,6 +3467,7 @@ public class LDAPConnection
      * @deprecated Please use the method signature where <CODE>cons</CODE> is
      * <CODE>LDAPConstraints</CODE> instead of <CODE>LDAPSearchConstraints</CODE>
      */
+    @Deprecated
     public void rename (String DN,
                            String newRDN,
                            String newParentDN,

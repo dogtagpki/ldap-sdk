@@ -53,21 +53,21 @@ public class LDAPPasswordExpiredControl extends LDAPStringControl {
     public final static String EXPIRED = "2.16.840.1.113730.3.4.4";
 
     /**
-     * Contructs an <CODE>LDAPPasswordExpiredControl</CODE> object. 
-     * This constructor is used by <CODE>LDAPControl.register</CODE> to 
+     * Contructs an <CODE>LDAPPasswordExpiredControl</CODE> object.
+     * This constructor is used by <CODE>LDAPControl.register</CODE> to
      * instantiate password expired controls.
      * <P>
      * To retrieve the message from the server, call <CODE>getMessage</CODE>.
-     * @param oid this parameter must be equal to 
+     * @param oid this parameter must be equal to
      * <CODE>LDAPPasswordExpiredControl.EXPIRED</CODE>
      * or an <CODE>LDAPException</CODE> is thrown
      * @param critical <code>true</code> if this control is critical
      * @param value the value associated with this control
-     * @exception netscape.ldap.LDAPException If oid is not 
+     * @exception netscape.ldap.LDAPException If oid is not
      * <CODE>LDAPPasswordExpiredControl.EXPIRED</CODE>.
      * @see netscape.ldap.LDAPControl#register
      */
-    public LDAPPasswordExpiredControl( String oid, boolean critical, 
+    public LDAPPasswordExpiredControl( String oid, boolean critical,
                                        byte[] value ) throws LDAPException {
         super( EXPIRED, critical, value );
 	if ( !oid.equals( EXPIRED )) {
@@ -88,27 +88,28 @@ public class LDAPPasswordExpiredControl extends LDAPStringControl {
      * @deprecated LDAPPasswordExpiredControl controls are now automatically
      * instantiated.
      */
+    @Deprecated
     public static String parseResponse( LDAPControl[] controls ) {
         return LDAPStringControl.parseResponse( controls, EXPIRED );
     }
- 
+
     /**
      * Gets the message returned by the server with this control.
      * @return the message returned by the server.
-     */    
+     */
     public String getMessage() {
         return m_msg;
     }
-    
+
     public String toString() {
          StringBuffer sb = new StringBuffer("{PasswordExpiredCtrl:");
-        
+
         sb.append(" isCritical=");
         sb.append(isCritical());
-        
+
         sb.append(" msg=");
         sb.append(m_msg);
-        
+
         sb.append("}");
 
         return sb.toString();

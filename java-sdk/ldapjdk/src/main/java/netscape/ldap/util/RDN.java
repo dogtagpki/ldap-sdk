@@ -221,6 +221,7 @@ public final class RDN implements java.io.Serializable {
      * @return an array of strings representing the DN component.
      * @deprecated use <code>toString</code> or <code>getValues</code> instead.
      */
+    @Deprecated
     public String[] explodeRDN(boolean noType) {
         if (m_type == null)
             return null;
@@ -238,6 +239,7 @@ public final class RDN implements java.io.Serializable {
      * @return rdn the attribute type of the DN component.
      * @deprecated use <code>getTypes()</code> instead.
      */
+    @Deprecated
     public String getType() {
         if (m_type != null && m_type.length > 0) {
             return m_type[0];
@@ -258,6 +260,7 @@ public final class RDN implements java.io.Serializable {
      * @return rdn the value of the DN component.
      * @deprecated use <code>getValues()</code> instead.
      */
+    @Deprecated
     public String getValue() {
         if (m_value != null && m_value.length > 0) {
             return m_value[0];

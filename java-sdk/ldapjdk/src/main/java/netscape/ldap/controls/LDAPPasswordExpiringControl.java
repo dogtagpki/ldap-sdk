@@ -54,21 +54,21 @@ public class LDAPPasswordExpiringControl extends LDAPStringControl {
 
     /**
      * Contructs an <CODE>LDAPPasswordExpiringControl</CODE> object.
-     * This constructor is used by <CODE>LDAPControl.register</CODE> to 
+     * This constructor is used by <CODE>LDAPControl.register</CODE> to
      * instantiate password expiring controls.
      * <P>
      * To retrieve the number of seconds until this password expires,
      * call <CODE>getSecondsToExpiration</CODE>.
-     * @param oid this parameter must be 
+     * @param oid this parameter must be
      * <CODE>LDAPPasswordExpiringControl.EXPIRING</CODE>
      * or an <CODE>LDAPException</CODE> is thrown
      * @param critical <code>true</code> if this control is critical
      * @param value the value associated with this control
-     * @exception netscape.ldap.LDAPException If oid is not 
+     * @exception netscape.ldap.LDAPException If oid is not
      * <CODE>LDAPPasswordExpiringControl.EXPIRING.</CODE>
      * @see netscape.ldap.LDAPControl#register
      */
-    public LDAPPasswordExpiringControl( String oid, boolean critical, 
+    public LDAPPasswordExpiringControl( String oid, boolean critical,
                                        byte[] value ) throws LDAPException {
         super( EXPIRING, critical, value );
 	if ( !oid.equals( EXPIRING )) {
@@ -78,11 +78,11 @@ public class LDAPPasswordExpiringControl extends LDAPStringControl {
     }
 
     /**
-     * Gets the number of seconds until the password expires returned by the 
+     * Gets the number of seconds until the password expires returned by the
      * server.
      * @return int the number of seconds until the password expires.
      * @exception java.lang.NumberFormatException If the server returned an
-     * undecipherable message. In this case, use <CODE>getMessage</CODE> to 
+     * undecipherable message. In this case, use <CODE>getMessage</CODE> to
      * retrieve the message as a string.
      */
     public int getSecondsToExpiration() {
@@ -108,22 +108,23 @@ public class LDAPPasswordExpiringControl extends LDAPStringControl {
      * @deprecated LDAPPasswordExpiringControl controls are now automatically
      * instantiated.
      */
+    @Deprecated
     public static String parseResponse( LDAPControl[] controls ) {
         return LDAPStringControl.parseResponse( controls, EXPIRING );
     }
-    
+
     public String toString() {
          StringBuffer sb = new StringBuffer("{PasswordExpiringCtrl:");
-        
+
         sb.append(" isCritical=");
         sb.append(isCritical());
-        
+
         sb.append(" msg=");
         sb.append(m_msg);
-        
+
         sb.append("}");
 
         return sb.toString();
     }
-    
+
 }

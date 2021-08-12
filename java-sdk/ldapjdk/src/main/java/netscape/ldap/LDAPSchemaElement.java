@@ -164,6 +164,7 @@ public abstract class LDAPSchemaElement implements java.io.Serializable {
      * or matching rule.
      * @deprecated Use <CODE>LDAPSchemaElement.getID()</CODE>
      */
+    @Deprecated
     public String getOID() {
         return getID();
     }

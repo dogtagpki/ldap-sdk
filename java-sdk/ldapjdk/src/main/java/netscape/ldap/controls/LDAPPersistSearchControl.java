@@ -37,10 +37,16 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.controls;
 
-import java.io.*;
-import netscape.ldap.client.JDAPBERTagDecoder;
+import java.io.ByteArrayInputStream;
+
 import netscape.ldap.LDAPControl;
-import netscape.ldap.ber.stream.*;
+import netscape.ldap.ber.stream.BERBoolean;
+import netscape.ldap.ber.stream.BERElement;
+import netscape.ldap.ber.stream.BEREnumerated;
+import netscape.ldap.ber.stream.BERInteger;
+import netscape.ldap.ber.stream.BEROctetString;
+import netscape.ldap.ber.stream.BERSequence;
+import netscape.ldap.client.JDAPBERTagDecoder;
 
 /**
  * Represents an LDAP v3 server control that specifies a persistent
@@ -156,7 +162,7 @@ public class LDAPPersistSearchControl extends LDAPControl {
      * </UL>
      * @param changesOnly <code>true</code> if you do not want the server
      * to return all existing entries in the directory that match the
-     * search criteria.  (Use this if you just want the changed entries 
+     * search criteria.  (Use this if you just want the changed entries
      * to be returned.)
      * @param returnControls <code>true</code> if you want the server to return
      * entry change controls with each entry in the search results
@@ -262,9 +268,10 @@ public class LDAPPersistSearchControl extends LDAPControl {
      *
      * @param c byte array that contains BER elements
      * @return the entry change control.
-     * @deprecated LDAPEntryChangeControl controls are now automatically 
+     * @deprecated LDAPEntryChangeControl controls are now automatically
      * instantiated.
      */
+    @Deprecated
     public LDAPEntryChangeControl parseResponse(byte[] c) {
         LDAPEntryChangeControl con = new LDAPEntryChangeControl();
 
@@ -394,9 +401,10 @@ public class LDAPPersistSearchControl extends LDAPControl {
      * control was sent, this method returns null.
      * @see netscape.ldap.controls.LDAPEntryChangeControl
      * @see netscape.ldap.LDAPConnection#getResponseControls
-     * @deprecated LDAPEntryChangeControl controls are now automatically 
+     * @deprecated LDAPEntryChangeControl controls are now automatically
      * instantiated.
      */
+    @Deprecated
     public static LDAPEntryChangeControl parseResponse(LDAPControl[] controls) {
 
         LDAPPersistSearchControl con = new LDAPPersistSearchControl();
@@ -436,19 +444,19 @@ public class LDAPPersistSearchControl extends LDAPControl {
 
     public String toString() {
         StringBuffer sb = new StringBuffer("{PersistSearchCtrl:");
-        
+
         sb.append(" isCritical=");
         sb.append(isCritical());
-        
+
         sb.append(" returnEntryChangeCtrls=");
         sb.append(m_returnECs);
-        
+
         sb.append(" changesOnly=");
         sb.append(m_changesOnly);
 
         sb.append(" changeTypes=");
         sb.append(typesToString(m_changeTypes));
-        
+
         sb.append("}");
 
         return sb.toString();
@@ -474,7 +482,7 @@ public class LDAPPersistSearchControl extends LDAPControl {
             types += (types.length() > 0) ? "+MODDN" : "MODDN";
         }
         return types;
-    }        
+    }
 
     private int m_changeTypes = 1;
     private boolean m_changesOnly = false;

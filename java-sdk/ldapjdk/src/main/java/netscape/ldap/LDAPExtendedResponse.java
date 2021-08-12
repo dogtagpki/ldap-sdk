@@ -41,7 +41,7 @@ import netscape.ldap.client.opers.JDAPExtendedResponse;
 
 /**
  * Represents a server response to an extended operation request.
- * 
+ *
  * @version 1.0
  */
 public class LDAPExtendedResponse extends LDAPResponse
@@ -51,7 +51,7 @@ public class LDAPExtendedResponse extends LDAPResponse
 
     /**
      * Constructor
-     * 
+     *
      * @param msgid message identifier
      * @param rsp extended operation response
      * @paarm controls array of controls or null
@@ -59,7 +59,7 @@ public class LDAPExtendedResponse extends LDAPResponse
     LDAPExtendedResponse(int msgid, JDAPExtendedResponse rsp, LDAPControl controls[]) {
         super(msgid, rsp, controls);
     }
-    
+
     /**
      * Returns the OID of the response.
      *
@@ -76,6 +76,7 @@ public class LDAPExtendedResponse extends LDAPResponse
      * @return the response OID.
      * @deprecated Use <CODE>LDAPExtendedResponse.getID()</CODE>
      */
+    @Deprecated
     public String  getOID() {
         return getID();
     }

@@ -37,11 +37,16 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.controls;
 
-import java.io.*;
-import netscape.ldap.client.JDAPBERTagDecoder;
+import java.io.ByteArrayInputStream;
+
 import netscape.ldap.LDAPControl;
-import netscape.ldap.ber.stream.*;
 import netscape.ldap.LDAPException;
+import netscape.ldap.ber.stream.BERElement;
+import netscape.ldap.ber.stream.BEREnumerated;
+import netscape.ldap.ber.stream.BERInteger;
+import netscape.ldap.ber.stream.BEROctetString;
+import netscape.ldap.ber.stream.BERSequence;
+import netscape.ldap.client.JDAPBERTagDecoder;
 
 /**
  * Represents control data for returning paged results from a search.
@@ -64,7 +69,7 @@ import netscape.ldap.LDAPException;
  *           offsetRangeError         (61),
  *           other                    (80)
  *       },
- *       contextID     OCTET STRING OPTIONAL 
+ *       contextID     OCTET STRING OPTIONAL
  *  }
  *</PRE>
  */
@@ -83,23 +88,23 @@ public class LDAPVirtualListResponse extends LDAPControl {
    /**
      * Contructs an <CODE>LDAPVirtualListResponse</CODE> object.
      * @param oid this parameter must be equal to
-     * <CODE>LDAPVirtualListResponse.VIRTUALLISTRESPONSE</CODE> or an 
+     * <CODE>LDAPVirtualListResponse.VIRTUALLISTRESPONSE</CODE> or an
      * <CODE>LDAPException</CODE>is thrown
      * @param critical <code>true</code> if this control is critical
      * @param value the value associated with this control
-     * @exception netscape.ldap.LDAPException If oid is not 
+     * @exception netscape.ldap.LDAPException If oid is not
      * <CODE>LDAPVirtualListResponse.VIRTUALLISTRESPONSE</CODE>.
      * @see netscape.ldap.LDAPControl#register
-     */ 
-    public LDAPVirtualListResponse( String oid, boolean critical, 
+     */
+    public LDAPVirtualListResponse( String oid, boolean critical,
                                     byte[] value ) throws LDAPException {
         super( VIRTUALLISTRESPONSE, critical, value );
         if ( !oid.equals( VIRTUALLISTRESPONSE ) ) {
              throw new LDAPException( "oid must be LDAPVirtualListResponse." +
-                                      "VIRTUALLISTRESPONSE", 
+                                      "VIRTUALLISTRESPONSE",
                                       LDAPException.PARAM_ERROR);
         }
-        
+
 	parseResponse();
     }
 
@@ -184,9 +189,10 @@ public class LDAPVirtualListResponse extends LDAPControl {
      * @param controls an array of controls that may include a VLV
      * results control
      * @return the control, if any; otherwise null.
-     * @deprecated LDAPVirtualListResponse controls are now automatically 
+     * @deprecated LDAPVirtualListResponse controls are now automatically
      * instantiated.
      */
+    @Deprecated
     public static LDAPVirtualListResponse parseResponse(
         LDAPControl[] controls ) {
         LDAPVirtualListResponse con = null;
@@ -206,19 +212,19 @@ public class LDAPVirtualListResponse extends LDAPControl {
 
     public String toString() {
          StringBuffer sb = new StringBuffer("{VirtListResponseCtrl:");
-        
+
         sb.append(" isCritical=");
         sb.append(isCritical());
-        
+
         sb.append(" firstPosition=");
         sb.append(m_firstPosition);
-        
+
         sb.append(" contentCount=");
         sb.append(m_contentCount);
 
         sb.append(" resultCode=");
         sb.append(m_resultCode);
-        
+
         if (m_context != null) {
             sb.append(" conext=");
             sb.append(m_context);
@@ -229,7 +235,7 @@ public class LDAPVirtualListResponse extends LDAPControl {
         return sb.toString();
     }
 
-    
+
     private int m_firstPosition = 0;
     private int m_contentCount = 0;
     private int m_resultCode = -1;
