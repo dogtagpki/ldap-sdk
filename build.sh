@@ -18,6 +18,8 @@ INSTALL_DIR=
 
 SOURCE_TAG=
 SPEC_TEMPLATE=
+VERSION=
+RELEASE=
 
 WITH_TIMESTAMP=
 WITH_COMMIT_ID=
@@ -38,6 +40,8 @@ usage() {
     echo "    --install-dir=<path>   Installation directory."
     echo "    --source-tag=<tag>     Generate RPM sources from a source tag."
     echo "    --spec=<file>          Use the specified RPM spec as a template."
+    echo "    --version=<version>    Use the specified version."
+    echo "    --release=<elease>     Use the specified release."
     echo "    --with-timestamp       Append timestamp to release number."
     echo "    --with-commit-id       Append commit ID to release number."
     echo "    --dist=<name>          Distribution name (e.g. fc28)."
@@ -188,6 +192,12 @@ while getopts v-: arg ; do
         spec=?*)
             SPEC_TEMPLATE="$LONG_OPTARG"
             ;;
+        version=?*)
+            VERSION="$LONG_OPTARG"
+            ;;
+        release=?*)
+            RELEASE="$LONG_OPTARG"
+            ;;
         with-timestamp)
             WITH_TIMESTAMP=true
             ;;
@@ -211,7 +221,7 @@ while getopts v-: arg ; do
         '')
             break # "--" terminates argument processing
             ;;
-        name* | work-dir* | java-lib-dir* | javadoc-dir* | maven-pom-dir* | install-dir* | source-tag* | spec* | dist*)
+        name* | work-dir* | java-lib-dir* | javadoc-dir* | maven-pom-dir* | install-dir* | source-tag* | spec* | version* | release* | dist*)
             echo "ERROR: Missing argument for --$OPTARG option" >&2
             exit 1
             ;;
@@ -317,13 +327,19 @@ if [ "$SPEC_TEMPLATE" = "" ] ; then
     SPEC_TEMPLATE="$SRC_DIR/ldapjdk.spec"
 fi
 
-VERSION="$(rpmspec -P "$SPEC_TEMPLATE" | grep "^Version:" | awk '{print $2;}')"
+if [ "$VERSION" = "" ] ; then
+    # if version not specified, get from spec template
+    VERSION="$(rpmspec -P "$SPEC_TEMPLATE" | grep "^Version:" | awk '{print $2;}')"
+fi
 
 if [ "$DEBUG" = true ] ; then
     echo "VERSION: $VERSION"
 fi
 
-RELEASE="$(rpmspec -P "$SPEC_TEMPLATE" --undefine dist | grep "^Release:" | awk '{print $2;}')"
+if [ "$RELEASE" = "" ] ; then
+    # if release not specified, get from spec template
+    RELEASE="$(rpmspec -P "$SPEC_TEMPLATE" --undefine dist | grep "^Release:" | awk '{print $2;}')"
+fi
 
 if [ "$DEBUG" = true ] ; then
     echo "RELEASE: $RELEASE"
