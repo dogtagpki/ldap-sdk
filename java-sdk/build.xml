@@ -158,16 +158,12 @@
         <!-- Compile the java jdk code from ${src} into ${dest} -->
         <javac srcdir="${basedir}/ldapjdk/src/main/java" destdir="${jdk.dist}"
             classpath="${jss.lib}:${slf4j.lib}"
-            source="1.8"
-            target="1.8"
         />
       </target>
 
     <target name="build-filter" depends="init,build-jdk">
         <javac srcdir="${basedir}/ldapfilter/src/main/java" destdir="${filter.dist}"
             classpath="${jdk.dist}:${jss.lib}:${slf4j.lib}"
-            source="1.8"
-            target="1.8"
         />
       </target>
 
@@ -175,8 +171,6 @@
         <!-- Compile the java jdk bean code from ${src} into ${dest} -->
         <javac srcdir="${basedir}/ldapbeans/src/main/java" destdir="${jdk.dist}"
             classpath="${jss.lib}:${slf4j.lib}"
-            source="1.8"
-            target="1.8"
         />
       </target>
 
@@ -184,8 +178,6 @@
         <!-- Compile the java code from ${src} into ${dest} -->
         <javac srcdir="${basedir}/ldapsp/src/main/java" destdir="${jndi.dist}"
             classpath="${jss.lib}:${basedir}/ldapsp/lib/jndi.jar:${slf4j.lib}"
-            source="1.8"
-            target="1.8"
         />
       </target>
 
