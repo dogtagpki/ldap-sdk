@@ -322,7 +322,7 @@ public class LDAPPersistSearchControl extends LDAPControl {
      * <P>
      *
      * For example:
-     * <PRE>
+     * <pre>{@Code
      * ...
      * LDAPConnection ld = new LDAPConnection();
      * try {
@@ -389,7 +389,7 @@ public class LDAPPersistSearchControl extends LDAPControl {
      * }
      * ...
      *
-     * </PRE>
+     * }</pre>
      *
      * @param controls an array of <CODE>LDAPControl</CODE> objects,
      * representing the controls returned by the server

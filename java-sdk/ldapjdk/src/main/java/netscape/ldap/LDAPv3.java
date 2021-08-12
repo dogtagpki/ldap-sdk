@@ -37,19 +37,9 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap;
 
-import java.util.*;
-import netscape.ldap.client.*;
-import netscape.ldap.client.opers.*;
-import java.io.*;
-
 /**
  * Specifies additional features available in version 3 of the
- * LDAP protocol. (To view preliminary information on this work
- * in progress, see the LDAP v3 internet draft.  You can find the
- * latest version of this document listed under the Internet-Drafts
- * section of the
- * <A HREF="http://www.ietf.cnri.reston.va.us/html.charters/asid-charter.html"
- * TARGET=_blank">ASID home page</A>.)
+ * LDAP protocol.
  *
  * @version 1.0
  */
@@ -72,10 +62,10 @@ public interface LDAPv3 extends LDAPv2 {
     /**
      * Authenticates to the LDAP server (to which the object is currently
      * connected) using the specified name, password, and version
-     * of the LDAP protocol. If the server does not support the requested 
-     * protocol version, an exception is thrown.  If the object has been 
-     * disconnected from an LDAP server, this method attempts to reconnect 
-     * to the server. If the object had already authenticated, the old 
+     * of the LDAP protocol. If the server does not support the requested
+     * protocol version, an exception is thrown.  If the object has been
+     * disconnected from an LDAP server, this method attempts to reconnect
+     * to the server. If the object had already authenticated, the old
      * authentication is discarded.
      * @param version requested LDAP protocol version: currently 2 or 3.
      * @param dn if non-null and non-empty, specifies that the
@@ -112,7 +102,7 @@ public interface LDAPv3 extends LDAPv2 {
                      String dn,
                      String passwd)
                      throws LDAPException;
-    
+
     /**
      * Performs an extended operation on the directory. Extended operations
      * are part of version 3 of the LDAP protocol.

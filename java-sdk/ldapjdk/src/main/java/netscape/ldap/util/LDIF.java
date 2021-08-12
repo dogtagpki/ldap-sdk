@@ -529,9 +529,9 @@ public class LDIF implements Serializable {
      *<BR>
      * control: 1.2.3.4.10.210:: 44GK44GM44GV44KP44KJ
      *<BR>
-     * control: 1.2.3.4.10.210 true:< file:///usr/local/directory/cont.dta
+     * control: 1.2.3.4.10.210 true:&lt; file:///usr/local/directory/cont.dta
      *<BR>
-     * control: 1.2.3.4.10.210:< file:///usr/local/directory/cont.dta
+     * control: 1.2.3.4.10.210:&lt; file:///usr/local/directory/cont.dta
      *
      * @param line a line containing a control spec
      * @return a parsed control.

@@ -335,9 +335,9 @@ public class LDAPSearchResults implements Enumeration<Object>, java.io.Serializa
      * <P>
      *
      * You can use this method in conjunction with the
-     * <CODE>hasMoreElements</CODE> method to iterate through
+     * {@Code hasMoreElements} method to iterate through
      * each entry in the search results.  For example:
-     * <PRE>
+     * <pre>{@Code
      * LDAPSearchResults res = ld.search( MY_SEARCHBASE,
      *                         LDAPConnection.SCOPE_BASE, MY_FILTER,
      *                         null, false );
@@ -356,7 +356,7 @@ public class LDAPSearchResults implements Enumeration<Object>, java.io.Serializa
      *   }
      *   ...
      * }
-     * </PRE>
+     * }</pre>
      * @return the next LDAP entry in the search results.
      * @exception LDAPReferralException A referral (thrown
      * if the next result is a referral), or LDAPException

@@ -37,8 +37,10 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.client;
 
-import java.util.*;
-import netscape.ldap.ber.stream.*;
+import java.util.StringTokenizer;
+import java.util.Vector;
+
+import netscape.ldap.ber.stream.BERElement;
 
 /**
  * This class implements the filter.
@@ -67,7 +69,7 @@ public abstract class JDAPFilter {
 
     /**
      * Constructs filter from filter string specified in RFC1558.
-     * <pre>
+     * <pre>{@Code
      * <filter> ::= '(' <filtercomp> ')'
      * <filtercomp> ::= <and> | <or> | <not> | <item>
      * <and> ::= '&' <filterlist>
@@ -87,7 +89,7 @@ public abstract class JDAPFilter {
      * <any> ::= '*' <starval>
      * <starval> ::= NULL | <value> '*' <starval>
      * <final> ::= NULL | <value>
-     * </pre>
+     * }</pre>
      * @param filter filter string as specified in RFC1558
      * @return filter
      */

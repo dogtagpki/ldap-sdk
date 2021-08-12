@@ -37,9 +37,6 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap;
 
-import java.util.*;
-import java.io.*;
-
 /**
  * Specifies how to retrieve authentication information automatically
  * for referrals. If you have set up the search constraints (or the options
@@ -50,12 +47,12 @@ import java.io.*;
  * If no class implements this interface, clients that follow automatic
  * referrals are authenticated anonymously to subsequent LDAP servers.
  * The following example is a simple class that implements this interface.
- * Objects of the myLDAPRebind class check the host and port of the 
- * referred LDAP server.  If the host and port are "alway.mcom.com:389", 
+ * Objects of the myLDAPRebind class check the host and port of the
+ * referred LDAP server.  If the host and port are "alway.mcom.com:389",
  * the directory manager's name and password are used to authenticate.
  * For all other LDAP servers, anonymous authentication is used.
  *
- * <PRE>
+ * <pre>{@Code
  * public class myLDAPRebind implements netscape.ldap.LDAPRebind
  * {
  *  private String myDN;
@@ -75,8 +72,8 @@ import java.io.*;
  *    }
  *    return myRebindInfo;
  *  }
- * } </PRE>
- *
+ * }
+ * }</pre>
  *
  * @version 1.0
  */

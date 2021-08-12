@@ -37,16 +37,17 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.controls;
 
-import java.io.*;
-import netscape.ldap.client.JDAPBERTagDecoder;
 import netscape.ldap.LDAPControl;
-import netscape.ldap.ber.stream.*;
+import netscape.ldap.ber.stream.BERInteger;
+import netscape.ldap.ber.stream.BEROctetString;
+import netscape.ldap.ber.stream.BERSequence;
+import netscape.ldap.ber.stream.BERTag;
 
 /**
  * Represents control data for returning paged results from a search.
  *
  * Example of usage, with JFC:
- *<PRE><CODE>
+ * <pre>{@Code
  *  // Call this to initialize the list box, whenever the search
  *  // conditions change.
  *  // "filter" may be "objectclass=person", for example
@@ -65,9 +66,9 @@ import netscape.ldap.ber.stream.*;
  *   model.setPageSize( getScrollVisibleSize() );
  *   _dataList.setModel( model );
  *  }
- *<P>
- * // Data model to supply buffer list data
- *class vlistModel extends AbstractListModel {
+ *
+ *  // Data model to supply buffer list data
+ *  class vlistModel extends AbstractListModel {
  *  vlistModel( String host, int port, String base, String filter ) {
  *      _base = base;
  *      _filter = filter;
@@ -219,9 +220,10 @@ import netscape.ldap.ber.stream.*;
  *  private String _base;
  *  private String _filter;
  *  private LDAPConnection _ldc;
- *}
- *</CODE></PRE>
- * <PRE>
+ *  }
+ * }</pre>
+ *
+ * <pre>{@Code
  *   VirtualListViewRequest ::= SEQUENCE {
  *            beforeCount    INTEGER (0 .. maxInt),
  *            afterCount     INTEGER (0 .. maxInt),
@@ -234,7 +236,7 @@ import netscape.ldap.ber.stream.*;
  *            },
  *            contextID     OCTET STRING OPTIONAL
  *  }
- * </PRE>
+ * }</pre>
  *
  * @version 1.0
  */
@@ -450,16 +452,16 @@ public class LDAPVirtualListControl extends LDAPControl {
 
     public String toString() {
          StringBuffer sb = new StringBuffer("{VirtListCtrl:");
-        
+
         sb.append(" isCritical=");
         sb.append(isCritical());
-        
+
         sb.append(" beforeCount=");
         sb.append(m_beforeCount);
-        
+
         sb.append(" afterCount=");
         sb.append(m_afterCount);
-        
+
         sb.append(" listIndex=");
         sb.append(m_listIndex);
 
@@ -475,7 +477,7 @@ public class LDAPVirtualListControl extends LDAPControl {
 
         return sb.toString();
     }
-    
+
     private final static int TAG_BYINDEX = 0;
     private final static int TAG_BYFILTER = 1;
     private int m_beforeCount = 0;

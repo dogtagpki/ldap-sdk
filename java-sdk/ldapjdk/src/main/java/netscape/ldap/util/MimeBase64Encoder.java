@@ -38,7 +38,7 @@
 package netscape.ldap.util;
 
 
-/** Implements a plaintext -> Base64 encoder.
+/** Implements a plaintext -&gt; Base64 encoder.
  */
 public final class MimeBase64Encoder extends MimeEncoder {
 

@@ -57,7 +57,7 @@ import javax.security.auth.callback.CallbackHandler;
  *</pre></blockquote>
  * It can then proceed to use the client create an authentication connection.
  * For example, an LDAP library might use the client as follows:
- *<blockquote><pre>
+ * <pre>{@code
  * InputStream is = ldap.getInputStream();
  * OutputStream os = ldap.getOutputStream();
  * byte[] toServer = sc.createInitialResponse();
@@ -76,7 +76,7 @@ import javax.security.auth.callback.CallbackHandler;
  *     ldap.setInputStream( is );
  *     ldap.setOutputStream( os );
  * }
- *</pre></blockquote>
+ * }</pre>
  *
  * IMPLEMENTATION NOTE: To use this class on JDK1.2, the caller needs:
  *<ul><tt>

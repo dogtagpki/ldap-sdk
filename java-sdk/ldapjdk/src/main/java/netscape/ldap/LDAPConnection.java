@@ -632,12 +632,12 @@ public class LDAPConnection
      * Returns the delay in seconds when making concurrent connection attempts to
      * multiple servers.
      * @return the delay in seconds between connection attempts:<br>
-     * <CODE>NODELAY_SERIAL</CODE> The serial connection setup policy is enabled
+     * {@Code NODELAY_SERIAL} The serial connection setup policy is enabled
      * (no concurrency).<br>
-     * <CODE>NODELAY_PARALLEL</CODE> The parallel connection setup policy with no delay
+     * {@Code NODELAY_PARALLEL} The parallel connection setup policy with no delay
      *  is enabled.<br>
-     * <CODE>delay > 0</CODE> The parallel connection setup policy with the delay of
-     * <CODE>delay</CODE> seconds is enabled.
+     * {@Code delay > 0} The parallel connection setup policy with the delay of
+     * {@Code delay} seconds is enabled.
      * @see netscape.ldap.LDAPConnection#setConnSetupDelay
      */
     public int getConnSetupDelay () {
@@ -648,7 +648,7 @@ public class LDAPConnection
      * Specifies the delay in seconds when making concurrent connection attempts to
      * multiple servers.
      * <P>Effectively, selects the connection setup policy when a list of hosts is passed
-     * to the <CODE>connect</CODE> method.
+     * to the {@Code connect} method.
      *
      * <br>If the serial policy is selected, the default one, an attempt is made to
      * connect to the first host in the list. The next entry in
@@ -658,15 +658,15 @@ public class LDAPConnection
      * <br>If the parallel policy is selected, multiple connection attempts may run
      * concurrently on a separate thread. A new connection attempt to the next entry
      * in the list can be started with or without delay.
-     * <P>You must set the <CODE>ConnSetupDelay</CODE> before making the call to the
-     * <CODE>connect</CODE> method.
+     * <P>You must set the {@Code ConnSetupDelay} before making the call to the
+     * {@Code connect} method.
      *
      * @param delay the delay in seconds between connection attempts. Possible values are:<br>
-     * <CODE>NODELAY_SERIAL</CODE> Use the serial connection setup policy.<br>
-     * <CODE>NODELAY_PARALLEL</CODE> Use the parallel connection setup policy with no delay.
+     * {@Code NODELAY_SERIAL} Use the serial connection setup policy.<br>
+     * {@Code NODELAY_PARALLEL} Use the parallel connection setup policy with no delay.
      * Start all connection setup threads immediately.<br>
-     * <CODE>delay > 0</CODE> Use the parallel connection setup policy with delay.
-     * Start another connection setup thread after <CODE>delay</CODE> seconds.<br>
+     * {@Code delay > 0} Use the parallel connection setup policy with delay.
+     * Start another connection setup thread after {@Code delay} seconds.<br>
      * @see netscape.ldap.LDAPConnection#NODELAY_SERIAL
      * @see netscape.ldap.LDAPConnection#NODELAY_PARALLEL
      * @see netscape.ldap.LDAPConnection#connect(java.lang.String, int)
@@ -4466,8 +4466,7 @@ public class LDAPConnection
      * </TABLE><P>
      * @param value the value to assign to the option.  The value must be
      * the java.lang object wrapper for the appropriate parameter
-     * (e.g. boolean->Boolean,
-     *   integer->Integer)
+     * (e.g. boolean-&gt;Boolean, integer-&gt;Integer)
      * @exception LDAPException Failed to set the specified option.
      * @see netscape.ldap.LDAPRebind
      * @see netscape.ldap.LDAPConstraints

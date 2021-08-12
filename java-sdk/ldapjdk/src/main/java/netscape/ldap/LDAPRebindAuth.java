@@ -49,7 +49,7 @@ package netscape.ldap;
  * on the LDAP server identified in the referral.  Ideally, this method would be
  * defined as part of a class implementing the <CODE>LDAPRebind</CODE> interface.
  *
- * <PRE>
+ * <pre>{@Code
  * private String myDN = "cn=Directory Manager,o=Ace Industry,c=US";
  * private String myPW = "alway4444";
  * private LDAPRebindAuth myRebindInfo;
@@ -61,7 +61,8 @@ package netscape.ldap;
  *      myRebindInfo = new LDAPRebindAuth( "", "" );
  *  }
  *  return myRebindInfo;
- * } </PRE>
+ * }
+ * }</pre>
  *
  * @version 1.0
  * @see netscape.ldap.LDAPRebind

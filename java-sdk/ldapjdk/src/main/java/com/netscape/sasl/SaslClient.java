@@ -60,7 +60,7 @@ import java.io.OutputStream;
  *</pre></blockquote>
  * It can then proceed to use the client for authentication.
  * For example, an LDAP library might use the client as follows:
- *<blockquote><pre>
+ * <pre>{@Code
  * InputStream is = ldap.getInputStream();
  * OutputStream os = ldap.getOutputStream();
  * byte[] toServer = sc.createInitialResponse();
@@ -79,7 +79,7 @@ import java.io.OutputStream;
  *     ldap.setInputStream( is );
  *     ldap.setOutputStream( os );
  * }
- *</pre></blockquote>
+ * }</pre>
  *
  * Note that the call to <tt>createInitialResponse()</tt> is optional.
  * Protocols such as IMAP4 do not invoke it but instead only use

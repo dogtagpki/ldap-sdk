@@ -37,9 +37,12 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.ber.stream;
 
-import java.util.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.StringTokenizer;
-import java.io.*;
+import java.util.Vector;
 
 /**
  * This class is for the Object ID object.
@@ -115,7 +118,7 @@ public class BERObjectId extends BERElement {
 
     /**
      * Sends the BER encoding directly to a stream. Note that OID must
-     * have >= 2 identifier components (values).
+     * have &gt;= 2 identifier components (values).
      * @param stream output stream
      * @exception IOException failed to write
      */
