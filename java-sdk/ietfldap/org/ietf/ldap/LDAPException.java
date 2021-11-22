@@ -1115,11 +1115,6 @@ public class LDAPException extends Exception
         if ( (matchedDN != null) && (matchedDN.length() > 0) ) {
             str += "; matchedDN = " + matchedDN;
         }
-        String errorStr = null;
-        if ( ((errorStr = resultCodeToString(m_locale)) != null) &&
-             (errorStr.length() > 0) ) {
-            str += "; " + errorStr;
-        }
         if ( (rootException != null) && (rootException != this) ) {
             str += " [Root exception is " + rootException.toString() + "]";
         }

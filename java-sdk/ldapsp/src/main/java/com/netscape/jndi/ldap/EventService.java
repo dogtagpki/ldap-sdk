@@ -304,8 +304,13 @@ class EventService implements Runnable{
             return; // ignore referral
         }
 
-        LDAPException ex = new LDAPException( "error result",rsp.getResultCode(),
-                           rsp.getErrorMessage(), rsp.getMatchedDN());
+        int resultCode = rsp.getResultCode();
+        LDAPException ex = new LDAPException(
+                LDAPException.errorCodeToString(resultCode),
+                resultCode,
+                rsp.getErrorMessage(),
+                rsp.getMatchedDN());
+
         NamingException nameEx = ExceptionMapper.getNamingException(ex);
         dispatchEvent(new NamingExceptionEvent(ee.ctx, nameEx), ee);
     }
