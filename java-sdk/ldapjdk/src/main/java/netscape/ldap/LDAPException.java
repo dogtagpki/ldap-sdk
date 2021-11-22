@@ -839,10 +839,6 @@ public class LDAPException extends java.lang.Exception
         if ( (matchedDN != null) && (matchedDN.length() > 0) ) {
             str += "; matchedDN = " + matchedDN;
         }
-        String  errorStr = errorCodeToString(m_locale);
-        if ((errorStr != null) && (errorStr.length() > 0)) {
-            str += "; " + errorStr;
-        }
         if (extraMessage != null) {
             str += "; " + extraMessage;
         }

@@ -5206,9 +5206,11 @@ public class LDAPConnection implements Cloneable, Serializable {
               throw new LDAPReferralException ( "referral", resultCode,
                                                 response.getErrorMessage() );
           } else {
-              throw new LDAPException ( "error result", resultCode,
-                                        response.getErrorMessage(),
-                                        response.getMatchedDN() );
+              throw new LDAPException(
+                      LDAPException.resultCodeToString(resultCode),
+                      resultCode,
+                      response.getErrorMessage(),
+                      response.getMatchedDN());
           }
 
       } else if ( m.getProtocolOp() instanceof JDAPSearchResultReference ) {
