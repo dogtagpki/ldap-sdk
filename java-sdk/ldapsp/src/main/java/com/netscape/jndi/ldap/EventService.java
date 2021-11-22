@@ -37,14 +37,33 @@
  * ***** END LICENSE BLOCK ***** */
 package com.netscape.jndi.ldap;
 
-import javax.naming.*;
-import javax.naming.directory.*;
-import javax.naming.ldap.*;
-import javax.naming.event.*;
-import netscape.ldap.*;
-import netscape.ldap.controls.*;
-import java.util.*;
-import com.netscape.jndi.ldap.common.*;
+import java.util.EventObject;
+import java.util.Vector;
+
+import javax.naming.Binding;
+import javax.naming.NamingException;
+import javax.naming.directory.SearchControls;
+import javax.naming.event.NamespaceChangeListener;
+import javax.naming.event.NamingEvent;
+import javax.naming.event.NamingExceptionEvent;
+import javax.naming.event.NamingListener;
+import javax.naming.event.ObjectChangeListener;
+
+import com.netscape.jndi.ldap.common.Debug;
+import com.netscape.jndi.ldap.common.ExceptionMapper;
+
+import netscape.ldap.LDAPConnection;
+import netscape.ldap.LDAPControl;
+import netscape.ldap.LDAPEntry;
+import netscape.ldap.LDAPException;
+import netscape.ldap.LDAPMessage;
+import netscape.ldap.LDAPResponse;
+import netscape.ldap.LDAPSearchConstraints;
+import netscape.ldap.LDAPSearchListener;
+import netscape.ldap.LDAPSearchResult;
+import netscape.ldap.LDAPSearchResultReference;
+import netscape.ldap.controls.LDAPEntryChangeControl;
+import netscape.ldap.controls.LDAPPersistSearchControl;
 
 /**
  * Event Service monitors changes on the server
@@ -59,7 +78,7 @@ class EventService implements Runnable{
     Vector m_eventList = new Vector();
     Thread m_monitorThread;
     LDAPSearchListener m_msgQueue; // for asynch ldap search
-    
+
     /**
      * Constructor
      */
@@ -73,7 +92,7 @@ class EventService implements Runnable{
     synchronized void addListener (LdapContextImpl ctx, String name,
                       String filter,SearchControls jndiCtrls, NamingListener l)
                       throws NamingException{
-        
+
         EventEntry event = null;
         LDAPSearchListener sl = null; // Search listener for this request
 
@@ -89,7 +108,7 @@ class EventService implements Runnable{
                 base = name;
             }
         }
-                
+
         //Create search constraints
         LDAPConnection ld = (LDAPConnection) m_ldapSvc.getConnection().clone();
         LDAPSearchConstraints cons=ld.getSearchConstraints();
@@ -98,13 +117,13 @@ class EventService implements Runnable{
 
         // return obj flag is ignored in this implementation
         boolean returnObjs = jndiCtrls.getReturningObjFlag();
-        
-        // Attributes in jndiCtrls.getReturningAttributes() are ignored 
+
+        // Attributes in jndiCtrls.getReturningAttributes() are ignored
         // This is because we are not returning objects in the NamingEvent
         // and thus listeners can not read attributes from the event.
         // Request only javaClassName to be able to determine object type
-        String[] attrs = new String[] { "javaclassname" }; 
-            
+        String[] attrs = new String[] { "javaclassname" };
+
         // Search scope
         int scope = ProviderUtils.jndiSearchScopeToLdap(jndiCtrls.getSearchScope());
 
@@ -116,11 +135,11 @@ class EventService implements Runnable{
                 break;
             }
         }
-        
+
         // If event entry does not exist, send an asynch persistent search
         // request and create a new event entry
         if (event == null) {
-            try {                    
+            try {
                 Debug.println(1, "Do persistent search for " + base);
                 sl = ld.search( base, scope, filter, attrs,
                                 false, /*l=*/null, cons);
@@ -145,15 +164,15 @@ class EventService implements Runnable{
         else {
             m_msgQueue.merge(sl);
         }
-        
+
         // Create new event if reqested change is not already monitored
         if (m_monitorThread == null) {
             m_monitorThread = new Thread (this, "EventService");
             m_monitorThread.setDaemon(true);
             m_monitorThread.start();
-        }    
+        }
     }
-    
+
     /**
      * Remove change event listener
      */
@@ -175,18 +194,18 @@ class EventService implements Runnable{
                 }
             }
         }
-        
+
         // Stop the monitor thread if no events are left
         // Actually, the thread should stop by itself, as when no outstanding
         // events are left LDAPSearchListener.getResponse() should return null
         if (m_eventList.size() == 0) {
             m_monitorThread = null;
-        }            
-      
+        }
+
         if (!removed) {
             throw new NamingException("Listener not found");
         }
-     }    
+     }
 
     /**
      * Abandon LDAP request with the specified message ID
@@ -198,23 +217,23 @@ class EventService implements Runnable{
         }
         catch (LDAPException ex) {}
      }
-         
-     
+
+
     /**
      * Main monitor thread loop. Wait for persistent search change notifications
      */
     public void run() {
-        
+
         LDAPMessage msg = null;
 
-        
+
         while (m_monitorThread != null) {
 
             try {
-                
+
                 // Block untill a message is received
                 msg = m_msgQueue.getResponse();
-                
+
             }
             catch (LDAPException ex) {
                 processNetworkError(ex);
@@ -225,11 +244,11 @@ class EventService implements Runnable{
                 Debug.println(1, "No more messages, bye");
                 m_monitorThread = null;
                 return;
-            }                        
-          
+            }
+
             synchronized (EventService.this) {
-                
-                EventEntry eventEntry = getEventEntry(msg.getMessageID());                
+
+                EventEntry eventEntry = getEventEntry(msg.getMessageID());
 
                 // If no listeners, abandon this message id
                 if (eventEntry == null) {
@@ -237,29 +256,29 @@ class EventService implements Runnable{
 
                     if (! (msg instanceof LDAPResponse)) {
                         abandonRequest(msg.getMessageID());
-                    }                    
+                    }
                     continue;
                 }
-                
+
                 // Check for error message ...
                 if (msg instanceof LDAPResponse) {
                     processResponseMsg((LDAPResponse) msg, eventEntry);
                 }
-                    
+
                 // ... or referral ...
                 else if (msg instanceof LDAPSearchResultReference) {
                     processSearchResultRef((LDAPSearchResultReference) msg, eventEntry);
-                }                   
+                }
 
-            
+
                 // ... then must be a LDAPSearchResult carrying change control
                 else if (msg instanceof LDAPSearchResult) {
                     processSearchResultMsg((LDAPSearchResult) msg, eventEntry);
                 }
             }
-        } // end of synchronized block            
+        } // end of synchronized block
     }
-    
+
     /**
      * On network error, create NamingExceptionEvent and delever it to all
      * listeners on all events.
@@ -270,8 +289,8 @@ class EventService implements Runnable{
             EventEntry ee = (EventEntry)m_eventList.elementAt(i);
             dispatchEvent(new NamingExceptionEvent(ee.ctx, nameEx), ee);
         }
-    }                
-    
+    }
+
     /**
      * Response message carries a LDAP error. Response with the code 0 (SUCCESS),
      * should never be received as persistent search never completes, it has to
@@ -284,19 +303,19 @@ class EventService implements Runnable{
         else if (rsp.getResultCode() == LDAPException.REFERRAL) {
             return; // ignore referral
         }
-        
+
         LDAPException ex = new LDAPException( "error result",rsp.getResultCode(),
                            rsp.getErrorMessage(), rsp.getMatchedDN());
         NamingException nameEx = ExceptionMapper.getNamingException(ex);
         dispatchEvent(new NamingExceptionEvent(ee.ctx, nameEx), ee);
-    }        
-    
+    }
+
     /**
      * Process change notification attached as the change control to the message
      */
     private void processSearchResultMsg(LDAPSearchResult res, EventEntry ee) {
         LDAPEntry modEntry = res.getEntry();
-               
+
         Debug.println(1, "Changed " + modEntry.getDN());
 
         /* Get any entry change controls. */
@@ -322,7 +341,7 @@ class EventService implements Runnable{
                     "Can not create NamingEvent, no change control info");
                     dispatchEvent(new NamingExceptionEvent(ee.ctx, ex), ee);
                 }
-      
+
                 // Convert control into a NamingEvent and dispatch to listeners
                 try {
                     NamingEvent event = createNamingEvent(ee.ctx, modEntry, changeCtrl);
@@ -332,9 +351,9 @@ class EventService implements Runnable{
                     dispatchEvent(new NamingExceptionEvent(ee.ctx, ex), ee);
                 }
             }
-        }                       
+        }
     }
-    
+
     /**
      * Search continuation messages are ignored.
      */
@@ -351,10 +370,10 @@ class EventService implements Runnable{
             if (ee.id == id) {
                 return ee;
             }
-        }            
+        }
         return null;
     }
-    
+
     /**
      * Dispatch naming event to all listeners
      */
@@ -368,7 +387,7 @@ class EventService implements Runnable{
                 dispatchList[i] = (NamingListener)eventEntry.listeners.elementAt(i);
             }
         }
-           
+
         // dispatch to all listeners
         for (int i=0; i < dispatchList.length; i++) {
             if (event instanceof NamingEvent) {
@@ -376,7 +395,7 @@ class EventService implements Runnable{
             }
             else {
                 ((NamingExceptionEvent)event).dispatch(dispatchList[i]);
-            }    
+            }
         }
     }
 
@@ -386,7 +405,7 @@ class EventService implements Runnable{
     private NamingEvent createNamingEvent(LdapContextImpl ctx, LDAPEntry entry,
                         LDAPEntryChangeControl changeCtrl)throws NamingException{
 
-        Binding oldBd = null, newBd = null;            
+        Binding oldBd = null, newBd = null;
         int eventType = -1;
         Object changeInfo = null;
         String oldName = null, newName = null;
@@ -430,10 +449,10 @@ class EventService implements Runnable{
 
         if (oldName != null) {
             oldBd = new Binding(oldName, className, /*obj=*/null, /*isRelative=*/true);
-        }    
+        }
         if (newName!= null) {
             newBd = new Binding(newName, className, /*obj=*/null, /*isRelative=*/true);
-        }    
+        }
         return new NamingEvent(ctx, eventType, newBd, oldBd, changeInfo);
     }
 
@@ -442,9 +461,9 @@ class EventService implements Runnable{
      */
     private LDAPPersistSearchControl createSrchCtrl(NamingListener listener)
                                      throws NamingException{
-        
+
         int op = 0;
-        
+
         if (listener instanceof ObjectChangeListener) {
             op = LDAPPersistSearchControl.MODIFY;
         }
@@ -456,7 +475,7 @@ class EventService implements Runnable{
         if (op == 0) {
             throw new NamingException("Non supported listener type " +
                 listener.getClass().getName());
-        }    
+        }
 
         return  new LDAPPersistSearchControl( op, /*changesOnly=*/true,
                           /*returnControls=*/true, /*isCritical=*/true );
@@ -468,14 +487,14 @@ class EventService implements Runnable{
      * described with a set of search parameters, and a list of listeners
      */
     static private class EventEntry {
-        
+
         LdapContextImpl ctx;
         String base, filter, attrs[];
         int scope;
         LDAPSearchConstraints cons;
         int id; // ldap message id
         Vector listeners   = new Vector(); // vector of NamingListener
-        
+
         /**
          * Constructor
          */
@@ -490,7 +509,7 @@ class EventService implements Runnable{
             this.attrs = attrs;
             this.cons = cons;
         }
-        
+
         /**
          * Add Listsner
          */
@@ -503,29 +522,29 @@ class EventService implements Runnable{
          */
         synchronized boolean removeListener(NamingListener l) {
             return listeners.removeElement(l);
-        }    
+        }
 
         /**
          * Chech whether there are any listeners
          */
         boolean isEmpty() {
             return listeners.size() == 0;
-         }    
-         
+         }
+
 
         /**
          * Check whether this event paramaters are matched
          */
         boolean isEqualEvent(String base, int scope, String filter,
                       String[] attrs, LDAPSearchConstraints cons) {
-        
+
             if (!this.base.equals(base) || this.scope != scope ||
                 !this.filter.equals(filter)) {
-                    
+
                 return false;
             }
-            
-            // attrs[] 
+
+            // attrs[]
             if (this.attrs == null) {
                 if (attrs != null) {
                     return false;
@@ -545,23 +564,23 @@ class EventService implements Runnable{
                         if (this.attrs[i].equals(attrs[j])) {
                             found = true;
                             break;
-                        }                            
+                        }
                     }
                     if (!found) {
                         return false;
-                    } 
+                    }
                 }
-            }    
+            }
 
             // Check if persistent search is for the same change type
             LDAPPersistSearchControl
                 psearch1 = (LDAPPersistSearchControl)this.cons.getServerControls()[0],
                 psearch2 = (LDAPPersistSearchControl)cons.getServerControls()[0];
             int types1 = psearch1.getChangeTypes(),
-                types2 = psearch2.getChangeTypes();                
+                types2 = psearch2.getChangeTypes();
             return (types1 == types2);
         }
-        
+
         public String toString() {
             LDAPPersistSearchControl
                 psearch = (LDAPPersistSearchControl)cons.getServerControls()[0];
@@ -580,4 +599,4 @@ class EventService implements Runnable{
             return str;
         }
     }
-}    
+}
