@@ -50,7 +50,7 @@ import java.net.Socket;
 public interface LDAPTLSSocketFactory extends LDAPSocketFactory {
     /**
      * Creates an SSL socket layered over an existing socket.
-     * 
+     *
      * Used for the start TLS operations (RFC2830).
      *
      * @param s An existing non-SSL socket

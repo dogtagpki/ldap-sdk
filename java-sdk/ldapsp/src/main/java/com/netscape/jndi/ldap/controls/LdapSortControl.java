@@ -126,6 +126,6 @@ public class LdapSortControl extends LDAPSortControl implements Control{
      */
     public byte[] getEncodedValue() {
         return getValue();
-    }    
+    }
 }
 

@@ -101,7 +101,7 @@ public class JDAPSearchRequest extends JDAPBaseDNRequest
     protected int m_time_limit;
     protected boolean m_attrs_only;
     protected String m_filter = null;
-    protected JDAPFilter m_parsedFilter = null; 
+    protected JDAPFilter m_parsedFilter = null;
     protected String m_attrs[] = null;
 
     /**
@@ -115,7 +115,7 @@ public class JDAPSearchRequest extends JDAPBaseDNRequest
      * @param filter string filter based on RFC1558
      * @param attrs list of attribute types
      * @exception IllegalArgumentException if the filter has bad syntax
-     * 
+     *
      */
     public JDAPSearchRequest(String base_dn, int scope, int deref,
         int size_limit, int time_limit, boolean attrs_only,
@@ -131,7 +131,7 @@ public class JDAPSearchRequest extends JDAPBaseDNRequest
             JDAPFilterOpers.convertLDAPv2Escape(m_filter));
         if (m_parsedFilter == null){
             throw new IllegalArgumentException("Bad search filter");
-        }        
+        }
         m_attrs = attrs;
     }
 

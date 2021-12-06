@@ -69,11 +69,11 @@ import netscape.ldap.LDAPReferralException;
 public class ExceptionMapper {
 
     public static NamingException getNamingException(Exception origException) {
-        
+
         if (origException instanceof NamingException) {
             return (NamingException)origException;
         }
-        
+
         /**
          * LdapJDK exceptions
          */
@@ -83,11 +83,11 @@ public class ExceptionMapper {
             // into jndi LdapReferralException instances.
             return new NamingException("Provider internal error, LDAPReferralException not captured");
         }
-        
+
         else if (origException instanceof LDAPException) {
             LDAPException ldapException = (LDAPException) origException;
             int resCode = ldapException.getLDAPResultCode();
-            
+
             if (resCode == LDAPException.OPERATION_ERROR) {
                 NamingException nameEx = new NamingException(ldapException.toString());
                 nameEx.setRootCause(ldapException);
@@ -107,7 +107,7 @@ public class ExceptionMapper {
                 NamingException nameEx = new NamingException(ldapException.toString());
                 nameEx.setRootCause(ldapException);
                 return nameEx;
-            }    
+            }
             // COMPARE_TRUE should never happen, but is included here for completeness
             else if (resCode == LDAPException.COMPARE_TRUE) {
                 NamingException nameEx = new NamingException(ldapException.toString());
@@ -206,28 +206,28 @@ public class ExceptionMapper {
                 return nameEx;
             }
             else if (resCode == LDAPException.NAMING_VIOLATION) {
-                return new InvalidNameException(ldapException.toString());                
+                return new InvalidNameException(ldapException.toString());
             }
             else if (resCode == LDAPException.OBJECT_CLASS_VIOLATION) {
-                return new SchemaViolationException(ldapException.toString());                
+                return new SchemaViolationException(ldapException.toString());
             }
             else if (resCode == LDAPException.NOT_ALLOWED_ON_NONLEAF) {
-                return new ContextNotEmptyException(ldapException.toString());                
+                return new ContextNotEmptyException(ldapException.toString());
             }
             else if (resCode == LDAPException.NOT_ALLOWED_ON_RDN) {
-                return new SchemaViolationException(ldapException.toString());                
+                return new SchemaViolationException(ldapException.toString());
             }
             else if (resCode == LDAPException.ENTRY_ALREADY_EXISTS) {
-                return new NameAlreadyBoundException(ldapException.toString());                
+                return new NameAlreadyBoundException(ldapException.toString());
             }
             else if (resCode == LDAPException.OBJECT_CLASS_MODS_PROHIBITED) {
-                return new SchemaViolationException(ldapException.toString());                
+                return new SchemaViolationException(ldapException.toString());
             }
             else if (resCode == LDAPException.SERVER_DOWN) {
-                return new CommunicationException(ldapException.toString());                
+                return new CommunicationException(ldapException.toString());
             }
             else if (resCode == LDAPException.CONNECT_ERROR) {
-                return new CommunicationException(ldapException.toString());                
+                return new CommunicationException(ldapException.toString());
             }
 
             else {
@@ -239,7 +239,7 @@ public class ExceptionMapper {
                 // 93     CONTROL_NOT_FOUND
                 // 94     NO_RESULTS_RETURNED
                 // 95     MORE_RESULTS_TO_RETURN
-                // 96     CLIENT_LOOP                referral                
+                // 96     CLIENT_LOOP                referral
                 // 97     REFERRAL_LIMIT_EXCEEDED    referral
 
                 NamingException nameEx = new NamingException(ldapException.toString());
@@ -247,7 +247,7 @@ public class ExceptionMapper {
                 return nameEx;
             }
         }
-        
+
         /**
          * All other Exceptions
          */

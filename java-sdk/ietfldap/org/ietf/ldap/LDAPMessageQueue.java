@@ -70,10 +70,10 @@ public interface LDAPMessageQueue {
     public LDAPMessage getResponse() throws LDAPException;
 
     /**
-     * Blocks until a response is available for a particular message ID, or 
-     * until all operations associated with the message ID have completed or 
-     * been canceled, and returns the response. If there is no outstanding 
-     * operation for the message ID (or if it is zero or a negative number), 
+     * Blocks until a response is available for a particular message ID, or
+     * until all operations associated with the message ID have completed or
+     * been canceled, and returns the response. If there is no outstanding
+     * operation for the message ID (or if it is zero or a negative number),
      * IllegalArgumentException is thrown.
      *
      * @param msgid A particular message to query for responses available
@@ -94,9 +94,9 @@ public interface LDAPMessageQueue {
     public boolean isResponseReceived();
 
     /**
-     * Reports true if a response has been received from the server for a 
-     * particular message ID. If there is no outstanding operation for the 
-     * message ID (or if it is zero or a negative number), 
+     * Reports true if a response has been received from the server for a
+     * particular message ID. If there is no outstanding operation for the
+     * message ID (or if it is zero or a negative number),
      * IllegalArgumentException is thrown.
      *
      * @param msgid A particular message to query for responses available
@@ -107,10 +107,10 @@ public interface LDAPMessageQueue {
     /**
      * Merge two message queues.
      * Move/append the content from another message queue to this one.
-     * 
+     *
      * To be used for synchronization of asynchronous LDAP operations where
      * requests are sent by one thread but processed by another one
-     * 
+     *
      * A client may be implemented in such a way that one thread makes LDAP
      * requests and calls l.getMessageIDs(), while another thread is
      * responsible for

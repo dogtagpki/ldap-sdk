@@ -90,7 +90,7 @@ public abstract class JDAPFilterSet extends JDAPFilter {
         try {
             BERSet filters = new BERSet();
             for (int i = 0; i < m_set.size(); i++) {
-                JDAPFilter f = (JDAPFilter)m_set.elementAt(i);
+                JDAPFilter f = m_set.elementAt(i);
                 filters.addElement(f.getBERElement());
             }
             BERTag element = new BERTag(m_tag, filters, true);
@@ -109,7 +109,7 @@ public abstract class JDAPFilterSet extends JDAPFilter {
         for (int i = 0; i < m_set.size(); i++) {
             if (i != 0)
                 s = s + ",";
-            JDAPFilter f = (JDAPFilter)m_set.elementAt(i);
+            JDAPFilter f = m_set.elementAt(i);
             s = s + f.toString();
         }
         return s;

@@ -49,12 +49,12 @@ import javax.naming.directory.ModificationItem;
 public abstract class SchemaElementContainer extends SchemaDirContext {
 
     SchemaManager m_schemaMgr;
-    
+
     public SchemaElementContainer(SchemaManager schemaMgr, String path) throws NamingException{
         m_schemaMgr = schemaMgr;
         m_path = path;
     }
-    
+
     /**
      * Create a new SchemaElement. Called by craeteSubcontext
      */
@@ -64,7 +64,7 @@ public abstract class SchemaElementContainer extends SchemaDirContext {
      * Delete a new SchemaElement. Called by destroySubcontext
      */
     abstract void removeSchemaElement(String name) throws NamingException;
-    
+
     /**
      * Return a list of names for subordinate SchemaElement. Called by list()
      */
@@ -75,18 +75,18 @@ public abstract class SchemaElementContainer extends SchemaDirContext {
      * listBindings()
      */
     abstract NamingEnumeration getBindingsList(String name) throws NamingException;
-    
+
     /**
      * Get a SchemaElement by name
      */
     abstract Object lookupSchemaElement(String name) throws NamingException;
-    
+
 
     /**
      * Attribute Operations
      */
     public Attributes getAttributes(String name) throws NamingException {
-        
+
         SchemaDirContext schemaElement = (SchemaDirContext)lookup(name);
         if (schemaElement == this) {
             throw new OperationNotSupportedException("No Attributes for " + m_path);
@@ -182,7 +182,7 @@ public abstract class SchemaElementContainer extends SchemaDirContext {
         }
         else {
             throw new IllegalArgumentException("Can not bind this type of object");
-        }    
+        }
     }
 
     public void bind(Name name, Object obj) throws NamingException {
@@ -237,7 +237,7 @@ public abstract class SchemaElementContainer extends SchemaDirContext {
      * Lookup Operations
      */
 
-    public Object lookup(String name) throws NamingException {    
+    public Object lookup(String name) throws NamingException {
         return lookupSchemaElement(name);
     }
 

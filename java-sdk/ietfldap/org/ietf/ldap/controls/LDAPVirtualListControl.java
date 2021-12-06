@@ -451,16 +451,16 @@ public class LDAPVirtualListControl extends LDAPControl {
 
     public String toString() {
          StringBuffer sb = new StringBuffer("{VirtListCtrl:");
-        
+
         sb.append(" isCritical=");
         sb.append(isCritical());
-        
+
         sb.append(" beforeCount=");
         sb.append(_beforeCount);
-        
+
         sb.append(" afterCount=");
         sb.append(_afterCount);
-        
+
         sb.append(" listIndex=");
         sb.append(_listIndex);
 
@@ -476,7 +476,7 @@ public class LDAPVirtualListControl extends LDAPControl {
 
         return sb.toString();
     }
-    
+
     private final static int TAG_BYINDEX = 0;
     private final static int TAG_BYFILTER = 1;
     private int _beforeCount = 0;

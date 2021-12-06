@@ -56,14 +56,14 @@ public class LdapPasswordExpiredControl extends LDAPPasswordExpiredControl imple
     LdapPasswordExpiredControl(boolean critical, byte[] value) throws Exception{
         super(EXPIRED, critical, value);
     }
-    
+
     /**
      * Return string message passed in the control
      * @return message string
      */
     public String getMessage() {
         return super.getMessage();
-    }    
+    }
 
     /**
      * Retrieves the ASN.1 BER encoded value of the LDAP control.
@@ -73,5 +73,5 @@ public class LdapPasswordExpiredControl extends LDAPPasswordExpiredControl imple
      */
     public byte[] getEncodedValue() {
         return getValue();
-    }    
+    }
 }

@@ -69,7 +69,7 @@ import org.ietf.ldap.client.JDAPBERTagDecoder;
  *           offsetRangeError         (61),
  *           other                    (80)
  *       },
- *       contextID     OCTET STRING OPTIONAL 
+ *       contextID     OCTET STRING OPTIONAL
  *  }
  *</PRE>
  */
@@ -88,23 +88,23 @@ public class LDAPVirtualListResponse extends LDAPControl {
    /**
      * Contructs an <CODE>LDAPVirtualListResponse</CODE> object.
      * @param oid this parameter must be equal to
-     * <CODE>LDAPVirtualListResponse.VIRTUALLISTRESPONSE</CODE> or an 
+     * <CODE>LDAPVirtualListResponse.VIRTUALLISTRESPONSE</CODE> or an
      * <CODE>LDAPException</CODE>is thrown
      * @param critical <code>true</code> if this control is critical
      * @param value the value associated with this control
-     * @exception org.ietf.ldap.LDAPException If oid is not 
+     * @exception org.ietf.ldap.LDAPException If oid is not
      * <CODE>LDAPVirtualListResponse.VIRTUALLISTRESPONSE</CODE>.
      * @see org.ietf.ldap.LDAPControl#register
-     */ 
-    public LDAPVirtualListResponse( String oid, boolean critical, 
+     */
+    public LDAPVirtualListResponse( String oid, boolean critical,
                                     byte[] value ) throws LDAPException {
         super( VIRTUALLISTRESPONSE, critical, value );
         if ( !oid.equals( VIRTUALLISTRESPONSE ) ) {
              throw new LDAPException( "oid must be LDAPVirtualListResponse." +
-                                      "VIRTUALLISTRESPONSE", 
+                                      "VIRTUALLISTRESPONSE",
                                       LDAPException.PARAM_ERROR);
         }
-        
+
 	parseResponse();
     }
 
@@ -189,7 +189,7 @@ public class LDAPVirtualListResponse extends LDAPControl {
      * @param controls an array of controls that may include a VLV
      * results control
      * @return the control, if any; otherwise null.
-     * @deprecated LDAPVirtualListResponse controls are now automatically 
+     * @deprecated LDAPVirtualListResponse controls are now automatically
      * instantiated.
      */
     public static LDAPVirtualListResponse parseResponse(
@@ -211,19 +211,19 @@ public class LDAPVirtualListResponse extends LDAPControl {
 
     public String toString() {
          StringBuffer sb = new StringBuffer("{VirtListResponseCtrl:");
-        
+
         sb.append(" isCritical=");
         sb.append(isCritical());
-        
+
         sb.append(" firstPosition=");
         sb.append(_firstPosition);
-        
+
         sb.append(" contentCount=");
         sb.append(_contentCount);
 
         sb.append(" resultCode=");
         sb.append(_resultCode);
-        
+
         if (_context != null) {
             sb.append(" conext=");
             sb.append(_context);
@@ -234,7 +234,7 @@ public class LDAPVirtualListResponse extends LDAPControl {
         return sb.toString();
     }
 
-    
+
     private int _firstPosition = 0;
     private int _contentCount = 0;
     private int _resultCode = -1;

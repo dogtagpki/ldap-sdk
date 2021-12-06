@@ -96,7 +96,7 @@ public class JSSESocketFactory
     public JSSESocketFactory( SSLSocketFactory factory) {
         this.factory = factory;
     }
-  
+
    /**
     * Factory constructor
     *
@@ -119,8 +119,8 @@ public class JSSESocketFactory
      * @exception LDAPException on error creating socket
      */
     public Socket createSocket(String host, int port)
-        throws LDAPException { 
-  
+        throws LDAPException {
+
         SSLSocket sock = null;
 
         try {
@@ -129,7 +129,7 @@ public class JSSESocketFactory
             if (suites != null) {
                 sock.setEnabledCipherSuites(suites);
             }
-            
+
             // Start handshake manually to immediately expose potential
             // SSL errors as exceptions. Otherwise, handshake will take
             // place first time the data are written to the socket.

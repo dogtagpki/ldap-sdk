@@ -47,7 +47,7 @@ import javax.naming.NamingException;
 class SchemaNameParser implements NameParser {
 
     private static SchemaNameParser m_parser;
-    
+
     // A table with compound name syntax properties
     static Properties nameSyntax;
     static {
@@ -59,7 +59,7 @@ class SchemaNameParser implements NameParser {
 
     // Can not be constructed
     private SchemaNameParser() {}
-    
+
     // Shared instance must be used
     public static SchemaNameParser getParser() {
         if (m_parser == null) {
@@ -67,10 +67,10 @@ class SchemaNameParser implements NameParser {
         }
         return m_parser;
     }
-    
+
     // implements parse
     public Name parse(String name) throws NamingException {
         return new CompoundName(name, nameSyntax);
     }
-    
+
 }

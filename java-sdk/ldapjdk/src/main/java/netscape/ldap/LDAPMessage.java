@@ -101,7 +101,7 @@ public class LDAPMessage implements java.io.Serializable {
     public final static int SEARCH_RESULT_REFERENCE = 19;
     public final static int EXTENDED_REQUEST    = 23;
     public final static int EXTENDED_RESPONSE   = 24;
-        
+
     /**
      * Internal variables
      */
@@ -135,13 +135,13 @@ public class LDAPMessage implements java.io.Serializable {
         int l_msgid;
         JDAPProtocolOp l_protocolOp = null;
         LDAPControl l_controls[] = null;
-        
+
         if (element.getType() != BERElement.SEQUENCE)
             throw new IOException("SEQUENCE in jdap message expected");
         BERSequence seq = (BERSequence)element;
         BERInteger msgid = (BERInteger)seq.elementAt(0);
         l_msgid = msgid.getValue();
-        BERElement protocolOp = (BERElement)seq.elementAt(1);
+        BERElement protocolOp = seq.elementAt(1);
         if (protocolOp.getType() != BERElement.TAG) {
             throw new IOException("TAG in protocol operation is expected");
         }
@@ -198,22 +198,22 @@ public class LDAPMessage implements java.io.Serializable {
     		    }
             }
         }
-        
+
         if (l_protocolOp instanceof JDAPSearchResponse) {
             return new LDAPSearchResult(l_msgid,
                 (JDAPSearchResponse) l_protocolOp, l_controls);
-        }            
+        }
         else if (l_protocolOp instanceof JDAPSearchResultReference) {
             return new LDAPSearchResultReference(l_msgid,
                 (JDAPSearchResultReference) l_protocolOp, l_controls);
-        }            
+        }
         else if (l_protocolOp instanceof JDAPExtendedResponse) {
             return new LDAPExtendedResponse(l_msgid,
                 (JDAPExtendedResponse) l_protocolOp, l_controls);
         }
         else {
             return new LDAPResponse(l_msgid, l_protocolOp, l_controls);
-        }            
+        }
     }
 
     /**
@@ -288,7 +288,7 @@ public class LDAPMessage implements java.io.Serializable {
         }
         return sb.toString();
     }
-    
+
     /**
      * Returns string representation of a ldap message with
      * the time stamp. Used for message trace

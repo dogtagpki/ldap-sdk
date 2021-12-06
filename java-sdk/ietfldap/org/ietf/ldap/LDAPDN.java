@@ -72,7 +72,7 @@ public class LDAPDN {
         }
     }
 
-    /** 
+    /**
      * Compares two dn's for equality.
      * @param dn1 the first dn to compare
      * @param dn2 the second dn to compare
@@ -112,7 +112,7 @@ public class LDAPDN {
                     buffer[j].insert(i, '\\');
                     i++;
                 }
-                
+
                 i++;
             }
 
@@ -147,7 +147,7 @@ public class LDAPDN {
         return true;
     }
 
-    /** 
+    /**
      * Normalizes the dn.
      * @param dn the DN to normalize
      * @return the normalized DN
@@ -155,7 +155,7 @@ public class LDAPDN {
     public static String normalize(String dn) {
         return (new DN(dn)).toString();
     }
-    
+
     /**
      * Returns the RDN after unescaping any escaped characters.
      * For a list of characters that are typically escaped in a

@@ -52,7 +52,7 @@ public class DisplayString extends TextArea implements Serializable {
     }
 
     public void reportChange(PropertyChangeEvent evt) {
-        Object obj = (Object)evt.getNewValue();
+        Object obj = evt.getNewValue();
         if (obj == null) {
             append("null\n");
             return;

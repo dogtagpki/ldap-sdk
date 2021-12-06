@@ -296,9 +296,9 @@ public abstract class BERElement implements Serializable {
                     bytes_read[0]++;
                 }
                 if (negative)
-                    value = (value<<8) + (int)(octet^0xFF)&0xFF;
+                    value = (value<<8) + (octet^0xFF)&0xFF;
                 else
-                    value = (value<<8) + (int)(octet&0xFF);
+                    value = (value<<8) + (octet&0xFF);
             }
             if (negative)  /* convert to 2's complement */
                 value = (value + 1) * -1;

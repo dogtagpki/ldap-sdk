@@ -170,7 +170,7 @@ public class BERReal extends BERElement {
                 number = readUnsignedBinary(stream, bytes_read, contents_length_left);
 
                 mantissa = (int)(sign * number * Math.pow(2, f));
-                m_value = mantissa * (float)Math.pow((double)base,(double)exponent);
+                m_value = mantissa * (float)Math.pow(base,exponent);
             } else {
                 /* bits 8 + 7 = 00 */
                 /* ISO 6093 field */

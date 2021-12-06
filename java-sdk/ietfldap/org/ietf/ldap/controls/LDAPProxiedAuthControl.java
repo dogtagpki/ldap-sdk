@@ -93,7 +93,7 @@ public class LDAPProxiedAuthControl extends LDAPControl {
                                             "2.16.840.1.113730.3.4.12";
 
     private String _dn;
-    
+
     /**
      * Constructs an <CODE>LDAPProxiedAuthControl</CODE> object with a
      * DN to use as identity.
@@ -126,13 +126,13 @@ public class LDAPProxiedAuthControl extends LDAPControl {
 
     public String toString() {
          StringBuffer sb = new StringBuffer("{ProxiedAuthCtrl:");
-        
+
         sb.append(" isCritical=");
         sb.append(isCritical());
-        
+
         sb.append(" dn=");
         sb.append(_dn);
-        
+
         sb.append("}");
 
         return sb.toString();

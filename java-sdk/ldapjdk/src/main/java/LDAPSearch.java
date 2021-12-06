@@ -62,14 +62,14 @@ import netscape.ldap.util.LDIFWriter;
 import netscape.ldap.util.MimeBase64Encoder;
 
 /**
- * Execute Search operations through the LDAP client interface. 
+ * Execute Search operations through the LDAP client interface.
  * This class is implemented based on the LDAP class library.
  *
  * <pre>
  * usage       : java LDAPSearch -b baseDN [options] filter [attributes...]
- * for example : java LDAPSearch -b "c=us" -h ds.internic.net -p 389 
+ * for example : java LDAPSearch -b "c=us" -h ds.internic.net -p 389
  *               "(objectClass=*)"
- *     
+ *
  *   note: '-' or '/' is used to distinct the option field.
  *         e.g. -a -b /c /d parameter -e parameter
  *
@@ -84,12 +84,12 @@ import netscape.ldap.util.MimeBase64Encoder;
  *
  * @version 1.0
  */
-public class LDAPSearch extends LDAPTool { 
+public class LDAPSearch extends LDAPTool {
 	/**
 	 * This is the main function.
 	 * @param args list of arguments
 	 */
-    public static void main(String args[]) { 
+    public static void main(String args[]) {
 
 		/* extract parameters from the arguments list */
 		extractParameters(args);
@@ -103,7 +103,7 @@ public class LDAPSearch extends LDAPTool {
 				System.err.println("Error: client connection failed!");
 				System.exit(0);
 			}
-	
+
 			/* perform an LDAP bind operation */
 			try {
 				m_client.authenticate( m_version, m_binddn, m_passwd );
@@ -184,7 +184,7 @@ public class LDAPSearch extends LDAPTool {
 	 * arguments list.
 	 * @param args list of args
 	 */
-    protected static void extractParameters(String args[]) { 
+    protected static void extractParameters(String args[]) {
 
 		String privateOpts = "HATtxvnXa:b:F:l:s:S:z:G:";
 
@@ -195,7 +195,7 @@ public class LDAPSearch extends LDAPTool {
 			doUsage();
 			System.exit(0);
 		} /* Help */
-  
+
 		/* -A retrieve attribute name only == no values */
 		if (options.hasOption('A'))
 			m_attrsonly = true;
@@ -212,9 +212,9 @@ public class LDAPSearch extends LDAPTool {
 
 		/* -a set alias deref option */
 		if (options.hasOption('a')) { /* has option a */
-    
+
 			String param = options.getOptionParam('a');
-      
+
 			if (param.equalsIgnoreCase("never"))
 				m_deref = 0;
 			else if (param.equalsIgnoreCase("search"))
@@ -236,12 +236,12 @@ public class LDAPSearch extends LDAPTool {
 		/* -S sort attribute */
 		if (options.hasOption('S'))
 			m_sort.addElement( options.getOptionParam('S') );
-      
+
 		/* -l time limit */
 		if (options.hasOption('l')) { /* if the option is -l */
-			try { 
+			try {
 				m_timelimit = Integer.parseInt(options.getOptionParam('l'));
-			} catch (NumberFormatException e) { 
+			} catch (NumberFormatException e) {
 				m_timelimit = 0;
 			}
 		} /* if the option is -l */
@@ -250,7 +250,7 @@ public class LDAPSearch extends LDAPTool {
 		if (options.hasOption('s')) { /* has option s */
 
 			String param = options.getOptionParam('s');
-      
+
 			if (param.equalsIgnoreCase("base"))
 				m_scope = 0;
 			else if (param.equalsIgnoreCase("one"))
@@ -261,14 +261,14 @@ public class LDAPSearch extends LDAPTool {
 				System.err.println("Error: scope should be base, " +
 								   "one or sub.");
 		} /* has option s */
-    
+
 		/* -z size limit */
 		if (options.hasOption('z')) { /* if the option is -z */
-			try { 
+			try {
 				m_sizelimit = Integer.parseInt(options.getOptionParam('z'));
 			} catch (NumberFormatException e) {
 				m_sizelimit = 0;
-			} 
+			}
 		} /* if the option is -z */
 
 		/* -T fold line */
@@ -286,17 +286,17 @@ public class LDAPSearch extends LDAPTool {
 		Vector vec = new Vector();
 
 		while (pa.hasMoreElements()) { /* while */
-			vec.addElement(pa.nextElement()); 
+			vec.addElement(pa.nextElement());
 		} /* while */
 
 		int counter = vec.size();
-       
+
 		if (counter <= 0) { /* No filter */
 			System.err.println("Error: must supply filter string!");
 			doUsage();
 			System.exit(0);
 		} /* No filter */
-  
+
 		if (counter == 1) { /* Has filter but no attributes */
 
 			/* gets filter string */
@@ -311,7 +311,7 @@ public class LDAPSearch extends LDAPTool {
 				System.err.println("filter is: ("+m_filter+")");
 			}
 		} /* Has filter but no attributes */
-    
+
 		if (counter > 1) { /* Has filter and attributes */
 
 			/* gets filter string */
@@ -327,12 +327,12 @@ public class LDAPSearch extends LDAPTool {
 				m_attrs[j-1] = (String)vec.elementAt(j);
                 if (m_verbose)
 					System.err.print(" "+m_attrs[j-1]);
-			}  
+			}
 			if (m_verbose) {
 				System.err.println();
 				System.err.println("filter is: ("+m_filter+")");
 			}
-		} /* Has filter and attributes */ 
+		} /* Has filter and attributes */
 	}
 
 	private static void parseVlv(GetOpt options) {
@@ -346,19 +346,19 @@ public class LDAPSearch extends LDAPTool {
 				doUsage();
 				System.exit(0);
 			}
-            
+
 			try {
 				m_beforeCount = Integer.parseInt((String)tokenizer.nextElement());
 			} catch (NumberFormatException e) {
 				m_beforeCount = 0;
 			}
-            
+
 			try {
 				m_afterCount = Integer.parseInt((String)tokenizer.nextElement());
 			} catch (NumberFormatException e) {
 				m_afterCount = 0;
 			}
-            
+
 			if (m_vlvTokens == 3) {
 				m_searchVal = (String)tokenizer.nextElement();
 			} else if (m_vlvTokens > 3) {
@@ -405,7 +405,7 @@ public class LDAPSearch extends LDAPTool {
 
             LDAPVirtualListControl vControl = null;
 			if (m_vlvTokens == 3) {
-				vControl = new LDAPVirtualListControl(m_searchVal, 
+				vControl = new LDAPVirtualListControl(m_searchVal,
 			    	m_beforeCount, m_afterCount);
 			} else if (m_vlvTokens > 3) {
 				vControl = new LDAPVirtualListControl(m_index, m_beforeCount,
@@ -436,7 +436,7 @@ public class LDAPSearch extends LDAPTool {
 		/* perform an LDAP Search Operation */
 		LDAPSearchResults res = null;
 		try {
-			LDAPSearchConstraints cons = 
+			LDAPSearchConstraints cons =
 			        m_client.getSearchConstraints();
 			cons.setServerControls(controls);
 			cons.setDereference( m_deref );
@@ -471,10 +471,10 @@ public class LDAPSearch extends LDAPTool {
 	}
 
 	/**
-	 * Print the result entries. 
+	 * Print the result entries.
 	 * @param res Search results
 	 */
-    private static void printResults( LDAPSearchResults res ) { 
+    private static void printResults( LDAPSearchResults res ) {
 		boolean isSchema = false;
 		boolean didEntryIntro = false;
 		LDAPWriter writer;
@@ -494,7 +494,7 @@ public class LDAPSearch extends LDAPTool {
 				LDAPEntry entry = null;
 				try {
 					/* Next directory entry */
-					entry = (LDAPEntry)res.next();
+					entry = res.next();
 				} catch (LDAPReferralException ee) {
 					LDAPUrl[] urls= ee.getURLs();
 					System.err.println("Referral entries: ");
@@ -611,7 +611,7 @@ public class LDAPSearch extends LDAPTool {
   private static int m_sizelimit = 0;
   private static int m_timelimit = 0;
   private static int verbose = 0;
-  private static String m_attrs[] = null; 
+  private static String m_attrs[] = null;
   private static String m_base = "o=ace industry,c=us";
   private static String m_filter = null;
   private static String m_sep = ":";

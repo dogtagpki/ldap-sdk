@@ -399,6 +399,6 @@ public class LDAPMatchingRuleSchema extends LDAPAttributeSchema {
     // Qualifiers tracked explicitly
     static final String[] EXPLICIT = { OBSOLETE,
                                        SYNTAX };
-    
+
     private String[] attributes = null;
 }

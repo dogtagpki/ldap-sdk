@@ -151,7 +151,7 @@ public class JDAPFilterSubString extends JDAPFilter {
         seq.addElement(new BEROctetString(m_type));
         BERSequence str_seq = new BERSequence();
         for (int i = 0; i < m_initial.size(); i++) {
-            String val = (String)m_initial.elementAt(i);
+            String val = m_initial.elementAt(i);
             if (val == null)
                 continue;
             BERTag str = new BERTag(BERTag.CONTEXT|0,
@@ -159,7 +159,7 @@ public class JDAPFilterSubString extends JDAPFilter {
             str_seq.addElement(str);
         }
         for (int i = 0; i < m_any.size(); i++) {
-            String val = (String)m_any.elementAt(i);
+            String val = m_any.elementAt(i);
             if (val == null)
                 continue;
             BERTag str = new BERTag(BERTag.CONTEXT|1,
@@ -167,7 +167,7 @@ public class JDAPFilterSubString extends JDAPFilter {
             str_seq.addElement(str);
         }
         for (int i = 0; i < m_final.size(); i++) {
-            String val = (String)m_final.elementAt(i);
+            String val = m_final.elementAt(i);
             if (val == null)
                 continue;
             BERTag str = new BERTag(BERTag.CONTEXT|2,
@@ -189,21 +189,21 @@ public class JDAPFilterSubString extends JDAPFilter {
         for (int i = 0; i < m_initial.size(); i++) {
             if (i != 0)
                 initial = initial + ",";
-            initial = initial + (String)m_initial.elementAt(i);
+            initial = initial + m_initial.elementAt(i);
         }
 
         String any = "";
         for (int i = 0; i < m_any.size(); i++) {
             if (i != 0)
                 any = any + ",";
-            any = any + (String)m_any.elementAt(i);
+            any = any + m_any.elementAt(i);
         }
 
         String s_final = "";
         for (int i = 0; i < m_final.size(); i++) {
             if (i != 0)
                 s_final = s_final + ",";
-            s_final = s_final + (String)m_final.elementAt(i);
+            s_final = s_final + m_final.elementAt(i);
         }
 
         return "JDAPFilterSubString {type=" + m_type + ", initial=" + initial +

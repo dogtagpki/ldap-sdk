@@ -187,16 +187,16 @@ public class LdapSortResponseControl extends LDAPSortControl implements Control 
     LdapSortResponseControl(boolean critical, byte[] value) throws Exception{
         super(SORTRESPONSE, critical, value);
     }
-    
+
     /**
-     * Get the first attribute type from the sort key list that 
+     * Get the first attribute type from the sort key list that
      * resulted in an error
      * @return Attribute name that resulted in an error
      */
     public String getFailedAttribute() {
         return super.getFailedAttribute();
     }
-    
+
     /**
      * Return the sort result code
      * @return The sort result code
@@ -215,7 +215,7 @@ public class LdapSortResponseControl extends LDAPSortControl implements Control 
         }
         return ExceptionMapper.getNamingException(
             new LDAPException("Server Sort Failed", getResultCode()));
-    }  
+    }
 
     /**
      * Retrieves the ASN.1 BER encoded value of the LDAP control.
@@ -225,6 +225,6 @@ public class LdapSortResponseControl extends LDAPSortControl implements Control 
      */
     public byte[] getEncodedValue() {
         return getValue();
-    }    
+    }
 }
 

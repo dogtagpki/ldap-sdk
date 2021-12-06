@@ -408,7 +408,7 @@ public final class ByteBuf implements Serializable {
     /**
      * Invokes the <CODE>RandomAccessFile.read</CODE> method, appending
      * the bytes read to this byte buffer.
-     * @param file the <CODE>RandomAccessFile</CODE> object from which 
+     * @param file the <CODE>RandomAccessFile</CODE> object from which
      * to read the bytes
      * @param max_bytes the maximum number of bytes to read into the
      * byte buffer

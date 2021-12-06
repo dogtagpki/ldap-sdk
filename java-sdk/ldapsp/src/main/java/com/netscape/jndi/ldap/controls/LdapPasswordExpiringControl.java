@@ -53,16 +53,16 @@ public class LdapPasswordExpiringControl extends LDAPPasswordExpiringControl imp
      * This constractor is used by the NetscapeControlFactory
      */
     LdapPasswordExpiringControl(boolean critical, byte[] value) throws Exception{
-        super(EXPIRING, critical, value);              
+        super(EXPIRING, critical, value);
     }
-    
+
     /**
      * Return parsed number of seconds before password expires
      * @return number of seconds before password expires
      */
     public int getSecondsToExipre() {
         return super.getSecondsToExpiration();
-    }    
+    }
 
     /**
      * Retrieves the ASN.1 BER encoded value of the LDAP control.

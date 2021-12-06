@@ -130,6 +130,6 @@ public class LdapEntryChangeControl extends LDAPEntryChangeControl implements Co
      */
     public byte[] getEncodedValue() {
         return getValue();
-    }    
+    }
 }
 

@@ -75,7 +75,7 @@ import java.util.Vector;
  * <CODE>LDAPSchemaElement</CODE>. Optional and custom qualifiers are
  * accessed with <CODE>getQualifier</CODE> and <CODE>getQualifierNames</CODE>
  * from <CODE>LDAPSchemaElement</CODE>.
- 
+
  * <P>
  *
  * To add or remove this name form definition from the

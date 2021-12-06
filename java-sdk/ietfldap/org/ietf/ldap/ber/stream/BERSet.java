@@ -100,7 +100,7 @@ public class BERSet extends BERConstruct {
         for (int i = 0; i < super.size(); i++) {
             if (i != 0)
                 elements = elements + ", ";
-            elements = elements + ((BERElement)super.elementAt(i)).toString();
+            elements = elements + super.elementAt(i).toString();
         }
         return "Set {" + elements + "}";
     }

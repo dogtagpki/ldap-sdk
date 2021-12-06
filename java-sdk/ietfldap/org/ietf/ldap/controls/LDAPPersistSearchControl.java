@@ -162,7 +162,7 @@ public class LDAPPersistSearchControl extends LDAPControl {
      * </UL>
      * @param changesOnly <code>true</code> if you do not want the server
      * to return all existing entries in the directory that match the
-     * search criteria.  (Use this if you just want the changed entries 
+     * search criteria.  (Use this if you just want the changed entries
      * to be returned.)
      * @param returnControls <code>true</code> if you want the server to return
      * entry change controls with each entry in the search results
@@ -268,7 +268,7 @@ public class LDAPPersistSearchControl extends LDAPControl {
      *
      * @param c byte array that contains BER elements
      * @return the entry change control.
-     * @deprecated LDAPEntryChangeControl controls are now automatically 
+     * @deprecated LDAPEntryChangeControl controls are now automatically
      * instantiated.
      */
     public LDAPEntryChangeControl parseResponse(byte[] c) {
@@ -400,7 +400,7 @@ public class LDAPPersistSearchControl extends LDAPControl {
      * control was sent, this method returns null.
      * @see org.ietf.ldap.controls.LDAPEntryChangeControl
      * @see org.ietf.ldap.LDAPConnection#getResponseControls
-     * @deprecated LDAPEntryChangeControl controls are now automatically 
+     * @deprecated LDAPEntryChangeControl controls are now automatically
      * instantiated.
      */
     public static LDAPEntryChangeControl parseResponse(LDAPControl[] controls) {
@@ -442,19 +442,19 @@ public class LDAPPersistSearchControl extends LDAPControl {
 
     public String toString() {
         StringBuffer sb = new StringBuffer("{PersistSearchCtrl:");
-        
+
         sb.append(" isCritical=");
         sb.append(isCritical());
-        
+
         sb.append(" returnEntryChangeCtrls=");
         sb.append(_returnECs);
-        
+
         sb.append(" changesOnly=");
         sb.append(_changesOnly);
 
         sb.append(" changeTypes=");
         sb.append(typesToString(_changeTypes));
-        
+
         sb.append("}");
 
         return sb.toString();
@@ -480,7 +480,7 @@ public class LDAPPersistSearchControl extends LDAPControl {
             types += (types.length() > 0) ? "+MODDN" : "MODDN";
         }
         return types;
-    }        
+    }
 
     private int _changeTypes = 1;
     private boolean _changesOnly = false;

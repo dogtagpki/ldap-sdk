@@ -115,7 +115,7 @@ public class LDAPDN {
                     buffer[j].insert(i, '\\');
                     i++;
                 }
-                
+
                 i++;
             }
 
@@ -161,7 +161,7 @@ public class LDAPDN {
         return name.getTypes()[0]+"="+(new String(copy));
     }
 
-    /** 
+    /**
      * Normalizes the dn.
      * @param dn the DN to normalize
      * @return the normalized DN
@@ -169,8 +169,8 @@ public class LDAPDN {
     public static String normalize(String dn) {
         return (new DN(dn)).toString();
     }
-    
-    /** 
+
+    /**
      * Compares two dn's for equality.
      * @param dn1 the first dn to compare
      * @param dn2 the second dn to compare

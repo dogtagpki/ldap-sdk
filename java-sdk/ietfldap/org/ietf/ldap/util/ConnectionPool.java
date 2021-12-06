@@ -83,7 +83,7 @@ import org.ietf.ldap.LDAPException;
  * @version 1.0
  **/
 public class ConnectionPool {
- 
+
     /**
      * Constructor for specifying all parameters
      *
@@ -115,7 +115,7 @@ public class ConnectionPool {
     public ConnectionPool( int min, int max,
                            String host, int port )
         throws LDAPException {
-        this( min, max, host, port, "", new byte[0]); 
+        this( min, max, host, port, "", new byte[0]);
     }
 
     /**
@@ -125,44 +125,44 @@ public class ConnectionPool {
      * @param port port number of LDAP server
      * @exception LDAPException on failure to create connections
      */
-    public ConnectionPool( String host, int port ) 
+    public ConnectionPool( String host, int port )
         throws LDAPException {
         // poolsize=10,max=20,host,port,
         // noauth,nopswd
         this( 10, 20, host, port, "", new byte[0] );
     }
 
-    /* 
+    /*
      * Constructor for using an existing connection to clone
      * from
-     * 
+     *
      * @param min initial number of connections
      * @param max maximum number of connections
-     * @param ldc connection to clone 
+     * @param ldc connection to clone
      * @param authpwd password
-     * @exception LDAPException on failure to create connections 
-     */ 
+     * @exception LDAPException on failure to create connections
+     */
     public ConnectionPool( int min, int max,
                            LDAPConnection ldc, byte[] authpwd )
         throws LDAPException {
         this( min, max, ldc.getHost(), ldc.getPort(),
               ldc.getAuthenticationDN(), authpwd,
               ldc );
-    } 
+    }
 
-    /* 
+    /*
      * Constructor for using an existing connection to clone
      * from
-     * 
+     *
      * @param min initial number of connections
      * @param max maximum number of connections
      * @param host hostname of LDAP server
      * @param port port number of LDAP server
      * @param authdn DN to authenticate as
      * @param authpw password for authentication
-     * @param ldc connection to clone 
-     * @exception LDAPException on failure to create connections 
-     */ 
+     * @param ldc connection to clone
+     * @exception LDAPException on failure to create connections
+     */
     private ConnectionPool( int min, int max,
                             String host, int port,
                             String authdn, byte[] authpw,
@@ -221,10 +221,10 @@ public class ConnectionPool {
      * extended if the number of connections is less than
      * the maximum; if the pool cannot be extended, the method
      * blocks until a free connection becomes available or the
-     * time limit is exceeded. 
+     * time limit is exceeded.
      *
      * @param timeout timeout in milliseconds
-     * @return an active connection or <CODE>null</CODE> if timed out. 
+     * @return an active connection or <CODE>null</CODE> if timed out.
      */
     public LDAPConnection getConnection(int timeout) {
         LDAPConnection con;
@@ -270,7 +270,7 @@ public class ConnectionPool {
         for ( int i = 0; i < pSize; i++ ) {
 
             // Get the ConnectionObject from the pool
-            LDAPConnectionObject co = 
+            LDAPConnectionObject co =
                 (LDAPConnectionObject)pool.elementAt(i);
 
             if ( co.isAvailable() ) {  // Conn available?
@@ -291,7 +291,7 @@ public class ConnectionPool {
 
                 // If a new connection was created, use it
                 if ( i >= 0 ) {
-                    ldapconnobj = 
+                    ldapconnobj =
                         (LDAPConnectionObject)pool.elementAt(i);
                 }
             } else {
@@ -316,7 +316,7 @@ public class ConnectionPool {
 
         int index = find( ld );
         if ( index != -1 ) {
-            LDAPConnectionObject co = 
+            LDAPConnectionObject co =
                 (LDAPConnectionObject)pool.elementAt(index);
             co.setInUse( false );  // Mark as available
             synchronized( pool ) {
@@ -324,7 +324,7 @@ public class ConnectionPool {
             }
         }
     }
-  
+
     /**
      * Debug method to print the contents of the pool
      */
@@ -340,7 +340,7 @@ public class ConnectionPool {
     private void disconnect(
         LDAPConnectionObject ldapconnObject ) {
         if ( ldapconnObject != null ) {
-            if (ldapconnObject.isAvailable()) {  
+            if (ldapconnObject.isAvailable()) {
                 LDAPConnection ld = ldapconnObject.getLDAPConn();
                 if ( (ld != null) && (ld.isConnected()) ) {
                     try {
@@ -353,7 +353,7 @@ public class ConnectionPool {
             }
         }
     }
- 
+
     private void createPool() throws LDAPException {
         // Called by the constructors
         if ( poolSize <= 0 ) {
@@ -392,7 +392,7 @@ public class ConnectionPool {
         }
         return index;
     }
-  
+
     private synchronized void setUpPool( int size )
         throws LDAPException {
         // Loop on creating connections
@@ -429,7 +429,7 @@ public class ConnectionPool {
         // Find the matching Connection in the pool
         if ( con != null ) {
             for ( int i = 0; i < pool.size(); i++ ) {
-                LDAPConnectionObject co = 
+                LDAPConnectionObject co =
                     (LDAPConnectionObject)pool.elementAt(i);
                 if ( co.getLDAPConn() == con ) {
                     return i;
@@ -479,7 +479,7 @@ public class ConnectionPool {
          * Returns the associated LDAPConnection.
          *
          * @return the LDAPConnection.
-         * 
+         *
          */
         LDAPConnection getLDAPConn() {
             return this.ld;
@@ -489,7 +489,7 @@ public class ConnectionPool {
          * Sets the associated LDAPConnection
          *
          * @param ld the LDAPConnection
-         * 
+         *
          */
         void setLDAPConn( LDAPConnection ld ) {
             this.ld = ld;
@@ -499,7 +499,7 @@ public class ConnectionPool {
          * Marks a connection in use or available
          *
          * @param inUse <code>true</code> to mark in use, <code>false</code> if available
-         * 
+         *
          */
         void setInUse( boolean inUse ) {
             this.inUse = inUse;
@@ -514,7 +514,7 @@ public class ConnectionPool {
         boolean isAvailable() {
             return !inUse;
         }
-  
+
         /**
          * Debug method
          *

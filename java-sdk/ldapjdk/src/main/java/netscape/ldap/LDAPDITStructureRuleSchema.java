@@ -42,7 +42,7 @@ package netscape.ldap;
  * <A HREF="http://www.ietf.org/rfc/rfc2252.txt"
  * TARGET="_blank">RFC 2252, Lightweight Directory Access Protocol (v3):
  * DIT Structure Rule Description</A> covers the types of information
- * to specify when defining a DIT structure rule. According to the RFC, 
+ * to specify when defining a DIT structure rule. According to the RFC,
  * the description of a DIT structure rule can include the following:
  * <P>
  *

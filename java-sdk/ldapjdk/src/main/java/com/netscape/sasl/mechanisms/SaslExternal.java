@@ -82,7 +82,7 @@ public class SaslExternal implements SaslClient {
      * @exception SaslException If an error occurred while processing
      * the challenge or generating a response.
      */
-    public byte[] evaluateChallenge(byte[] challenge) 
+    public byte[] evaluateChallenge(byte[] challenge)
         throws SaslException {
         return null;
     }

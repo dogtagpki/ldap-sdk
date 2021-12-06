@@ -99,7 +99,7 @@ public class LdapVirtualListResponseControl extends LDAPVirtualListResponse impl
     public int getResultCode() {
         return super.getResultCode();
     }
-    
+
     /**
      * Retrieves the ASN.1 BER encoded value of the LDAP control.
      * Null is returned if the value is absent.
@@ -108,5 +108,5 @@ public class LdapVirtualListResponseControl extends LDAPVirtualListResponse impl
      */
     public byte[] getEncodedValue() {
         return getValue();
-    }    
+    }
 }

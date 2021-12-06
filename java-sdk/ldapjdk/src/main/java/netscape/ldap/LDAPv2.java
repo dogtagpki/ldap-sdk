@@ -105,9 +105,9 @@ public interface LDAPv2 {
     public static final int TIMELIMIT = 4;
 
     /**
-     * Option specifying the maximum number of milliseconds the 
+     * Option specifying the maximum number of milliseconds the
      * server should spend returning search results before aborting
-     * the search. 
+     * the search.
      * @see netscape.ldap.LDAPConnection#getOption
      * @see netscape.ldap.LDAPConnection#setOption
      */
@@ -144,10 +144,10 @@ public interface LDAPv2 {
      * @see netscape.ldap.LDAPConnection#setOption
      */
     public static final int REFERRALS_HOP_LIMIT   = 10;
-    
+
     /**
      * Option specifying the object containing the method for
-     * authenticating to the server.  
+     * authenticating to the server.
      * @see netscape.ldap.LDAPConnection#getOption
      * @see netscape.ldap.LDAPConnection#setOption
      * @see netscape.ldap.LDAPBind
@@ -265,9 +265,9 @@ public interface LDAPv2 {
      */
     public void disconnect() throws LDAPException;
 
-    /** 
+    /**
      * Notifies the server to not send additional results associated with this
-     * <CODE>LDAPSearchResults</CODE> object, and discards any results already 
+     * <CODE>LDAPSearchResults</CODE> object, and discards any results already
      * received.
      * @param results LDAPSearchResults object returned from a search
      * @exception LDAPException Failed to notify the server.

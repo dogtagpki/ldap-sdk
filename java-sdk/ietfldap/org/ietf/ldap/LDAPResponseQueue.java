@@ -49,7 +49,7 @@ public class LDAPResponseQueue extends LDAPMessageQueueImpl {
     /**
      * Constructor
      *
-     * @param asynchOp a boolean flag that is true if the object is used for 
+     * @param asynchOp a boolean flag that is true if the object is used for
      * asynchronous LDAP operations
      * @see org.ietf.ldap.LDAPAsynchronousConnection
      */

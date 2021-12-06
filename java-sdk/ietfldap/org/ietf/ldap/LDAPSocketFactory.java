@@ -49,8 +49,8 @@ import java.net.Socket;
  * <P>
  *
  * When you construct a new <CODE>LDAPConnection</CODE>
- * object, you can specify that the connection use this socket. 
- * To do this, pass the constructor an object of the class that 
+ * object, you can specify that the connection use this socket.
+ * To do this, pass the constructor an object of the class that
  * implements this interface.
  * <P>
  *

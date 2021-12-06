@@ -207,14 +207,14 @@ public class BERBitString extends BERElement {
         int last_unused_bits = 8 - (num_bits % 8);
 
         /* Figure out the number of content octets */
-        int num_content_octets = (int)(num_bits/8) + 1;
+        int num_content_octets = num_bits/8 + 1;
         if (last_unused_bits > 0)
             num_content_octets += 1;
         stream.write(num_content_octets);    /* length octet */
 
         stream.write(last_unused_bits);    /* first content octet */
 
-        for (int i = 0; i < (int)(num_bits/8); i++) {
+        for (int i = 0; i < num_bits/8; i++) {
             int new_octet = 0;
             int bit = 0x80;
             for (int j = 0; j < 8; j++) {
@@ -233,7 +233,7 @@ public class BERBitString extends BERElement {
             int new_octet = 0;
             int bit = 0x80;
             for (int j = 0; j < last_unused_bits; j++) {
-                if (m_value.get(((int)(num_bits/8))*8+j))
+                if (m_value.get((num_bits/8)*8+j))
                     new_octet += bit;
                 bit = bit/2;
             }
@@ -273,7 +273,7 @@ public class BERBitString extends BERElement {
 
         //int num_bits = m_value.size();
         int num_bits = m_value_num_bits;
-        for (int i = 0; i < (int)(num_bits/8); i++) {
+        for (int i = 0; i < num_bits/8; i++) {
             octet = 0;
             int bit = 0x80;
             for (int j = 0; j < 8; j++) {
@@ -286,8 +286,8 @@ public class BERBitString extends BERElement {
 
         int bit = 0x80;
         octet = 0;
-        for (int k = 0; k < num_bits-(int)(num_bits/8); k++) {
-            if (m_value.get(((int)(num_bits/8))*8+k))
+        for (int k = 0; k < num_bits-num_bits/8; k++) {
+            if (m_value.get((num_bits/8)*8+k))
                 octet += bit;
             bit = bit/2;
         }

@@ -114,7 +114,7 @@ public final class DN implements Serializable {
         if (neutralDN == null) {
             return; // malformed
         }
-        
+
         // RFC1485
         if (neutralDN.indexOf(',') != -1 || neutralDN.indexOf(';') != -1) {
             parseRDNs(neutralDN, dn, ",;");
@@ -133,8 +133,8 @@ public final class DN implements Serializable {
             /* reverse the RDNs order */
             for (int i = rdns.size() - 1; i >= 0; i--) {
                 m_rdns.addElement(rdns.elementAt(i));
-            }        
-        }        
+            }
+        }
         else if (RDN.isRDN(dn)) {
             m_rdns.addElement(new RDN(dn));
         }
@@ -143,13 +143,13 @@ public final class DN implements Serializable {
     /**
      * Neutralize backslash escapes and quoted sequences for easy parsing.
      * @return dn string with disabled escapes or null if malformed dn
-     */    
+     */
     private String neutralizeEscapes(String dn) {
         String neutralDN = RDN.neutralizeEscapes(dn);
         if (neutralDN == null) {
             return null; // malformed
         }
-        
+
         String dn2 = neutralDN.trim();
         if (dn2.length() == 0) {
             return neutralDN;
@@ -163,7 +163,7 @@ public final class DN implements Serializable {
         }
         return neutralDN;
     }
-    
+
     /**
      * Parse RDNs in the DN
      */
@@ -183,7 +183,7 @@ public final class DN implements Serializable {
                 return;
             }
             startIdx = endIdx + 1;
-        }        
+        }
     }
 
     /**
@@ -191,7 +191,7 @@ public final class DN implements Serializable {
      * beginning of the current DN.
      * <P>
      *
-     * @param rdn the relative distinguished name to add to the 
+     * @param rdn the relative distinguished name to add to the
      * beginning of the current DN
      * @see org.ietf.ldap.util.RDN
      */
@@ -419,10 +419,10 @@ public final class DN implements Serializable {
      */
 
     public boolean contains(DN dn) {
-        
+
         return isDescendantOf(dn);
     }
-    
+
     /**
      * Determines if this DN is a descendant of the given DN.
      * <P>
@@ -457,8 +457,8 @@ public final class DN implements Serializable {
 
         int i = rdns1.size() - 1;
         int j = rdns2.size() - 1;
-        
-        if ((j < i) || (equals(dn) == true)) 
+
+        if ((j < i) || (equals(dn) == true))
           return false;
 
         for (; i>=0 && j>=0; i--, j--) {

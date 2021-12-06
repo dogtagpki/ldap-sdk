@@ -163,7 +163,7 @@ public class LDAPReferralException extends LDAPException {
         }
         return res;
     }
-    
+
    /**
      * Gets the string representation of the referral exception,
      * which includes the result code, the message sent back

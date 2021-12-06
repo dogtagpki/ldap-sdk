@@ -47,7 +47,7 @@ import javax.naming.NamingException;
 class LdapNameParser implements NameParser {
 
     private static LdapNameParser m_parser;
-    
+
     // A table with compound name syntax properties
     static Properties nameSyntax;
     static {
@@ -57,14 +57,14 @@ class LdapNameParser implements NameParser {
         nameSyntax.put("jndi.syntax.ignorecase", "true");
         nameSyntax.put("jndi.syntax.escape", "\\");
         nameSyntax.put("jndi.syntax.beginquote", "\"");
-        nameSyntax.put("jndi.syntax.trimblanks", "true");        
+        nameSyntax.put("jndi.syntax.trimblanks", "true");
         nameSyntax.put("jndi.syntax.separator.ava", "+");
         nameSyntax.put("jndi.syntax.separator.typeval", "=");
     }
 
     // Can not be constructed
     private LdapNameParser() {}
-    
+
     // Shared instance must be used
     public static LdapNameParser getParser() {
         if (m_parser == null) {
@@ -72,12 +72,12 @@ class LdapNameParser implements NameParser {
         }
         return m_parser;
     }
-    
+
     // implements parse
     public Name parse(String name) throws NamingException {
         return new CompoundName(name, nameSyntax);
     }
-    
+
     /**
      * A convenience method for extracting RDN
      * @return RDN for the DN
@@ -128,7 +128,7 @@ class LdapNameParser implements NameParser {
             throw new NamingException("Name not in context");
         }
         return entryName.getSuffix(contextName.size()).toString();
-    }    
+    }
 
     /**
      * A convenience method for extracting relative name from the ancestor context
@@ -139,7 +139,7 @@ class LdapNameParser implements NameParser {
     static String getRelativeName(Name contextName, String entry) throws NamingException{
         if (entry==null) {
             entry = "";
-        }    
+        }
         Name entryName = getParser().parse(entry);
         if (!entryName.startsWith(contextName)) {
             throw new NamingException("Name not in context");
@@ -162,13 +162,13 @@ class LdapNameParser implements NameParser {
             name.add("attr=val");
             System.out.println(name);
             System.out.println(name.get(0));
-            System.out.println("in name=val name:<" + getAttrName("name=val ") + 
+            System.out.println("in name=val name:<" + getAttrName("name=val ") +
                                 "> val:<" + getAttrValue("name=val ") + ">");
         }
         catch (Exception e) {
             System.err.println(e);
-        }    
-    }    
+        }
+    }
 
     // Relative name test
     public static void main(String[] args) {
@@ -181,7 +181,7 @@ class LdapNameParser implements NameParser {
         }
         catch (Exception e) {
             System.err.println(e);
-        }    
-    }    
+        }
+    }
 
 }

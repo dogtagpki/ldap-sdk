@@ -42,7 +42,7 @@ package netscape.ldap;
  * <A HREF="http://www.ietf.org/rfc/rfc2252.txt"
  * TARGET="_blank">RFC 2252, Lightweight Directory Access Protocol (v3):
  * Attribute Syntax Definitions</A> covers the types of information
- * to specify when defining an attribute type. According to the RFC, 
+ * to specify when defining an attribute type. According to the RFC,
  * the description of an attribute type can include the following:
  * <P>
  *
@@ -357,7 +357,7 @@ public class LDAPAttributeSchema extends LDAPSchemaElement {
     public static final String COLLECTIVE = "COLLECTIVE";
     public static final String NO_USER_MODIFICATION = "NO-USER-MODIFICATION";
     public static final String USAGE = "USAGE";
-    
+
     // Qualifiers known to not have values; prepare a Hashtable
     static String[] NOVALS = { SINGLE,
                                COLLECTIVE,

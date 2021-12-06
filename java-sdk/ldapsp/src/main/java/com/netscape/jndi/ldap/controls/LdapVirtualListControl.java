@@ -158,7 +158,7 @@ public class LdapVirtualListControl extends LDAPVirtualListControl implements Co
     public int getAfterCount() {
         return super.getAfterCount();
     }
-    
+
     /**
      * Retrieves the ASN.1 BER encoded value of the LDAP control.
      * Null is returned if the value is absent.
@@ -167,5 +167,5 @@ public class LdapVirtualListControl extends LDAPVirtualListControl implements Co
      */
     public byte[] getEncodedValue() {
         return getValue();
-    }     
+    }
 }

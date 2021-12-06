@@ -76,7 +76,7 @@ public class JSSESocketFactory implements LDAPTLSSocketFactory,
     public JSSESocketFactory() {
         this.factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
     }
-  
+
     /**
      * Factory constructor
      *
@@ -88,7 +88,7 @@ public class JSSESocketFactory implements LDAPTLSSocketFactory,
         this.suites = suites;
         this.factory = (SSLSocketFactory)SSLSocketFactory.getDefault();
     }
-  
+
     /**
      * Factory constructor
      * @param factory the SSL socketfactory to use
@@ -118,7 +118,7 @@ public class JSSESocketFactory implements LDAPTLSSocketFactory,
      * @exception LDAPException on error creating socket
      */
     public Socket makeSocket(String host, int port)
-        throws LDAPException { 
+        throws LDAPException {
 
         SSLSocket sock = null;
 
@@ -128,7 +128,7 @@ public class JSSESocketFactory implements LDAPTLSSocketFactory,
             if (suites != null) {
                 sock.setEnabledCipherSuites(suites);
             }
-            
+
             // Start handshake manually to immediately expose potential
             // SSL errors as exceptions. Otherwise, handshake will take
             // place first time the data are written to the socket.
@@ -148,7 +148,7 @@ public class JSSESocketFactory implements LDAPTLSSocketFactory,
 
     /**
      * Creates an SSL socket layered over an existing socket.
-     * 
+     *
      * Used for the startTLS implementation (RFC2830).
      *
      * @param s An existing non-SSL socket
@@ -157,8 +157,8 @@ public class JSSESocketFactory implements LDAPTLSSocketFactory,
      * @since LDAPJDK 4.17
      */
     public Socket makeSocket(Socket s)
-        throws LDAPException { 
-  
+        throws LDAPException {
+
         SSLSocket sock = null;
         String host = s.getInetAddress().getHostName();
         int port = s.getPort();
@@ -169,7 +169,7 @@ public class JSSESocketFactory implements LDAPTLSSocketFactory,
             if (suites != null) {
                 sock.setEnabledCipherSuites(suites);
             }
-            
+
             sock.startHandshake();
 
         } catch (IOException f) {

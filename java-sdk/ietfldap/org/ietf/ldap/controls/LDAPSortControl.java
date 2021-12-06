@@ -246,31 +246,31 @@ public class LDAPSortControl extends LDAPControl {
     // Response varibales
     private String _failedAttribute = null;
     private int _resultCode = 0;
-    
+
     // Request variables
     private LDAPSortKey[] _keys;
 
     /**
      * Constructs a sort response <CODE>LDAPSortControl</CODE> object.
-     * This constructor is used by <CODE>LDAPControl.register</CODE> to 
+     * This constructor is used by <CODE>LDAPControl.register</CODE> to
      * instantiate sort response controls.
      * <P>
-     * To retrieve the result code of the sort operation, call 
+     * To retrieve the result code of the sort operation, call
      * <CODE>getResultCode</CODE>.
-     * <P> 
+     * <P>
      * To retrieve the attribute that caused the sort operation to fail, call
      * <CODE>getFailedAttribute</CODE>.
-     * @param oid the oid for this control. This must be 
-     * <CODE>LDAPSortControl.SORTRESPONSE</CODE> or an <CODE>LDAPException</CODE> 
+     * @param oid the oid for this control. This must be
+     * <CODE>LDAPSortControl.SORTRESPONSE</CODE> or an <CODE>LDAPException</CODE>
      * is thrown.
      * @param critical <code>true</code> if this control is critical to the operation
      * @param value the value associated with this control
-     * @exception org.ietf.ldap.LDAPException If oid is not 
+     * @exception org.ietf.ldap.LDAPException If oid is not
      * <CODE>LDAPSortControl.SORTRESPONSE</CODE>.
      * @exception java.io.IOException If value contains an invalid BER sequence.
      * @see org.ietf.ldap.LDAPControl#register
      */
-    public LDAPSortControl( String oid, boolean critical, byte[] value ) 
+    public LDAPSortControl( String oid, boolean critical, byte[] value )
         throws LDAPException, IOException {
 	super( oid, critical, value );
 
@@ -315,7 +315,7 @@ public class LDAPSortControl extends LDAPControl {
     public int getResultCode() {
 	return _resultCode;
     }
-    
+
     /**
      * Constructs an <CODE>LDAPSortControl</CODE> object with a single
      * sorting key.
@@ -332,7 +332,7 @@ public class LDAPSortControl extends LDAPControl {
         LDAPSortKey[] keys = new LDAPSortKey[1];
         keys[0] = key;
         _value = createSortSpecification( _keys = keys );
-        
+
     }
 
     /**
@@ -522,7 +522,7 @@ public class LDAPSortControl extends LDAPControl {
      * @return the attribute that caused the error, or null if the server did
      * not specify which attribute caused the error.
      * @see org.ietf.ldap.LDAPConnection#getResponseControls
-     * @deprecated LDAPSortControl response controls are now automatically 
+     * @deprecated LDAPSortControl response controls are now automatically
      * instantiated.
      */
     public static String parseResponse( LDAPControl[] controls, int[] results ) {
@@ -593,40 +593,40 @@ public class LDAPSortControl extends LDAPControl {
         /* Suck out the data and return it */
         return flattenBER( ber );
     }
-    
+
     public String toString() {
         return (getID() == SORTREQUEST) ? reqToString() : rspToString();
     }
-    
+
     String reqToString() {
-        
+
         StringBuffer sb = new StringBuffer("{SortCtrl:");
-        
+
         sb.append(" isCritical=");
         sb.append(isCritical());
-        
+
         sb.append(" ");
         for (int i=0; i < _keys.length; i++) {
             sb.append(_keys[i]);
-        }            
-        
+        }
+
         sb.append("}");
 
         return sb.toString();
     }
 
     String rspToString() {
-        
+
         StringBuffer sb = new StringBuffer("{SortResponseCtrl:");
-        
+
         sb.append(" isCritical=");
         sb.append(isCritical());
-        
+
         if (_failedAttribute != null) {
             sb.append(" failedAttr=");
             sb.append(_failedAttribute);
         }
-        
+
         sb.append(" resultCode=");
         sb.append(_resultCode);
 

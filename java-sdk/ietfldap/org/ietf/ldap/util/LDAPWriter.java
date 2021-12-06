@@ -123,7 +123,7 @@ public abstract class LDAPWriter implements Serializable {
 		String s = "";
 		ByteBuf inBuf = new ByteBuf( b, 0, b.length );
 		ByteBuf encodedBuf = new ByteBuf();
-		// Translate to base 64 
+		// Translate to base 64
 		m_encoder.translate( inBuf, encodedBuf );
 		int nBytes = encodedBuf.length();
 		if ( nBytes > 0 ) {

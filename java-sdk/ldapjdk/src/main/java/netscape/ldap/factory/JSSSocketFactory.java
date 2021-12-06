@@ -61,7 +61,7 @@ import netscape.ldap.LDAPTLSSocketFactory;
  * By default, the factory uses "secmod.db", "key*.db" and "cert*.db"
  * databases in the current directory. If you need to override this default
  * setting, then you should use the constructor <CODE>JSSSocketFactory(certdbDir)</CODE>.
- * 
+ *
  * @version 1.1
  * @see LDAPSocketFactory
  * @see LDAPConnection#LDAPConnection(netscape.ldap.LDAPSocketFactory)
@@ -79,7 +79,7 @@ public class JSSSocketFactory implements Serializable,
      * JSS security system if it has not already been initialized.
      * <p>
      * The current directory is assumed to be the certificate database directory.
-     * 
+     *
      * @exception LDAPException on initialization error
      * @see netscape.ldap.factory.JSSSocketFactory#JSSSocketFactory(java.lang.String)
      */
@@ -108,9 +108,9 @@ public class JSSSocketFactory implements Serializable,
      * <CODE>cert*.db</CODE> files as the security module database, key database
      * and certificate database respectively.
      * <P>
-     * The method may be called only once, before the first instance of 
+     * The method may be called only once, before the first instance of
      * <CODE>JSSSocketFactory</CODE> is created. When creating the first
-     * instance, the constructor will automatically initialize the JSS 
+     * instance, the constructor will automatically initialize the JSS
      * security subsystem using the defaults, unless it is already initialized.
      * <P>
      * @param certdbDir The full path, relative or absolute, of the certificate
@@ -155,7 +155,7 @@ public class JSSSocketFactory implements Serializable,
         catch (UnknownHostException e) {
             throw new LDAPException("JSSSocketFactory.makeSocket - Unknown host: " + host,
                                     LDAPException.CONNECT_ERROR);
-                    
+
         }
         catch (Exception e) {
             throw new LDAPException("JSSSocketFactory.makeSocket " +
@@ -180,20 +180,20 @@ public class JSSSocketFactory implements Serializable,
      */
     public boolean approve(X509Certificate serverCert,
                            ValidityStatus status) {
-        
+
         return true;
     }
 
     /**
      * Creates an SSL socket layered over an existing socket.
-     * 
+     *
      * Used for the startTLS implementation (RFC2830).
      *
      * @param s An existing non-SSL socket
      * @return A SSL socket layered over the input socket
      * @exception LDAPException on error creating socket
      * @since LDAPJDK 4.17
-     */    
+     */
     public Socket makeSocket(Socket s) throws LDAPException {
         SSLSocket socket = null;
         String host = s.getInetAddress().getHostName();
@@ -212,6 +212,6 @@ public class JSSSocketFactory implements Serializable,
                                     LDAPException.TLS_NOT_SUPPORTED);
         }
 
-        return socket;        
+        return socket;
     }
 }

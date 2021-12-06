@@ -60,30 +60,30 @@ import netscape.ldap.controls.LDAPVirtualListResponse;
 
 public class NetscapeControlFactory extends ControlFactory {
 
-    // "1.2.840.113556.1.4.473" Sort Control (Request) 
+    // "1.2.840.113556.1.4.473" Sort Control (Request)
     final static String REQ_SORT  = LDAPSortControl.SORTREQUEST;
-    
-    // "1.2.840.113556.1.4.474" Sort Control (Response)  
+
+    // "1.2.840.113556.1.4.474" Sort Control (Response)
     final static String RSP_SORT = LDAPSortControl.SORTRESPONSE;
 
-    // "2.16.840.1.113730.3.4.2" ManageDSAIT Control 
+    // "2.16.840.1.113730.3.4.2" ManageDSAIT Control
     final static String REQ_MANAGEDSAIT = LDAPControl.MANAGEDSAIT;
 
-    // "2.16.840.1.113730.3.4.3" PersistentSearch Control 
+    // "2.16.840.1.113730.3.4.3" PersistentSearch Control
     final static String REQ_PERSISTENTSEARCH  = LDAPPersistSearchControl.PERSISTENTSEARCH;
-    
+
     // "2.16.840.1.113730.3.4.4" PasswordExpired Control
     final static String RSP_PWDEXPIRED = LDAPPasswordExpiredControl.EXPIRED;
-    
-    // "2.16.840.1.113730.3.4.5" PasswordExpiring Control 
+
+    // "2.16.840.1.113730.3.4.5" PasswordExpiring Control
     final static String RSP_PWDEXPIRING = LDAPPasswordExpiringControl.EXPIRING;
-    
-    // "2.16.840.1.113730.3.4.7" EntryChanged Controle 
+
+    // "2.16.840.1.113730.3.4.7" EntryChanged Controle
     final static String RSP_ENTRYCHANGED = LDAPEntryChangeControl.ENTRYCHANGED;
 
-    // "2.16.840.1.113730.3.4.9" Virtual List (Request) 
+    // "2.16.840.1.113730.3.4.9" Virtual List (Request)
     final static String REQ_VIRTUALLIST = LDAPVirtualListControl.VIRTUALLIST;
-    
+
     // "2.16.840.1.113730.3.4.10" Virtual List (Response)
     final static String RSP_VIRTUALLIST = LDAPVirtualListResponse.VIRTUALLISTRESPONSE;
 
@@ -104,9 +104,9 @@ public class NetscapeControlFactory extends ControlFactory {
         }
         LDAPControl rawCtrl = new LDAPControl(
             ctrl.getID(), ctrl.isCritical(), ctrl.getEncodedValue());
-        return getControlInstance(rawCtrl);        
-    }    
-        
+        return getControlInstance(rawCtrl);
+    }
+
     /**
      * Create a JNDI control from a raw ldapjdk control
      * @param rawCtrl A non-null control.
@@ -119,15 +119,15 @@ public class NetscapeControlFactory extends ControlFactory {
             return null;
         }
 
-        try { 
+        try {
             String ctrlID = rawCtrl.getID();
-        
-             // Entry changed control is parsed by LDAPPersistSearchControl             
+
+             // Entry changed control is parsed by LDAPPersistSearchControl
             if (ctrlID.equals(RSP_ENTRYCHANGED)) {
                 return new LdapEntryChangeControl(
                     rawCtrl.isCritical(), rawCtrl.getValue());
             }
-            
+
             // Password Expired control
             else if(ctrlID.equals(RSP_PWDEXPIRED)) {
                 return new LdapPasswordExpiredControl(

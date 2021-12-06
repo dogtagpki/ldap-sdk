@@ -104,9 +104,9 @@ public abstract class BERIntegral extends BERElement {
                     bytes_read[0]++;
                 }
                 if (negative)
-                    m_value = (m_value<<8) + (int)(octet^0xFF)&0xFF;
+                    m_value = (m_value<<8) + (octet^0xFF)&0xFF;
                 else
-                    m_value = (m_value<<8) + (int)(octet&0xFF);
+                    m_value = (m_value<<8) + (octet&0xFF);
             }
             if (negative)  /* convert to 2's complement */
                 m_value = (m_value + 1) * -1;
@@ -151,7 +151,7 @@ public abstract class BERIntegral extends BERElement {
                 binary_value = (binary_value>>8);
                 num_content_octets++;
             } while (binary_value > 0);
-            
+
             /* pse 1/16/96 we've just created a string that is in non-network order
                flip it for net order */
             for (i=0; i<num_content_octets; i++)
@@ -159,7 +159,7 @@ public abstract class BERIntegral extends BERElement {
 
             /* pse 1/16/96 if we have the value encoded and the leading encoding bit is set
                then stuff in a leading zero byte */
-            lead = (int)net_octets[offset];
+            lead = net_octets[offset];
 
             if ((m_value > 0) && ((lead & 0x80) > 0)) {
                 offset = 0;

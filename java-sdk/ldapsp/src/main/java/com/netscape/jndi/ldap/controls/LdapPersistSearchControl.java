@@ -126,7 +126,7 @@ public class LdapPersistSearchControl extends LDAPPersistSearchControl implement
      * @see com.netscape.jndi.ldap.controls.LdapPersistSearchControl#setChangeTypes
      */
     public static final int MODDN = LDAPPersistSearchControl.MODDN;
-    
+
     /**
      * Constructs an <CODE>LdapPersistSearchControl</CODE> object
      * that specifies a persistent search.

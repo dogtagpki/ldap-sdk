@@ -145,7 +145,7 @@ public class LDAPModificationSet implements java.io.Serializable {
     public String toString() {
         String s = "LDAPModificationSet: {";
         for( int i = 0; i < modifications.size(); i++ ) {
-            s += (LDAPModification)modifications.elementAt(i);
+            s += modifications.elementAt(i);
             if ( i < modifications.size()-1 ) {
                 s += ", ";
             }

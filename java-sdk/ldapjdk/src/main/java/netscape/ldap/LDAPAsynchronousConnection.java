@@ -39,12 +39,12 @@ package netscape.ldap;
 
 /**
  * Encapsulates a connection to an LDAP server, providing access to the input queue
- * for messages received. 
+ * for messages received.
  *
  * @version 1.0
  */
 public interface LDAPAsynchronousConnection {
-  
+
     /**
      * Adds an entry to the directory.
      *
@@ -61,7 +61,7 @@ public interface LDAPAsynchronousConnection {
     public LDAPResponseListener add(LDAPEntry entry,
                                     LDAPResponseListener listener)
                                     throws LDAPException;
- 
+
     /**
      * Adds an entry to the directory and allows you to specify constraints
      * for this LDAP add operation by using an <CODE>LDAPConstraints</CODE>
@@ -93,7 +93,7 @@ public interface LDAPAsynchronousConnection {
      * has been disconnected from an LDAP server, this method attempts to
      * reconnect to the server. If the object had already authenticated, the
      * old authentication is discarded.
-     * 
+     *
      * @param dn if non-null and non-empty, specifies that the connection
      * and all operations through it should be authenticated with dn as the
      * distinguished name
@@ -120,7 +120,7 @@ public interface LDAPAsynchronousConnection {
      * has been disconnected from an LDAP server, this method attempts to
      * reconnect to the server. If the object had already authenticated, the
      * old authentication is discarded.
-     * 
+     *
      * @param dn if non-null and non-empty, specifies that the connection
      * and all operations through it should be authenticated with dn as the
      * distinguished name
@@ -139,14 +139,14 @@ public interface LDAPAsynchronousConnection {
     public LDAPResponseListener bind(String dn,
                                      String passwd,
                                      LDAPResponseListener listener,
-                                     LDAPConstraints cons) 
+                                     LDAPConstraints cons)
                                      throws LDAPException;
 
 
-    
+
     /**
      * Deletes the entry for the specified DN from the directory.
-     * 
+     *
      * @param dn distinguished name of the entry to delete
      * @param listener handler for messages returned from a server in response
      * to this request. If it is null, a listener object is created internally.
@@ -162,7 +162,7 @@ public interface LDAPAsynchronousConnection {
 
     /**
      * Deletes the entry for the specified DN from the directory.
-     * 
+     *
      * @param dn distinguished name of the entry to delete
      * @param listener handler for messages returned from a server in response
      * to this request. If it is null, a listener object is created internally.
@@ -178,14 +178,14 @@ public interface LDAPAsynchronousConnection {
                                       LDAPConstraints cons)
                                       throws LDAPException;
 
-    
+
     /**
      * Makes a single change to an existing entry in the directory.
      * For example, changes the value of an attribute, adds a new attribute
      * value, or removes an existing attribute value.<BR>
      * The LDAPModification object specifies both the change to be made and
      * the LDAPAttribute value to be changed.
-     * 
+     *
      * @param dn distinguished name of the entry to modify
      * @param mod a single change to make to an entry
      * @param listener handler for messages returned from a server in response
@@ -199,15 +199,15 @@ public interface LDAPAsynchronousConnection {
     public LDAPResponseListener modify(String dn,
                                        LDAPModification mod,
                                        LDAPResponseListener listener)
-                                       throws LDAPException;   
-    
+                                       throws LDAPException;
+
     /**
      * Makes a single change to an existing entry in the directory.
      * For example, changes the value of an attribute, adds a new attribute
      * value, or removes an existing attribute value.<BR>
      * The LDAPModification object specifies both the change to be made and
      * the LDAPAttribute value to be changed.
-     * 
+     *
      * @param dn distinguished name of the entry to modify
      * @param mod a single change to make to an entry
      * @param listener handler for messages returned from a server in response
@@ -224,7 +224,7 @@ public interface LDAPAsynchronousConnection {
                                        LDAPModification mod,
                                        LDAPResponseListener listener,
                                        LDAPConstraints cons)
-                                       throws LDAPException;    
+                                       throws LDAPException;
 
     /**
      * Makes a set of changes to an existing entry in the directory.
@@ -244,13 +244,13 @@ public interface LDAPAsynchronousConnection {
     public LDAPResponseListener modify(String dn,
                                        LDAPModificationSet mods,
                                        LDAPResponseListener listener)
-                                       throws LDAPException;   
-    
+                                       throws LDAPException;
+
     /**
      * Makes a set of changes to an existing entry in the directory.
      * For example, changes attribute values, adds new attribute values, or
      * removes existing attribute values.
-     * 
+     *
      * @param dn distinguished name of the entry to modify
      * @param mods a set of modifications to make to the entry
      * @param listener handler for messages returned from a server in response
@@ -267,12 +267,12 @@ public interface LDAPAsynchronousConnection {
                                        LDAPModificationSet mods,
                                        LDAPResponseListener listener,
                                        LDAPConstraints cons)
-                                       throws LDAPException;    
-    
+                                       throws LDAPException;
+
 
     /**
      * Renames an existing entry in the directory.
-     * 
+     *
      * @param dn current distinguished name of the entry
      * @param newRdn new relative distinguished name for the entry
      * @param deleteOldRdn if <code>true</code>, the old name is not retained as an
@@ -292,7 +292,7 @@ public interface LDAPAsynchronousConnection {
 
     /**
      * Renames an existing entry in the directory.
-     * 
+     *
      * @param dn current distinguished name of the entry
      * @param newRdn new relative distinguished name for the entry
      * @param deleteOldRdn if <code>true</code>, the old name is not retained as an
@@ -312,7 +312,7 @@ public interface LDAPAsynchronousConnection {
                                        LDAPResponseListener listener,
                                        LDAPConstraints cons)
                                        throws LDAPException;
-    
+
     /**
      * Performs the search specified by the criteria that you enter. <P>
      * To abandon the search, use the <CODE>abandon</CODE> method.
@@ -388,14 +388,14 @@ public interface LDAPAsynchronousConnection {
                                      LDAPSearchListener listener,
                                       LDAPSearchConstraints cons)
                                      throws LDAPException;
-    
+
     /**
      * Compares an attribute value with one in the directory. The result
-     * is obtained by calling <CODE>getResultCode</CODE> on the 
+     * is obtained by calling <CODE>getResultCode</CODE> on the
      * <CODE>LDAPResponse</CODE> from the <CODE>LDAPResponseListener</CODE>.
-     * The code will be <CODE>LDAPException.COMPARE_TRUE</CODE> or 
-     * <CODE>LDAPException.COMPARE_FALSE</CODE>. 
-     * 
+     * The code will be <CODE>LDAPException.COMPARE_TRUE</CODE> or
+     * <CODE>LDAPException.COMPARE_FALSE</CODE>.
+     *
      * @param dn distinguished name of the entry to compare
      * @param attr attribute with a value to compare
      * @param listener handler for messages returned from a server in response
@@ -404,18 +404,18 @@ public interface LDAPAsynchronousConnection {
      * in response to the specified request.
      * @exception LDAPException Failed to send request.
      */
-    public LDAPResponseListener compare(String dn, 
-                                        LDAPAttribute attr, 
+    public LDAPResponseListener compare(String dn,
+                                        LDAPAttribute attr,
                                         LDAPResponseListener listener)
                                         throws LDAPException;
-    
+
     /**
      * Compares an attribute value with one in the directory. The result
-     * is obtained by calling <CODE>getResultCode</CODE> on the 
+     * is obtained by calling <CODE>getResultCode</CODE> on the
      * <CODE>LDAPResponse</CODE> from the <CODE>LDAPResponseListener</CODE>.
-     * The code will be <CODE>LDAPException.COMPARE_TRUE</CODE> or 
-     * <CODE>LDAPException.COMPARE_FALSE</CODE>. 
-     * 
+     * The code will be <CODE>LDAPException.COMPARE_TRUE</CODE> or
+     * <CODE>LDAPException.COMPARE_FALSE</CODE>.
+     *
      * @param dn distinguished name of the entry to compare
      * @param attr attribute with a value to compare
      * @param listener handler for messages returned from a server in response
@@ -425,25 +425,25 @@ public interface LDAPAsynchronousConnection {
      * in response to the specified request.
      * @exception LDAPException Failed to send request.
      */
-    public LDAPResponseListener compare(String dn, 
-                                        LDAPAttribute attr, 
+    public LDAPResponseListener compare(String dn,
+                                        LDAPAttribute attr,
                                         LDAPResponseListener listener,
-                                        LDAPConstraints cons) 
+                                        LDAPConstraints cons)
                                         throws LDAPException;
-    
+
     /**
      * Cancels the ldap request with the specified id and discards
      * any results already received.
-     * 
+     *
      * @param id an LDAP request ID
      * @exception LDAPException Failed to send request.
      */
     public void abandon(int id) throws LDAPException;
-    
+
     /**
      * Cancels all outstanding search requests associated with this
      * LDAPSearchListener object and discards any results already received.
-     * 
+     *
      * @param searchlistener a search listener returned from a search
      * @exception LDAPException Failed to send request.
      */
