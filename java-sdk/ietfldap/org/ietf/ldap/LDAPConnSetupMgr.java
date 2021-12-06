@@ -37,9 +37,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap;
 
-import java.util.*;
-import java.io.*;
-import java.net.*;
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.Socket;
 
 /**
  * Makes a connection to a server from a list using "smart" failover.

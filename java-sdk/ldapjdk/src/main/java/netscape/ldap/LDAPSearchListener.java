@@ -37,9 +37,6 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap;
 
-import java.util.*;
-import netscape.ldap.client.*;
-
 /**
  * Manages search results, references and responses returned on one or 
  * more search requests

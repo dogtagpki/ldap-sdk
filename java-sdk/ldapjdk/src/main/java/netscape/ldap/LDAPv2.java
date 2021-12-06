@@ -37,9 +37,6 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap;
 
-import java.util.*;
-import java.io.*;
-
 /**
  * This interface summarizes the basic functionality available in the
  * Lightweight Directory Access Protocol (LDAP) version 2. (See

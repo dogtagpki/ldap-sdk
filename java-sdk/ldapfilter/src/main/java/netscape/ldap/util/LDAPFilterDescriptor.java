@@ -37,13 +37,20 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.util;
 
-import java.io.*;
-import java.util.*;
-import java.util.regex.Pattern;
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Vector;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import java.net.*;
-import netscape.ldap.*;
+
+import netscape.ldap.LDAPConnection;
 
 /**
  * Represents an LDAP filter configuration file read into memory.

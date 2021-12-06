@@ -37,9 +37,8 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap;
 
-import java.util.*;
-import netscape.ldap.util.*;
-import java.io.*;
+import netscape.ldap.util.DN;
+import netscape.ldap.util.RDN;
 
 /**
  * Represents a distinguished name in LDAP.

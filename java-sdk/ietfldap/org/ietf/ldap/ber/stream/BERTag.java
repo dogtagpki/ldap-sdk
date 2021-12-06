@@ -37,8 +37,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap.ber.stream;
 
-import java.util.*;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * This class is for the tagged object type. A nested tag is

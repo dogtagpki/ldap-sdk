@@ -37,10 +37,10 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.client.opers;
 
-import java.util.*;
-import netscape.ldap.client.*;
-import netscape.ldap.ber.stream.*;
-import java.io.*;
+import netscape.ldap.ber.stream.BERElement;
+import netscape.ldap.ber.stream.BEROctetString;
+import netscape.ldap.ber.stream.BERSequence;
+import netscape.ldap.ber.stream.BERTag;
 
 /**
  * This class implements the ExtendedRequest request. This object

@@ -37,9 +37,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap.util;
 
-import java.util.*;
-import org.ietf.ldap.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.util.Iterator;
+
+import org.ietf.ldap.LDAPAttribute;
+import org.ietf.ldap.LDAPAttributeSet;
+import org.ietf.ldap.LDAPEntry;
 
 /**
  * Abstract class for outputting LDAP entries to a stream.

@@ -42,12 +42,21 @@ package com.netscape.jndi.ldap.controls;
  * Factory for creating controls. Only controls send by the direcory server
  * are processed.
  */
+import javax.naming.NamingException;
+import javax.naming.ldap.Control;
+import javax.naming.ldap.ControlFactory;
 
-import javax.naming.*;
-import javax.naming.ldap.*;
-import netscape.ldap.LDAPControl;
-import netscape.ldap.controls.*;
 import com.netscape.jndi.ldap.common.ExceptionMapper;
+
+import netscape.ldap.LDAPControl;
+import netscape.ldap.controls.LDAPEntryChangeControl;
+import netscape.ldap.controls.LDAPPasswordExpiredControl;
+import netscape.ldap.controls.LDAPPasswordExpiringControl;
+import netscape.ldap.controls.LDAPPersistSearchControl;
+import netscape.ldap.controls.LDAPProxiedAuthControl;
+import netscape.ldap.controls.LDAPSortControl;
+import netscape.ldap.controls.LDAPVirtualListControl;
+import netscape.ldap.controls.LDAPVirtualListResponse;
 
 public class NetscapeControlFactory extends ControlFactory {
 

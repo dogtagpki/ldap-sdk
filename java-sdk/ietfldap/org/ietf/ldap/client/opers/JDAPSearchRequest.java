@@ -37,11 +37,15 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap.client.opers;
 
-import java.util.*;
-import org.ietf.ldap.client.*;
-import org.ietf.ldap.ber.stream.*;
-import java.io.*;
-import java.net.*;
+import org.ietf.ldap.ber.stream.BERBoolean;
+import org.ietf.ldap.ber.stream.BERElement;
+import org.ietf.ldap.ber.stream.BEREnumerated;
+import org.ietf.ldap.ber.stream.BERInteger;
+import org.ietf.ldap.ber.stream.BEROctetString;
+import org.ietf.ldap.ber.stream.BERSequence;
+import org.ietf.ldap.ber.stream.BERTag;
+import org.ietf.ldap.client.JDAPFilter;
+import org.ietf.ldap.client.JDAPFilterOpers;
 
 /**
  * This class implements the search request. This object is

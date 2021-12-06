@@ -37,8 +37,9 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.ber.stream;
 
-import java.util.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * This class is for the "any" object that is unknown to the

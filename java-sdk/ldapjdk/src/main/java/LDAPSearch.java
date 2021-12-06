@@ -36,12 +36,30 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import netscape.ldap.*;
-import netscape.ldap.util.*;
-import netscape.ldap.controls.*;
+import java.io.PrintWriter;
+import java.util.Enumeration;
+import java.util.StringTokenizer;
+import java.util.Vector;
+
+import netscape.ldap.LDAPAttribute;
+import netscape.ldap.LDAPCompareAttrNames;
+import netscape.ldap.LDAPConnection;
+import netscape.ldap.LDAPControl;
+import netscape.ldap.LDAPEntry;
+import netscape.ldap.LDAPException;
+import netscape.ldap.LDAPReferralException;
+import netscape.ldap.LDAPSearchConstraints;
+import netscape.ldap.LDAPSearchResults;
+import netscape.ldap.LDAPSortKey;
+import netscape.ldap.LDAPUrl;
+import netscape.ldap.controls.LDAPSortControl;
+import netscape.ldap.controls.LDAPVirtualListControl;
+import netscape.ldap.controls.LDAPVirtualListResponse;
+import netscape.ldap.util.DSMLWriter;
+import netscape.ldap.util.GetOpt;
+import netscape.ldap.util.LDAPWriter;
+import netscape.ldap.util.LDIFWriter;
+import netscape.ldap.util.MimeBase64Encoder;
 
 /**
  * Execute Search operations through the LDAP client interface. 

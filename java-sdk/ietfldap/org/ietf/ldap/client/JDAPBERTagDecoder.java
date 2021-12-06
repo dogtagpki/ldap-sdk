@@ -37,9 +37,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap.client;
 
-import java.util.*;
-import org.ietf.ldap.ber.stream.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.ietf.ldap.ber.stream.BERElement;
+import org.ietf.ldap.ber.stream.BERInteger;
+import org.ietf.ldap.ber.stream.BEROctetString;
+import org.ietf.ldap.ber.stream.BERSequence;
+import org.ietf.ldap.ber.stream.BERTagDecoder;
 
 /**
  * This class is to help BER libraries to make decision

@@ -37,9 +37,12 @@
  * ***** END LICENSE BLOCK ***** */
 package com.netscape.jndi.ldap.schema;
 
-import java.util.Hashtable;
 import java.util.Properties;
-import javax.naming.*;
+
+import javax.naming.CompoundName;
+import javax.naming.Name;
+import javax.naming.NameParser;
+import javax.naming.NamingException;
 
 class SchemaNameParser implements NameParser {
 

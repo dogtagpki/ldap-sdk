@@ -37,11 +37,16 @@
  * ***** END LICENSE BLOCK ***** */
 package com.netscape.jndi.ldap.common;
 
-import javax.naming.*;
-import javax.naming.directory.*;
-import javax.naming.ldap.*;
-import javax.naming.event.*;
-import java.util.Hashtable;
+import javax.naming.Name;
+import javax.naming.NamingException;
+import javax.naming.OperationNotSupportedException;
+import javax.naming.directory.SearchControls;
+import javax.naming.event.EventDirContext;
+import javax.naming.event.NamingListener;
+import javax.naming.ldap.Control;
+import javax.naming.ldap.ExtendedRequest;
+import javax.naming.ldap.ExtendedResponse;
+import javax.naming.ldap.LdapContext;
 
 public class LdapContextAdapter extends DirContextAdapter implements EventDirContext, LdapContext {
 

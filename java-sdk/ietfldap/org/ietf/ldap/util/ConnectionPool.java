@@ -37,8 +37,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap.util;
 
-import java.util.*;
-import org.ietf.ldap.*;
+import java.util.Date;
+
+import org.ietf.ldap.LDAPConnection;
+import org.ietf.ldap.LDAPException;
 
 /**
  * Class to maintain a pool of individual connections to the

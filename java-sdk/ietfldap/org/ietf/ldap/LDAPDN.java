@@ -37,9 +37,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap;
 
-import java.util.*;
-import org.ietf.ldap.util.*;
-import java.io.*;
+import org.ietf.ldap.util.DN;
+import org.ietf.ldap.util.RDN;
 
 /**
  * Represents a distinguished name in LDAP.

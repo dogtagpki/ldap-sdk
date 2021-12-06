@@ -37,9 +37,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap.client;
 
-import java.util.*;
-import org.ietf.ldap.ber.stream.*;
-import java.io.*;
+import java.util.StringTokenizer;
+import java.util.Vector;
+
+import org.ietf.ldap.ber.stream.BERElement;
 
 /**
  * This class implements the filter.

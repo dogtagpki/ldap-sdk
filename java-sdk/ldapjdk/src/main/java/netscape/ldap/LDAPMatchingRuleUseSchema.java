@@ -37,7 +37,7 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap;
 
-import java.util.*;
+import java.util.Vector;
 
 /**
  * The definition of a matching rule use in the schema.

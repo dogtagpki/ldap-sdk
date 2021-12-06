@@ -37,7 +37,7 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.util;
 
-import java.util.*;
+import java.util.Vector;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 

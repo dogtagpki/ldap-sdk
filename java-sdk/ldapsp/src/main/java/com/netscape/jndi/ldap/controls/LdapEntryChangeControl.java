@@ -38,7 +38,8 @@
 package com.netscape.jndi.ldap.controls;
 
 import javax.naming.ldap.Control;
-import netscape.ldap.controls.*;
+
+import netscape.ldap.controls.LDAPEntryChangeControl;
 
 /**
  * Represents an LDAP v3 server control that specifies information

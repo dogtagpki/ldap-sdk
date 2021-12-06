@@ -37,17 +37,20 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.factory;
 
-import java.net.*;
-import java.io.*;
+import java.io.Serializable;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
-import netscape.ldap.*;
-
-import org.mozilla.jss.ssl.SSLSocket;
-import org.mozilla.jss.ssl.SSLCertificateApprovalCallback.ValidityStatus;
-import org.mozilla.jss.ssl.SSLCertificateApprovalCallback;
-import org.mozilla.jss.crypto.X509Certificate;
-import org.mozilla.jss.crypto.AlreadyInitializedException;
 import org.mozilla.jss.CryptoManager;
+import org.mozilla.jss.crypto.AlreadyInitializedException;
+import org.mozilla.jss.crypto.X509Certificate;
+import org.mozilla.jss.ssl.SSLCertificateApprovalCallback;
+import org.mozilla.jss.ssl.SSLSocket;
+
+import netscape.ldap.LDAPConnection;
+import netscape.ldap.LDAPException;
+import netscape.ldap.LDAPSocketFactory;
+import netscape.ldap.LDAPTLSSocketFactory;
 
 /**
  * Creates an SSL socket connection to a server, using the Netscape/Mozilla

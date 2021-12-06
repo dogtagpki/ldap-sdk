@@ -37,8 +37,10 @@
  * ***** END LICENSE BLOCK ***** */
 package com.netscape.jndi.ldap;
 
-import javax.naming.ldap.*;
-import javax.naming.directory.*;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.SearchResult;
+import javax.naming.ldap.Control;
+import javax.naming.ldap.HasControls;
 
 /**
  * An extension of SearchResult that allows access to controls sent

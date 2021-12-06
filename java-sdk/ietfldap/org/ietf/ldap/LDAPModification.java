@@ -39,7 +39,9 @@ package org.ietf.ldap;
 
 import java.io.Serializable;
 
-import org.ietf.ldap.ber.stream.*;
+import org.ietf.ldap.ber.stream.BERElement;
+import org.ietf.ldap.ber.stream.BEREnumerated;
+import org.ietf.ldap.ber.stream.BERSequence;
 
 /**
  * Specifies changes to be made to the values of an attribute.  The change is

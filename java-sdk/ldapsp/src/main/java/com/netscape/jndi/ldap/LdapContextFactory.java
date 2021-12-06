@@ -37,11 +37,13 @@
  * ***** END LICENSE BLOCK ***** */
 package com.netscape.jndi.ldap;
 
-import javax.naming.*;
-import javax.naming.directory.*;
-import javax.naming.event.*;
-import javax.naming.spi.*;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.Hashtable;
+
+import javax.naming.Context;
+import javax.naming.NamingException;
+import javax.naming.event.EventDirContext;
+import javax.naming.spi.InitialContextFactory;
 
 public class LdapContextFactory implements InitialContextFactory {
 

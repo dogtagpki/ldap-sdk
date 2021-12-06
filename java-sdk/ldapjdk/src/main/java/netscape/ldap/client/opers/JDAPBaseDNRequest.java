@@ -37,12 +37,6 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.client.opers;
 
-import java.util.*;
-import netscape.ldap.client.*;
-import netscape.ldap.ber.stream.*;
-import java.io.*;
-import java.net.*;
-
 /**
  * This is the base class for all the request that
  * has a base dn component. The existence of this

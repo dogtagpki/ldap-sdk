@@ -38,8 +38,12 @@
 
 package com.netscape.sasl.mechanisms;
 
-import java.io.*;
-import com.netscape.sasl.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import com.netscape.sasl.SaslClient;
+import com.netscape.sasl.SaslException;
 
 /**
  * This class provides the implementation of the EXTERNAL mechanism driver.

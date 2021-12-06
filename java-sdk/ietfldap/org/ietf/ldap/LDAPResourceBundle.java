@@ -37,8 +37,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap;
 
-import java.util.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Locale;
+import java.util.PropertyResourceBundle;
 
 /**
  * This class represents a locale-specific resource for a property file.

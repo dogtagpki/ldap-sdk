@@ -38,6 +38,7 @@
 package org.ietf.ldap.util;
 
 import java.io.Serializable;
+
 import org.ietf.ldap.LDAPControl;
 
 /**

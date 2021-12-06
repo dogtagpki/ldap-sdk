@@ -37,9 +37,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap.client;
 
-import java.util.*;
-import org.ietf.ldap.ber.stream.*;
-import java.io.*;
+import java.util.Vector;
+
+import org.ietf.ldap.ber.stream.BERElement;
+import org.ietf.ldap.ber.stream.BEROctetString;
+import org.ietf.ldap.ber.stream.BERSequence;
+import org.ietf.ldap.ber.stream.BERTag;
 
 /**
  * This class implements the filter substring.

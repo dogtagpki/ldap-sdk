@@ -42,11 +42,13 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import javax.net.SocketFactory;
+
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
-import org.ietf.ldap.*;
+import org.ietf.ldap.LDAPConnection;
+import org.ietf.ldap.LDAPException;
+import org.ietf.ldap.LDAPSocketFactory;
 
 /**
  * Creates an SSL socket connection to a server, using the JSSE package

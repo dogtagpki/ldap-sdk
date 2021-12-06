@@ -37,12 +37,11 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.client.opers;
 
-import java.util.*;
-import netscape.ldap.*;
-import netscape.ldap.client.*;
-import netscape.ldap.ber.stream.*;
-import java.io.*;
-import java.net.*;
+import netscape.ldap.LDAPModification;
+import netscape.ldap.ber.stream.BERElement;
+import netscape.ldap.ber.stream.BEROctetString;
+import netscape.ldap.ber.stream.BERSequence;
+import netscape.ldap.ber.stream.BERTag;
 
 /**
  * This class implements the modify request.

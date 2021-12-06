@@ -37,8 +37,14 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.client;
 
-import netscape.ldap.ber.stream.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+
+import netscape.ldap.ber.stream.BERElement;
+import netscape.ldap.ber.stream.BERInteger;
+import netscape.ldap.ber.stream.BEROctetString;
+import netscape.ldap.ber.stream.BERSequence;
+import netscape.ldap.ber.stream.BERTagDecoder;
 
 /**
  * This class is to help BER libraries to make decision

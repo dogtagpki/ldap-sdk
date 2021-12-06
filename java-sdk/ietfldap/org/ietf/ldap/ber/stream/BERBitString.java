@@ -37,9 +37,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap.ber.stream;
 
-import java.util.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.BitSet;
-import java.io.*;
 
 /**
  * This class is for the BitString object. Note that the BitSet class

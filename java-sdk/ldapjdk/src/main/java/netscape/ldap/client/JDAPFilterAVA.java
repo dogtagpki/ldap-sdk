@@ -37,7 +37,8 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.client;
 
-import netscape.ldap.ber.stream.*;
+import netscape.ldap.ber.stream.BERElement;
+import netscape.ldap.ber.stream.BERTag;
 
 /**
  * This class implements the attribute value assertion filter.

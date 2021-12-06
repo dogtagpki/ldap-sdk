@@ -37,8 +37,10 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.ber.stream;
 
-import java.util.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Serializable;
 
 /**
  * This class is for the tagged object type. A nested tag is

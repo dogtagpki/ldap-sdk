@@ -37,9 +37,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap.ber.stream;
 
-import java.util.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.StringTokenizer;
-import java.io.*;
+import java.util.Vector;
 
 /**
  * This class is for the Object ID object.

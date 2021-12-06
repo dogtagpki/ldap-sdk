@@ -37,8 +37,6 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap;
 
-import java.util.*;
-
 /**
  * The definition of a syntax type in the schema.
  * <A HREF="http://www.ietf.org/rfc/rfc2252.txt"

@@ -37,8 +37,6 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap;
 
-import java.util.*;
-
 /**
  * Represents an entry in the directory.
  *

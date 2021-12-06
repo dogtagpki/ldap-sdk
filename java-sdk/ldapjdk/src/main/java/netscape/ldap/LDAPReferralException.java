@@ -37,10 +37,8 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap;
 
-import java.util.*;
-import netscape.ldap.client.*;
-import netscape.ldap.client.opers.*;
-import java.io.*;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
 /**
  * Represents the situation in which the LDAP server refers the client to

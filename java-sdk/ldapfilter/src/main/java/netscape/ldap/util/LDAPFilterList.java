@@ -37,7 +37,8 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.util;
 
-import java.util.*;
+import java.util.Enumeration;
+import java.util.Vector;
 
 /**
  * The list of LDAPFilter objects returned from a LDAPFilterDescriptor

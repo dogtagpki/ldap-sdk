@@ -37,13 +37,31 @@
  * ***** END LICENSE BLOCK ***** */
 package com.netscape.jndi.ldap.common;
 
-import javax.naming.*;
-import javax.naming.directory.*;
-import javax.naming.ldap.*;
+import javax.naming.AuthenticationException;
+import javax.naming.AuthenticationNotSupportedException;
+import javax.naming.CommunicationException;
+import javax.naming.ContextNotEmptyException;
+import javax.naming.InvalidNameException;
+import javax.naming.LimitExceededException;
+import javax.naming.NameAlreadyBoundException;
+import javax.naming.NameNotFoundException;
+import javax.naming.NamingException;
+import javax.naming.NoPermissionException;
+import javax.naming.OperationNotSupportedException;
+import javax.naming.PartialResultException;
+import javax.naming.ServiceUnavailableException;
+import javax.naming.SizeLimitExceededException;
+import javax.naming.TimeLimitExceededException;
+import javax.naming.directory.AttributeInUseException;
+import javax.naming.directory.InvalidAttributeIdentifierException;
+import javax.naming.directory.InvalidAttributeValueException;
+import javax.naming.directory.InvalidSearchControlsException;
+import javax.naming.directory.InvalidSearchFilterException;
+import javax.naming.directory.NoSuchAttributeException;
+import javax.naming.directory.SchemaViolationException;
 
-import netscape.ldap.*;
-
-import java.util.Hashtable;
+import netscape.ldap.LDAPException;
+import netscape.ldap.LDAPReferralException;
 
 /**
  * Class used to map ldapjdk exceptions to JNDI NamingException

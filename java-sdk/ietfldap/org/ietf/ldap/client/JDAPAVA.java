@@ -37,9 +37,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap.client;
 
-import java.util.*;
-import java.io.*;
-import org.ietf.ldap.ber.stream.*;
+import org.ietf.ldap.ber.stream.BERElement;
+import org.ietf.ldap.ber.stream.BEROctetString;
+import org.ietf.ldap.ber.stream.BERSequence;
 
 /**
  * This class implements the attribute value assertion.

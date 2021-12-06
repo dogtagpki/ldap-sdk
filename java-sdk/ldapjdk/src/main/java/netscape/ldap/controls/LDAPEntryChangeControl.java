@@ -37,10 +37,18 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.controls;
 
-import java.io.*;
-import netscape.ldap.ber.stream.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+
+import netscape.ldap.LDAPControl;
+import netscape.ldap.LDAPException;
+import netscape.ldap.ber.stream.BERElement;
+import netscape.ldap.ber.stream.BEREnumerated;
+import netscape.ldap.ber.stream.BERInteger;
+import netscape.ldap.ber.stream.BEROctetString;
+import netscape.ldap.ber.stream.BERSequence;
 import netscape.ldap.client.JDAPBERTagDecoder;
-import netscape.ldap.*;
 
 /**
  * Represents an LDAP v3 server control that specifies information

@@ -37,11 +37,24 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap;
 
-import java.util.*;
-import netscape.ldap.client.opers.*;
-import netscape.ldap.ber.stream.*;
-import java.io.*;
-import java.net.*;
+import java.io.IOException;
+import java.io.OutputStream;
+
+import netscape.ldap.ber.stream.BERElement;
+import netscape.ldap.ber.stream.BERInteger;
+import netscape.ldap.ber.stream.BERSequence;
+import netscape.ldap.ber.stream.BERTag;
+import netscape.ldap.client.opers.JDAPAddResponse;
+import netscape.ldap.client.opers.JDAPBindResponse;
+import netscape.ldap.client.opers.JDAPCompareResponse;
+import netscape.ldap.client.opers.JDAPDeleteResponse;
+import netscape.ldap.client.opers.JDAPExtendedResponse;
+import netscape.ldap.client.opers.JDAPModifyRDNResponse;
+import netscape.ldap.client.opers.JDAPModifyResponse;
+import netscape.ldap.client.opers.JDAPProtocolOp;
+import netscape.ldap.client.opers.JDAPSearchResponse;
+import netscape.ldap.client.opers.JDAPSearchResult;
+import netscape.ldap.client.opers.JDAPSearchResultReference;
 
 
 /**

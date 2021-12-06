@@ -37,12 +37,19 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap.controls;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+
 import org.ietf.ldap.LDAPControl;
-import org.ietf.ldap.LDAPSortKey;
-import org.ietf.ldap.client.JDAPBERTagDecoder;
 import org.ietf.ldap.LDAPException;
-import org.ietf.ldap.ber.stream.*;
+import org.ietf.ldap.LDAPSortKey;
+import org.ietf.ldap.ber.stream.BERElement;
+import org.ietf.ldap.ber.stream.BEREnumerated;
+import org.ietf.ldap.ber.stream.BEROctetString;
+import org.ietf.ldap.ber.stream.BERSequence;
+import org.ietf.ldap.ber.stream.BERTag;
+import org.ietf.ldap.client.JDAPBERTagDecoder;
 
 /**
  * Represents an LDAP v3 server control that specifies that you want

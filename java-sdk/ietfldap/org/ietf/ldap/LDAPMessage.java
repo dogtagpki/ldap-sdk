@@ -37,11 +37,25 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap;
 
-import java.util.*;
-import org.ietf.ldap.client.opers.*;
-import org.ietf.ldap.ber.stream.*;
-import java.io.*;
-import java.net.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.Serializable;
+
+import org.ietf.ldap.ber.stream.BERElement;
+import org.ietf.ldap.ber.stream.BERInteger;
+import org.ietf.ldap.ber.stream.BERSequence;
+import org.ietf.ldap.ber.stream.BERTag;
+import org.ietf.ldap.client.opers.JDAPAddResponse;
+import org.ietf.ldap.client.opers.JDAPBindResponse;
+import org.ietf.ldap.client.opers.JDAPCompareResponse;
+import org.ietf.ldap.client.opers.JDAPDeleteResponse;
+import org.ietf.ldap.client.opers.JDAPExtendedResponse;
+import org.ietf.ldap.client.opers.JDAPModifyRDNResponse;
+import org.ietf.ldap.client.opers.JDAPModifyResponse;
+import org.ietf.ldap.client.opers.JDAPProtocolOp;
+import org.ietf.ldap.client.opers.JDAPSearchResponse;
+import org.ietf.ldap.client.opers.JDAPSearchResult;
+import org.ietf.ldap.client.opers.JDAPSearchResultReference;
 
 
 /**

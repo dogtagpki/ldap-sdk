@@ -37,9 +37,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap;
 
-import java.io.Serializable;
-import java.util.Vector;
-
 /**
  * A queue of response messsages from the server. Multiple requests
  * can be multiplexed on the same queue. For synchronous LDAPConnection

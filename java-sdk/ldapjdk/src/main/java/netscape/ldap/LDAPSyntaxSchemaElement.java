@@ -37,8 +37,6 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap;
 
-import java.util.*;
-
 /**
  * Helper class supporting schema elements that include syntax
  * definitions - attributes and matching rules

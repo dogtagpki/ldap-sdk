@@ -37,13 +37,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap.util;
 
-import java.util.*;
-
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintStream;
 import java.io.RandomAccessFile;
 import java.io.Serializable;
 

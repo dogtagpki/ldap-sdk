@@ -37,10 +37,13 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.client.opers;
 
-import java.util.*;
-import netscape.ldap.ber.stream.*;
-import java.io.*;
-import java.net.*;
+import java.io.IOException;
+
+import netscape.ldap.ber.stream.BERElement;
+import netscape.ldap.ber.stream.BEREnumerated;
+import netscape.ldap.ber.stream.BEROctetString;
+import netscape.ldap.ber.stream.BERSequence;
+import netscape.ldap.ber.stream.BERTag;
 
 /**
  * This class implements the ldap result where stores

@@ -37,11 +37,9 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.client.opers;
 
-import java.util.*;
-import netscape.ldap.client.*;
-import netscape.ldap.ber.stream.*;
-import java.io.*;
-import java.net.*;
+import netscape.ldap.ber.stream.BERElement;
+import netscape.ldap.ber.stream.BERInteger;
+import netscape.ldap.ber.stream.BERTag;
 
 /**
  * This class implements the abandon request. This object

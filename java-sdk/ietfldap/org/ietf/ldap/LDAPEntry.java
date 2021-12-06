@@ -38,7 +38,6 @@
 package org.ietf.ldap;
 
 import java.io.Serializable;
-import java.util.*;
 
 /**
  * Represents an entry in the directory.

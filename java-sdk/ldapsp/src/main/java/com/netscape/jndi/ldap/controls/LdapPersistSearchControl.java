@@ -38,7 +38,8 @@
 package com.netscape.jndi.ldap.controls;
 
 import javax.naming.ldap.Control;
-import netscape.ldap.controls.*;
+
+import netscape.ldap.controls.LDAPPersistSearchControl;
 
 /**
  * Represents an LDAP v3 server control that specifies a persistent

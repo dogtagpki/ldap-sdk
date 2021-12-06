@@ -37,8 +37,8 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.ber.stream;
 
-import java.util.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * This class is for the Integer object.

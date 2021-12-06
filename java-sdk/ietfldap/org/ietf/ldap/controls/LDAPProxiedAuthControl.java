@@ -37,11 +37,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap.controls;
 
-import java.io.*;
 import org.ietf.ldap.LDAPControl;
-import org.ietf.ldap.LDAPSortKey;
-import org.ietf.ldap.client.JDAPBERTagDecoder;
-import org.ietf.ldap.ber.stream.*;
+import org.ietf.ldap.ber.stream.BEROctetString;
+import org.ietf.ldap.ber.stream.BERSequence;
 
 /**
  * Represents an LDAP v3 server control that specifies that you want

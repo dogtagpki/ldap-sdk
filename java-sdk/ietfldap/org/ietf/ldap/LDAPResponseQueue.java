@@ -37,13 +37,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap;
 
-import java.io.Serializable;
-import java.util.Vector;
-
 /**
  * Represents the message queue associated with a particular LDAP
  * operation or operations.
- * 
+ *
  */
 public class LDAPResponseQueue extends LDAPMessageQueueImpl {
 

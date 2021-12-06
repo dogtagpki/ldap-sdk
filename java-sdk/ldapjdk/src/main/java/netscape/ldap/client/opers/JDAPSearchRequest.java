@@ -37,11 +37,15 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.client.opers;
 
-import java.util.*;
-import netscape.ldap.client.*;
-import netscape.ldap.ber.stream.*;
-import java.io.*;
-import java.net.*;
+import netscape.ldap.ber.stream.BERBoolean;
+import netscape.ldap.ber.stream.BERElement;
+import netscape.ldap.ber.stream.BEREnumerated;
+import netscape.ldap.ber.stream.BERInteger;
+import netscape.ldap.ber.stream.BEROctetString;
+import netscape.ldap.ber.stream.BERSequence;
+import netscape.ldap.ber.stream.BERTag;
+import netscape.ldap.client.JDAPFilter;
+import netscape.ldap.client.JDAPFilterOpers;
 
 /**
  * This class implements the search request. This object is

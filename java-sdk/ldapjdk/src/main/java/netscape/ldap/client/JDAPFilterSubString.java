@@ -37,8 +37,13 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.client;
 
-import java.util.*;
-import netscape.ldap.ber.stream.*;
+import java.util.Collection;
+import java.util.Vector;
+
+import netscape.ldap.ber.stream.BERElement;
+import netscape.ldap.ber.stream.BEROctetString;
+import netscape.ldap.ber.stream.BERSequence;
+import netscape.ldap.ber.stream.BERTag;
 
 /**
  * This class implements the filter substring.

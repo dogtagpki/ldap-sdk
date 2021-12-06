@@ -37,10 +37,16 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap.controls;
 
-import java.io.*;
-import org.ietf.ldap.client.JDAPBERTagDecoder;
+import java.io.ByteArrayInputStream;
+
 import org.ietf.ldap.LDAPControl;
-import org.ietf.ldap.ber.stream.*;
+import org.ietf.ldap.ber.stream.BERBoolean;
+import org.ietf.ldap.ber.stream.BERElement;
+import org.ietf.ldap.ber.stream.BEREnumerated;
+import org.ietf.ldap.ber.stream.BERInteger;
+import org.ietf.ldap.ber.stream.BEROctetString;
+import org.ietf.ldap.ber.stream.BERSequence;
+import org.ietf.ldap.client.JDAPBERTagDecoder;
 
 /**
  * Represents an LDAP v3 server control that specifies a persistent

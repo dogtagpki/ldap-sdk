@@ -37,10 +37,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap;
 
-import java.util.*;
 //import org.ietf.ldap.client.*;
 //import org.ietf.ldap.client.opers.*;
 //import java.io.*;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
 /**
  * Represents the situation in which the LDAP server refers the client to

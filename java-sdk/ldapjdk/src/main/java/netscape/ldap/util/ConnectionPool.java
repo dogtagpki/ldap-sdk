@@ -37,8 +37,10 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.util;
 
-import java.util.*;
-import netscape.ldap.*;
+import java.util.Date;
+
+import netscape.ldap.LDAPConnection;
+import netscape.ldap.LDAPException;
 
 /**
  * Class to maintain a pool of individual connections to the

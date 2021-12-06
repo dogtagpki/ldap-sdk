@@ -37,9 +37,14 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.util;
 
-import java.util.*;
-import netscape.ldap.*;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.Enumeration;
+
+import netscape.ldap.LDAPAttribute;
 
 /**
  * Class for outputting LDAP entries to a stream as LDIF.

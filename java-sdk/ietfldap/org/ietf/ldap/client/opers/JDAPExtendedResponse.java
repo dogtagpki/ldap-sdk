@@ -37,11 +37,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap.client.opers;
 
-import java.util.*;
-import org.ietf.ldap.client.*;
-import org.ietf.ldap.ber.stream.*;
-import java.io.*;
-import java.net.*;
+import java.io.IOException;
+
+import org.ietf.ldap.ber.stream.BERElement;
+import org.ietf.ldap.ber.stream.BEROctetString;
+import org.ietf.ldap.ber.stream.BERSequence;
+import org.ietf.ldap.ber.stream.BERTag;
 
 /**
  * This class implements the extended response. This object

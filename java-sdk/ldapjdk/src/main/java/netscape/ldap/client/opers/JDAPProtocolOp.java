@@ -37,10 +37,7 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.client.opers;
 
-import java.util.*;
-import netscape.ldap.ber.stream.*;
-import java.io.*;
-import java.net.*;
+import netscape.ldap.ber.stream.BERElement;
 
 /**
  * This is the base interface for all protocol operation

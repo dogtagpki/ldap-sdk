@@ -37,10 +37,10 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.beans;
 
-import netscape.ldap.*;
-import netscape.ldap.beans.LDAPBasePropertySupport;
+import java.awt.event.ActionEvent;
 import java.io.Serializable;
-import java.awt.event.*;
+
+import netscape.ldap.LDAPConnection;
 
 /**
  * Invisible Bean that just authenticates a user with a Directory

@@ -37,7 +37,7 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap;
 
-import java.util.*;
+import java.util.Vector;
 
 /**
  * Represents a set of modifications to be made to attributes in an entry.

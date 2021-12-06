@@ -37,9 +37,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap.util;
 
-import java.util.*;
-import java.io.*;
+import java.io.Serializable;
 import java.util.StringTokenizer;
+import java.util.Vector;
 
 /**
  * Objects of this class represent distinguished names (DN). A

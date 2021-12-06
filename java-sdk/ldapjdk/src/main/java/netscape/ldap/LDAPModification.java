@@ -37,7 +37,9 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap;
 
-import netscape.ldap.ber.stream.*;
+import netscape.ldap.ber.stream.BERElement;
+import netscape.ldap.ber.stream.BEREnumerated;
+import netscape.ldap.ber.stream.BERSequence;
 
 /**
  * Specifies changes to be made to the values of an attribute.  The change is

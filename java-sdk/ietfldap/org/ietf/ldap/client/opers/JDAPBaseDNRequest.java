@@ -37,12 +37,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap.client.opers;
 
-import java.util.*;
-import org.ietf.ldap.client.*;
-import org.ietf.ldap.ber.stream.*;
-import java.io.*;
-import java.net.*;
-
 /**
  * This is the base class for all the request that
  * has a base dn component. The existence of this

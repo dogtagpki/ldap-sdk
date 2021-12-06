@@ -38,10 +38,17 @@
 
 package netscape.ldap.factory;
 
-import java.net.*; 
-import java.io.*; 
-import javax.net.ssl.*; 
-import netscape.ldap.*;
+import java.io.IOException;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+
+import netscape.ldap.LDAPConnection;
+import netscape.ldap.LDAPException;
+import netscape.ldap.LDAPSocketFactory;
+import netscape.ldap.LDAPTLSSocketFactory;
 
 /**
  * Creates an SSL socket connection to a server, using the JSSE package

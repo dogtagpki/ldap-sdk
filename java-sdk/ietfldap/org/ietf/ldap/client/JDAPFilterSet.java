@@ -37,9 +37,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap.client;
 
-import java.util.*;
-import org.ietf.ldap.ber.stream.*;
-import java.io.*;
+import java.io.IOException;
+import java.util.Vector;
+
+import org.ietf.ldap.ber.stream.BERElement;
+import org.ietf.ldap.ber.stream.BERSet;
+import org.ietf.ldap.ber.stream.BERTag;
 
 /**
  * This class implements the base class of filter "and" and filter "or".

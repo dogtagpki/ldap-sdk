@@ -37,9 +37,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap.client;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Vector;
-import java.io.*;
-import org.ietf.ldap.ber.stream.*;
+
+import org.ietf.ldap.ber.stream.BEROctetString;
 
 /**
  * This class provides miscellaneous operations for JDAPFilter object.

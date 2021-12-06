@@ -37,7 +37,9 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.client;
 
-import netscape.ldap.ber.stream.*;
+import netscape.ldap.ber.stream.BERElement;
+import netscape.ldap.ber.stream.BEROctetString;
+import netscape.ldap.ber.stream.BERSequence;
 
 /**
  * This class implements the attribute value assertion.

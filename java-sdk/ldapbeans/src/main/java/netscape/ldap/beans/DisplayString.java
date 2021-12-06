@@ -37,9 +37,11 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.beans;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.beans.*;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.TextArea;
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
 import java.io.Serializable;
 
 public class DisplayString extends TextArea implements Serializable {

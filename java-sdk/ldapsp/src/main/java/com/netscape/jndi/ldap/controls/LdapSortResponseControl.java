@@ -39,10 +39,11 @@ package com.netscape.jndi.ldap.controls;
 
 import javax.naming.NamingException;
 import javax.naming.ldap.Control;
-import netscape.ldap.LDAPControl;
-import netscape.ldap.LDAPException;
-import netscape.ldap.controls.*;
+
 import com.netscape.jndi.ldap.common.ExceptionMapper;
+
+import netscape.ldap.LDAPException;
+import netscape.ldap.controls.LDAPSortControl;
 
 /**
  * The LDAP server sends back a sort response control to indicate

@@ -37,9 +37,10 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.client;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Vector;
-import java.io.*;
-import netscape.ldap.ber.stream.*;
+
+import netscape.ldap.ber.stream.BEROctetString;
 
 /**
  * This class provides miscellaneous operations for JDAPFilter object.

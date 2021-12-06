@@ -37,11 +37,9 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.controls;
 
-import java.io.*;
 import netscape.ldap.LDAPControl;
-import netscape.ldap.LDAPSortKey;
-import netscape.ldap.client.JDAPBERTagDecoder;
-import netscape.ldap.ber.stream.*;
+import netscape.ldap.ber.stream.BEROctetString;
+import netscape.ldap.ber.stream.BERSequence;
 
 /**
  * Represents an LDAP v3 server control that specifies that you want

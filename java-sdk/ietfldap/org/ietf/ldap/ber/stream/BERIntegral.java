@@ -37,8 +37,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.ietf.ldap.ber.stream;
 
-import java.util.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * This is the base class for integral types such as Integer and

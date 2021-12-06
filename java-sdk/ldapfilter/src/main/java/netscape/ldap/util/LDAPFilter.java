@@ -37,8 +37,9 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap.util;
 
-import netscape.ldap.*;
-import java.util.*;
+import java.util.StringTokenizer;
+
+import netscape.ldap.LDAPConnection;
 
 /**
  * Represents an LDAP search filter, which includes the string-based
