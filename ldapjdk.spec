@@ -10,7 +10,7 @@ BuildArch:        noarch
 
 # For development (i.e. unsupported) releases, use x.y.z-0.n.<phase>.
 # For official (i.e. supported) releases, use x.y.z-r where r >=1.
-Version:          5.0.0
+Version:          5.1.0
 Release:          1%{?_timestamp}%{?_commit_id}%{?dist}
 #global           _phase -alpha1
 
@@ -46,7 +46,7 @@ BuildRequires:    %{java_devel}
 BuildRequires:    javapackages-local
 BuildRequires:    slf4j
 BuildRequires:    slf4j-jdk14
-BuildRequires:    jss >= 5.0.0
+BuildRequires:    jss >= 5.1.0
 
 ################################################################################
 # Runtime Dependencies
@@ -56,7 +56,7 @@ Requires:         %{java_headless}
 Requires:         jpackage-utils >= 0:1.5
 Requires:         slf4j
 Requires:         slf4j-jdk14
-Requires:         jss >= 5.0.0
+Requires:         jss >= 5.1.0
 
 %description
 The Mozilla LDAP SDKs enable you to write applications which access,
