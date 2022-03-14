@@ -280,8 +280,7 @@ public class LDAPSchema implements Serializable {
             _contentRules.put( name, (LDAPDITContentRuleSchema) el );
         } else if ( el instanceof LDAPDITStructureRuleSchema ) {
             _structureRulesByName.put( name, (LDAPDITStructureRuleSchema) el );
-            _structureRulesById.put( new Integer(
-                ((LDAPDITStructureRuleSchema)el).getRuleID() ), (LDAPDITStructureRuleSchema) el );
+            _structureRulesById.put( ((LDAPDITStructureRuleSchema)el).getRuleID(), (LDAPDITStructureRuleSchema) el );
         }
     }
 
@@ -390,7 +389,7 @@ public class LDAPSchema implements Serializable {
      * the rule, or <CODE>null</CODE> if not found.
      */
     public LDAPDITStructureRuleSchema getDITStructureRuleSchema( int ID ) {
-        return _structureRulesById.get( new Integer( ID ) );
+        return _structureRulesById.get( ID );
     }
 
     /**
@@ -595,8 +594,7 @@ public class LDAPSchema implements Serializable {
             _contentRules.put( name, (LDAPDITContentRuleSchema) el );
         } else if ( el instanceof LDAPDITStructureRuleSchema ) {
             _structureRulesByName.put( name, (LDAPDITStructureRuleSchema) el );
-            _structureRulesById.put( new Integer(
-                ((LDAPDITStructureRuleSchema)el).getRuleID() ), (LDAPDITStructureRuleSchema) el );
+            _structureRulesById.put( ((LDAPDITStructureRuleSchema)el).getRuleID(), (LDAPDITStructureRuleSchema) el );
         }
     }
 
@@ -657,8 +655,7 @@ public class LDAPSchema implements Serializable {
             _contentRules.remove( name );
         } else if ( el instanceof LDAPDITStructureRuleSchema ) {
             _structureRulesByName.remove( name );
-            _structureRulesById.remove( new Integer(
-                ((LDAPDITStructureRuleSchema)el).getRuleID() ) );
+            _structureRulesById.remove( ((LDAPDITStructureRuleSchema)el).getRuleID() );
         }
     }
 

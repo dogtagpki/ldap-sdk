@@ -255,8 +255,7 @@ class LDAPConnThread extends Thread {
             if ( !(request instanceof JDAPAbandonRequest ||
                    request instanceof JDAPUnbindRequest) ) {
                 /* Only worry about toNotify if we expect a response... */
-                this._requests.put( new Integer( msg.getMessageID()),
-                                    queue );
+                this._requests.put( msg.getMessageID(), queue );
                 /* Notify the backlog checker that there may be another
                    outstanding request */
                 resultRetrieved();
@@ -538,7 +537,7 @@ class LDAPConnThread extends Thread {
      * @param msg New message from LDAP server
      */
     private void processResponse( LDAPMessage msg, int size ) {
-        Integer messageID = new Integer( msg.getMessageID() );
+        Integer messageID = msg.getMessageID();
         LDAPMessageQueueImpl l =
             (LDAPMessageQueueImpl)_requests.get( messageID );
         if ( l == null ) {
@@ -590,7 +589,7 @@ class LDAPConnThread extends Thread {
      */
     private synchronized void cacheSearchResult( LDAPSearchQueue l,
                                                  LDAPMessage msg, int size ) {
-        Integer messageID = new Integer( msg.getMessageID() );
+        Integer messageID = msg.getMessageID();
         Long key = l.getKey();
         Vector<Object> v = null;
 
@@ -605,7 +604,7 @@ class LDAPConnThread extends Thread {
             v = _messages.get( messageID );
             if ( v == null ) {
                 _messages.put( messageID, v = new Vector<>() );
-                v.addElement( new Long(0) );
+                v.addElement( 0L );
             }
 
             // Return if the entry size is -1, i.e. caching is disabled
@@ -624,12 +623,12 @@ class LDAPConnThread extends Thread {
             // by setting the entry size to -1.
             if ( entrySize > _cache.getSize() ) {
                 v.removeAllElements();
-                v.addElement( new Long(-1L) );
+                v.addElement( -1L );
                 return;
             }
 
             // update the lump sum located in the first element of the vector
-            v.setElementAt( new Long(entrySize), 0 );
+            v.setElementAt( entrySize, 0 );
 
             // convert LDAPMessage object into LDAPEntry which is stored to the
             // end of the Vector
@@ -646,7 +645,7 @@ class LDAPConnThread extends Thread {
             else {
                 v.removeAllElements();
             }
-            v.addElement( new Long(-1L) );
+            v.addElement( -1L );
 
         } else if ( msg instanceof LDAPResponse ) {
 
@@ -662,7 +661,7 @@ class LDAPConnThread extends Thread {
                 // server
                 if ( v == null ) {
                     v = new Vector<>();
-                    v.addElement(new Long(0));
+                    v.addElement( 0L );
                 }
 
                 // add the new entry if the entry size is not -1 (caching
@@ -685,10 +684,10 @@ class LDAPConnThread extends Thread {
         }
 
         LDAPMessageQueueImpl l =
-            (LDAPMessageQueueImpl)_requests.remove( new Integer(id) );
+            (LDAPMessageQueueImpl)_requests.remove( id );
         // Clean up cache if enabled
         if ( _messages != null ) {
-            _messages.remove( new Integer(id) );
+            _messages.remove( id );
         }
         if ( l != null ) {
             l.removeRequest( id );
@@ -711,7 +710,7 @@ class LDAPConnThread extends Thread {
                                                    LDAPException.OTHER ) );
             return null;
         }
-        return _requests.put( new Integer(id), toNotify );
+        return _requests.put( id, toNotify );
     }
 
     /**

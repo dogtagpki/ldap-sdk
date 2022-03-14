@@ -95,21 +95,19 @@ public class BERObjectId extends BERElement {
 
         contents_length -= contents_read[0];
         if (sub_id < 40)
-            oid.addElement(new Integer(0));
+            oid.addElement(0);
         else if (sub_id < 80)
-            oid.addElement(new Integer(1));
+            oid.addElement(1);
         else
-            oid.addElement(new Integer(2));
-        oid.addElement(new Integer(
-            sub_id - (((Integer)oid.elementAt(
-                oid.size()-1)).intValue() * 40)));
+            oid.addElement(2);
+        oid.addElement(sub_id - (((Integer)oid.elementAt(oid.size()-1)).intValue() * 40));
 
         while (contents_length > 0) {
             contents_read[0] = 0;
             sub_id = readSubIdentifier(stream, contents_read);
 
             contents_length -= contents_read[0];
-            oid.addElement(new Integer(sub_id));
+            oid.addElement(sub_id);
         }
         m_value = new int[oid.size()];
         for (int i = 0; i<oid.size(); i++)

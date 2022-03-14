@@ -458,8 +458,7 @@ public class LDAPCache implements Serializable {
             for (int i=0; i<serverControls.length; i++) {
                 LDAPControl ctrl = serverControls[i];
                 long val = getCRC32(ctrl.getValue());
-                objID[i] = ctrl.getID() + ctrl.isCritical() +
-                    new Long(val).toString();
+                objID[i] = ctrl.getID() + ctrl.isCritical() + val;
             }
             key = key + appendString(objID);
         }  else {
@@ -470,7 +469,7 @@ public class LDAPCache implements Serializable {
         if ( m_debug ) {
             System.out.println("key="+val + " for "+key);
         }
-        return new Long(val);
+        return val;
     }
 
     /**
@@ -584,7 +583,7 @@ public class LDAPCache implements Serializable {
         m_cache.put(key, v);
         Vector<Long> element = new Vector<>(2);
         element.addElement(key);
-        element.addElement(new Long(System.currentTimeMillis()));
+        element.addElement(System.currentTimeMillis());
         m_orderedStruct.addElement(element);
 
         // Start TTL Timer if first entry is added

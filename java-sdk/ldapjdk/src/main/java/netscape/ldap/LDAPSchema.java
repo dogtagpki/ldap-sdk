@@ -356,7 +356,7 @@ public class LDAPSchema implements java.io.Serializable {
     public void addDITStructureRule( LDAPDITStructureRuleSchema rule ) {
         String name = rule.getName().toLowerCase();
         structureRulesByName.put( name, rule );
-        structureRulesById.put( new Integer( rule.getRuleID() ), rule );
+        structureRulesById.put( rule.getRuleID(), rule );
     }
 
     /**
@@ -532,7 +532,7 @@ public class LDAPSchema implements java.io.Serializable {
      * the rule, or <CODE>null</CODE> if not found.
      */
     public LDAPDITStructureRuleSchema getDITStructureRule( int ID ) {
-        return structureRulesById.get( new Integer( ID ) );
+        return structureRulesById.get( ID );
     }
 
     /**
