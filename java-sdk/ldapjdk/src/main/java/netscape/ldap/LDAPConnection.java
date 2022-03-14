@@ -291,11 +291,11 @@ public class LDAPConnection
     /**
      * Properties
      */
-    private final static Float SdkVersion = new Float(4.18f);
-    private final static Float ProtocolVersion = new Float(3.0f);
+    private final static Float SdkVersion = 4.18f;
+    private final static Float ProtocolVersion = 3.0f;
     private final static String SecurityVersion = new String("none,simple,sasl");
-    private final static Float MajorVersion = new Float(4.0f);
-    private final static Float MinorVersion = new Float(0.18f);
+    private final static Float MajorVersion = 4.0f;
+    private final static Float MinorVersion = 0.18f;
     private final static String DELIM = "#";
     private final static String PersistSearchPackageName =
       "netscape.ldap.controls.LDAPPersistSearchControl";
@@ -4280,7 +4280,7 @@ public class LDAPConnection
      */
     public Object getOption( int option ) throws LDAPException {
         if (option == LDAPv2.PROTOCOL_VERSION) {
-            return new Integer(m_protocolVersion);
+            return m_protocolVersion;
         }
 
         return getOption(option, m_defaultConstraints);
@@ -4290,27 +4290,27 @@ public class LDAPConnection
         throws LDAPException {
         switch (option) {
             case LDAPv2.DEREF:
-              return new Integer (cons.getDereference());
+              return cons.getDereference();
             case LDAPv2.SIZELIMIT:
-              return new Integer (cons.getMaxResults());
+              return cons.getMaxResults();
             case LDAPv2.TIMELIMIT:
-              return new Integer (cons.getServerTimeLimit());
+              return cons.getServerTimeLimit();
             case LDAPv2.REFERRALS:
-              return new Boolean (cons.getReferrals());
+              return cons.getReferrals();
             case LDAPv2.REFERRALS_REBIND_PROC:
               return cons.getRebindProc();
             case LDAPv2.BIND:
               return cons.getBindProc();
             case LDAPv2.REFERRALS_HOP_LIMIT:
-              return new Integer (cons.getHopLimit());
+              return cons.getHopLimit();
             case LDAPv2.BATCHSIZE:
-              return new Integer (cons.getBatchSize());
+              return cons.getBatchSize();
             case LDAPv3.CLIENTCONTROLS:
               return cons.getClientControls();
             case LDAPv3.SERVERCONTROLS:
               return cons.getServerControls();
             case MAXBACKLOG:
-              return new Integer (cons.getMaxBacklog());
+              return cons.getMaxBacklog();
             default:
               throw new LDAPException ( "invalid option",
                                         LDAPException.PARAM_ERROR );
@@ -4983,7 +4983,7 @@ public class LDAPConnection
         // Set the same connection setup failover policy as for this connection
         connection.setConnSetupDelay(getConnSetupDelay());
 
-        connection.setOption(REFERRALS, new Boolean(true));
+        connection.setOption(REFERRALS, true);
         connection.setOption(REFERRALS_REBIND_PROC, cons.getRebindProc());
         connection.setOption(BIND, cons.getBindProc());
 
@@ -4993,11 +4993,9 @@ public class LDAPConnection
         }
 
         // need to set the protocol version which gets passed to connection
-        connection.setOption(PROTOCOL_VERSION,
-                              new Integer(m_protocolVersion));
+        connection.setOption(PROTOCOL_VERSION, m_protocolVersion);
 
-        connection.setOption(REFERRALS_HOP_LIMIT,
-                              new Integer(cons.getHopLimit()-1));
+        connection.setOption(REFERRALS_HOP_LIMIT, cons.getHopLimit()-1 );
 
         try {
             connection.connect (refList);
@@ -5266,7 +5264,7 @@ public class LDAPConnection
                     break;
                 case JDAPProtocolOp.COMPARE_REQUEST:
                     boolean bool = connection.compare(dn, attr, cons);
-                    results.addElement(new Boolean(bool));
+                    results.addElement(bool);
                     break;
                 default:
                     /* impossible */

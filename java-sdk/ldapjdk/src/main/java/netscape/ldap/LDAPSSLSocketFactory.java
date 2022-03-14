@@ -300,7 +300,7 @@ public class LDAPSSLSocketFactory
                      (params[1].getName().equals("int")) ) {
                     Object[] args = new Object[2];
                     args[0] = host;
-                    args[1] = new Integer(port);
+                    args[1] = port;
                     s = (Socket)(m[i].newInstance(args));
                     return s;
                 } else if ( (m_cipherSuites != null) && (params.length == 3) &&
@@ -309,7 +309,7 @@ public class LDAPSSLSocketFactory
                      (params[2].getName().equals(cipherClassName)) ) {
                     Object[] args = new Object[3];
                     args[0] = host;
-                    args[1] = new Integer(port);
+                    args[1] = port;
                     args[2] = m_cipherSuites;
                     s = (Socket)(m[i].newInstance(args));
                     return s;

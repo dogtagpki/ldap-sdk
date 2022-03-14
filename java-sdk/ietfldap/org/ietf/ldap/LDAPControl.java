@@ -361,7 +361,7 @@ public class LDAPControl implements Cloneable, Serializable {
             return new LDAPControl(oid, critical, value);
         }
 
-        Object[] oparams = { oid, new Boolean(critical), value } ;
+        Object[] oparams = { oid, critical, value } ;
         LDAPControl returnControl = null;
         try {
             returnControl = (LDAPControl)creator.newInstance(oparams);

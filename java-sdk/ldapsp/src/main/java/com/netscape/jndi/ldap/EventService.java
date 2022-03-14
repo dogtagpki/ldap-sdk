@@ -450,7 +450,7 @@ class EventService implements Runnable{
 
         // Pass the change log number as event's change info
         // If the change log number is not present the value is -1
-        changeInfo = new Integer(changeCtrl.getChangeNumber());
+        changeInfo = changeCtrl.getChangeNumber();
 
         if (oldName != null) {
             oldBd = new Binding(oldName, className, /*obj=*/null, /*isRelative=*/true);

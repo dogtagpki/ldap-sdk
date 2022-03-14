@@ -512,11 +512,11 @@ public class LDAPConnection implements Cloneable, Serializable {
     /**
      * Properties
      */
-    private final static Float SdkVersion = new Float(4.14f);
-    private final static Float ProtocolVersion = new Float(3.0f);
+    private final static Float SdkVersion = 4.14f;
+    private final static Float ProtocolVersion = 3.0f;
     private final static String SecurityVersion = new String("none,simple,sasl");
-    private final static Float MajorVersion = new Float(4.0f);
-    private final static Float MinorVersion = new Float(0.14f);
+    private final static Float MajorVersion = 4.0f;
+    private final static Float MinorVersion = 0.14f;
     private final static String DELIM = "#";
     private final static String PersistSearchPackageName =
       "org.ietf.ldap.controls.LDAPPersistSearchControl";
@@ -4383,7 +4383,7 @@ public class LDAPConnection implements Cloneable, Serializable {
      */
     public Object getOption( int option ) throws LDAPException {
         if (option == LDAPConnection.PROTOCOL_VERSION) {
-            return new Integer(_protocolVersion);
+            return _protocolVersion;
         }
 
         return getOption(option, _defaultConstraints);
@@ -4393,23 +4393,23 @@ public class LDAPConnection implements Cloneable, Serializable {
         throws LDAPException {
         switch (option) {
             case LDAPConnection.DEREF:
-              return new Integer (cons.getDereference());
+              return cons.getDereference();
             case LDAPConnection.SIZELIMIT:
-              return new Integer (cons.getMaxResults());
+              return cons.getMaxResults();
             case LDAPConnection.TIMELIMIT:
-              return new Integer (cons.getServerTimeLimit());
+              return cons.getServerTimeLimit();
             case LDAPConnection.REFERRALS:
-              return new Boolean (cons.getReferralFollowing());
+              return cons.getReferralFollowing();
             case LDAPConnection.REFERRALS_REBIND_PROC:
               return cons.getReferralHandler();
             case LDAPConnection.REFERRALS_HOP_LIMIT:
-              return new Integer (cons.getHopLimit());
+              return cons.getHopLimit();
             case LDAPConnection.BATCHSIZE:
-              return new Integer (cons.getBatchSize());
+              return cons.getBatchSize();
             case LDAPConnection.SERVERCONTROLS:
               return cons.getControls();
             case MAXBACKLOG:
-              return new Integer (cons.getMaxBacklog());
+              return cons.getMaxBacklog();
             default:
               throw new LDAPException ( "invalid option",
                                         LDAPException.PARAM_ERROR );
@@ -5310,16 +5310,14 @@ public class LDAPConnection implements Cloneable, Serializable {
         // Set the same connection setup failover policy as for this connection
         connection.setConnSetupDelay( getConnSetupDelay() );
 
-        connection.setOption( REFERRALS, new Boolean(true) );
+        connection.setOption( REFERRALS, true );
         connection.setOption( REFERRALS_REBIND_PROC,
                               cons.getReferralHandler() );
 
         // need to set the protocol version which gets passed to connection
-        connection.setOption( PROTOCOL_VERSION,
-                              new Integer(_protocolVersion) );
+        connection.setOption( PROTOCOL_VERSION, _protocolVersion );
 
-        connection.setOption( REFERRALS_HOP_LIMIT,
-                              new Integer(cons.getHopLimit()-1) );
+        connection.setOption( REFERRALS_HOP_LIMIT, cons.getHopLimit()-1 );
 
         try {
             connection.connect( connectList, LDAPConnection.DEFAULT_PORT );
@@ -5580,7 +5578,7 @@ public class LDAPConnection implements Cloneable, Serializable {
                     break;
                 case JDAPProtocolOp.COMPARE_REQUEST:
                     boolean bool = connection.compare( dn, attr, cons );
-                    results.addElement( new Boolean(bool) );
+                    results.addElement( bool );
                     break;
                 default:
                     /* impossible */

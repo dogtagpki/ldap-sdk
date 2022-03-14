@@ -192,7 +192,7 @@ class LDAPSSLSocket extends Socket {
                     (params[1].getName().equals("int"))) {
                     Object[] args = new Object[2];
                     args[0] = host;
-                    args[1] = new Integer(port);
+                    args[1] = port;
                     m_socket = (m[i].newInstance(args));
                     return;
                 }
@@ -234,7 +234,7 @@ class LDAPSSLSocket extends Socket {
                     (params[2].getName().equals(cipherClassName))) {
                     Object[] args = new Object[3];
                     args[0] = host;
-                    args[1] = new Integer(port);
+                    args[1] = port;
                     args[2] = cipherSuites;
                     m_socket = (m[i].newInstance(args));
                     return;
@@ -284,7 +284,7 @@ class LDAPSSLSocket extends Socket {
     public void close(boolean wait) throws IOException {
         try {
             Object[] args = new Object[1];
-            args[0] = new Boolean(wait);
+            args[0] = wait;
             invokeMethod(m_socket, "close", args);
         } catch (LDAPException e) {
             printDebug(e.toString());

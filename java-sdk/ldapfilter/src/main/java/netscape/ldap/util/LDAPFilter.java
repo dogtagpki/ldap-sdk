@@ -324,17 +324,13 @@ public class LDAPFilter implements Cloneable {
                         case '7':
                         case '8':
                         case '9':
-                            int nValue = Integer.parseInt
-                                ( new Character
-                                  (cFilterTemplate[i]).toString() );
+                            int nValue = Integer.parseInt( String.valueOf(cFilterTemplate[i]) );
                             nValue--;
                             i++;
                             if ( cFilterTemplate[i] == '-' ) {
                                 i++;
                                 if ( Character.isDigit ( cFilterTemplate[i] )) {
-                                int nValue2 = Integer.parseInt
-                                    ( new Character
-                                    (cFilterTemplate[i]).toString() );
+                                int nValue2 = Integer.parseInt( String.valueOf(cFilterTemplate[i]) );
                                 nValue2--;
                                 for ( int j = nValue; j <= nValue2; j++ ) {
                                     sbFilter.append ( aValues[j] );

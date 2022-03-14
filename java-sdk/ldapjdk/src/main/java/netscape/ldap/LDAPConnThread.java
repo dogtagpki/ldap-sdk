@@ -288,7 +288,7 @@ class LDAPConnThread implements Runnable {
 
         if ( toNotify != null ) {
             /* Only worry about toNotify if we expect a response... */
-            m_requests.put (new Integer (msg.getMessageID()), toNotify);
+            m_requests.put (msg.getMessageID(), toNotify);
 
             /* Notify the backlog checker that there may be another outstanding
                request */
@@ -643,7 +643,7 @@ class LDAPConnThread implements Runnable {
      * @param msg New message from LDAP server
      */
     private void processResponse (LDAPMessage msg, int size) {
-        Integer messageID = new Integer (msg.getMessageID());
+        Integer messageID = msg.getMessageID();
         LDAPMessageQueue l = m_requests.get (messageID);
         if (l == null) {
             return; /* nobody is waiting for this response (!) */
@@ -707,7 +707,7 @@ class LDAPConnThread implements Runnable {
      * the entry size to -1.
      */
     private synchronized void cacheSearchResult (LDAPSearchListener l, LDAPMessage msg, int size) {
-        Integer messageID = new Integer (msg.getMessageID());
+        Integer messageID = msg.getMessageID();
         Long key = l.getKey();
         Vector<Object> v = null;
 
@@ -721,7 +721,7 @@ class LDAPConnThread implements Runnable {
             v = m_messages.get(messageID);
             if (v == null) {
                 m_messages.put(messageID, v = new Vector<Object>());
-                v.addElement(new Long(0));
+                v.addElement(0L);
             }
 
             // Return if the entry size is -1, i.e. the caching is disabled
@@ -740,12 +740,12 @@ class LDAPConnThread implements Runnable {
             // by setting the entry size to -1.
             if (entrySize > m_cache.getSize()) {
                 v.removeAllElements();
-                v.addElement(new Long(-1L));
+                v.addElement(-1L);
                 return;
             }
 
             // update the lump sum located in the first element of the vector
-            v.setElementAt(new Long(entrySize), 0);
+            v.setElementAt(entrySize, 0);
 
             // convert LDAPMessage object into LDAPEntry which is stored to the
             // end of the Vector
@@ -762,7 +762,7 @@ class LDAPConnThread implements Runnable {
             else {
                 v.removeAllElements();
             }
-            v.addElement(new Long(-1L));
+            v.addElement(-1L);
 
         } else if (msg instanceof LDAPResponse) {
 
@@ -778,7 +778,7 @@ class LDAPConnThread implements Runnable {
                 // server
                 if (v == null) {
                     v = new Vector<Object>();
-                    v.addElement(new Long(0));
+                    v.addElement(0L);
                 }
 
                 // add the new entry if the entry size is not -1 (caching diabled)
@@ -800,10 +800,10 @@ class LDAPConnThread implements Runnable {
             return;
         }
 
-        LDAPMessageQueue l = m_requests.remove(new Integer(id));
+        LDAPMessageQueue l = m_requests.remove(id);
         // Clean up cache if enabled
         if (m_messages != null) {
-            m_messages.remove(new Integer(id));
+            m_messages.remove(id);
         }
         if (l != null) {
             l.removeRequest(id);
@@ -826,7 +826,7 @@ class LDAPConnThread implements Runnable {
                                                            LDAPException.SERVER_DOWN));
             return null;
         }
-        return m_requests.put (new Integer (id), toNotify);
+        return m_requests.put (id, toNotify);
     }
 
     /**
