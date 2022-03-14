@@ -404,9 +404,8 @@ class LDAPConnThread implements Runnable {
 
     public void close() {
 
-        logger.info("LDAPConnThread: Closing connection");
-
         if (m_serverOutput != null) {
+            logger.debug("LDAPConnThread: Closing output stream");
             try {
                 m_serverOutput.close();
             } catch (Exception e) {
@@ -417,6 +416,7 @@ class LDAPConnThread implements Runnable {
         }
 
         if (m_serverInput != null) {
+            logger.debug("LDAPConnThread: Closing input stream");
             try {
                 m_serverInput.close();
             } catch (Exception e) {
@@ -427,6 +427,7 @@ class LDAPConnThread implements Runnable {
         }
 
         if (m_origServerInput != null) {
+            logger.debug("LDAPConnThread: Closing original input stream");
             try {
                 m_origServerInput.close();
             } catch (Exception e) {
@@ -437,6 +438,7 @@ class LDAPConnThread implements Runnable {
         }
 
         if (m_origServerOutput != null) {
+            logger.debug("LDAPConnThread: Closing original output stream");
             try {
                 m_origServerOutput.close();
             } catch (Exception e) {
@@ -446,6 +448,7 @@ class LDAPConnThread implements Runnable {
             }
         }
 
+        logger.debug("LDAPConnThread: Closing connection");
         m_connMgr.closeConnection();
     }
 
