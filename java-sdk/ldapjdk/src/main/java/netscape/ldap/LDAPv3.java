@@ -43,7 +43,185 @@ package netscape.ldap;
  *
  * @version 1.0
  */
+@SuppressWarnings("removal")
 public interface LDAPv3 extends LDAPv2 {
+
+    /**
+     * The default port number for LDAP servers.  You can specify
+     * this identifier when calling the <CODE>LDAPConnection.connect</CODE>
+     * method to connect to an LDAP server.
+     * @see netscape.ldap.LDAPConnection#connect
+     */
+    public final static int DEFAULT_PORT = 389;
+
+    /**
+     * Option specifying how aliases are dereferenced.
+     * <P>
+     *
+     * This option can have one of the following values:
+     * <UL>
+     * <LI><A HREF="#DEREF_NEVER"><CODE>DEREF_NEVER</CODE></A>
+     * <LI><A HREF="#DEREF_FINDING"><CODE>DEREF_FINDING</CODE></A>
+     * <LI><A HREF="#DEREF_SEARCHING"><CODE>DEREF_SEARCHING</CODE></A>
+     * <LI><A HREF="#DEREF_ALWAYS"><CODE>DEREF_ALWAYS</CODE></A>
+     * </UL>
+     * <P>
+     *
+     * @see netscape.ldap.LDAPConnection#getOption
+     * @see netscape.ldap.LDAPConnection#setOption
+     */
+    public static final int DEREF = 2;
+
+    /**
+     * Option specifying the maximum number of search results to
+     * return.
+     * <P>
+     *
+     * @see netscape.ldap.LDAPConnection#getOption
+     * @see netscape.ldap.LDAPConnection#setOption
+     */
+    public static final int SIZELIMIT = 3;
+
+    /**
+     * Option specifying the maximum number of milliseconds to
+     * wait for an operation to complete.
+     * @see netscape.ldap.LDAPConnection#getOption
+     * @see netscape.ldap.LDAPConnection#setOption
+     */
+    public static final int TIMELIMIT = 4;
+
+    /**
+     * Option specifying the maximum number of milliseconds the
+     * server should spend returning search results before aborting
+     * the search.
+     * @see netscape.ldap.LDAPConnection#getOption
+     * @see netscape.ldap.LDAPConnection#setOption
+     */
+    public static final int SERVER_TIMELIMIT = 5;
+
+    /**
+     * Option specifying whether or not referrals to other LDAP
+     * servers are followed automatically.
+     * @see netscape.ldap.LDAPConnection#getOption
+     * @see netscape.ldap.LDAPConnection#setOption
+     * @see netscape.ldap.LDAPRebind
+     * @see netscape.ldap.LDAPRebindAuth
+     */
+    public static final int REFERRALS = 8;
+
+    /**
+     * Option specifying the object containing the method for
+     * getting authentication information (the distinguished name
+     * and password) used during a referral.  For example, when
+     * referred to another LDAP server, your client uses this object
+     * to obtain the DN and password.  Your client authenticates to
+     * the LDAP server using this DN and password.
+     * @see netscape.ldap.LDAPConnection#getOption
+     * @see netscape.ldap.LDAPConnection#setOption
+     * @see netscape.ldap.LDAPRebind
+     * @see netscape.ldap.LDAPRebindAuth
+     */
+    public static final int REFERRALS_REBIND_PROC = 9;
+
+    /**
+     * Option specifying the maximum number of referrals to follow
+     * in a sequence when requesting an LDAP operation.
+     * @see netscape.ldap.LDAPConnection#getOption
+     * @see netscape.ldap.LDAPConnection#setOption
+     */
+    public static final int REFERRALS_HOP_LIMIT   = 10;
+
+    /**
+     * Option specifying the object containing the method for
+     * authenticating to the server.
+     * @see netscape.ldap.LDAPConnection#getOption
+     * @see netscape.ldap.LDAPConnection#setOption
+     * @see netscape.ldap.LDAPBind
+     */
+    public static final int BIND = 13;
+
+    /**
+     * Option specifying the version of the LDAP protocol
+     * used by your client when interacting with the LDAP server.
+     * If no version is set, the default version is 2.  If you
+     * are planning to use LDAP v3 features (such as controls
+     * or extended operations), you should set this version to 3
+     * or specify version 3 as an argument to the <CODE>authenticate</CODE>
+     * method of the <CODE>LDAPConnection</CODE> object.
+     * @see netscape.ldap.LDAPConnection#getOption
+     * @see netscape.ldap.LDAPConnection#setOption
+     * @see netscape.ldap.LDAPConnection#authenticate(int, java.lang.String, java.lang.String)
+     */
+    public static final int PROTOCOL_VERSION = 17;
+
+    /**
+     * Option specifying the number of results to return at a time.
+     * @see netscape.ldap.LDAPConnection#getOption
+     * @see netscape.ldap.LDAPConnection#setOption
+     */
+    public static final int BATCHSIZE = 20;
+
+
+    /*
+     * Valid options for Scope
+     */
+
+    /**
+     * Specifies that the scope of a search includes
+     * only the base DN (distinguished name).
+     * @see netscape.ldap.LDAPConnection#search(java.lang.String, int, java.lang.String, java.lang.String[], boolean, netscape.ldap.LDAPSearchConstraints)
+     */
+    public static final int SCOPE_BASE = 0;
+
+    /**
+     * Specifies that the scope of a search includes
+     * only the entries one level below the base DN (distinguished name).
+     * @see netscape.ldap.LDAPConnection#search(java.lang.String, int, java.lang.String, java.lang.String[], boolean, netscape.ldap.LDAPSearchConstraints)   */
+    public static final int SCOPE_ONE = 1;
+
+    /**
+     * Specifies that the scope of a search includes
+     * the base DN (distinguished name) and all entries at all levels
+     * beneath that base.
+     * @see netscape.ldap.LDAPConnection#search(java.lang.String, int, java.lang.String, java.lang.String[], boolean, netscape.ldap.LDAPSearchConstraints)   */
+    public static final int SCOPE_SUB = 2;
+
+
+    /*
+     * Valid options for Dereference
+     */
+
+    /**
+     * Specifies that aliases are never dereferenced.
+     * @see netscape.ldap.LDAPConnection#getOption
+     * @see netscape.ldap.LDAPConnection#setOption
+     */
+    public static final int DEREF_NEVER = 0;
+
+    /**
+     * Specifies that aliases are dereferenced when searching the
+     * entries beneath the starting point of the search (but
+     * not when finding the starting entry).
+     * @see netscape.ldap.LDAPConnection#getOption
+     * @see netscape.ldap.LDAPConnection#setOption
+     */
+    public static final int DEREF_SEARCHING = 1;
+
+    /**
+     * Specifies that aliases are dereferenced when finding the
+     * starting point for the search (but not when searching
+     * under that starting entry).
+     * @see netscape.ldap.LDAPConnection#getOption
+     * @see netscape.ldap.LDAPConnection#setOption
+     */
+    public static final int DEREF_FINDING = 2;
+
+    /**
+     * Specifies that aliases are always dereferenced.
+     * @see netscape.ldap.LDAPConnection#getOption
+     * @see netscape.ldap.LDAPConnection#setOption
+     */
+    public static final int DEREF_ALWAYS = 3;
 
     /**
      * Connects and authenticates to the LDAP server using the specified version of the

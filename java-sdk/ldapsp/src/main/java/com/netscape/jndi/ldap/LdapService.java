@@ -61,8 +61,6 @@ import netscape.ldap.LDAPSSLSocketFactory;
 import netscape.ldap.LDAPSearchConstraints;
 import netscape.ldap.LDAPSearchResults;
 import netscape.ldap.LDAPUrl;
-import netscape.ldap.LDAPv2;
-import netscape.ldap.LDAPv3;
 
 /**
  * Ldap Service encapsulates a Ldap connection and Ldap operations over the
@@ -80,9 +78,9 @@ import netscape.ldap.LDAPv3;
 class LdapService {
 
     public static final String DEFAULT_FILTER = "(objectclass=*)";
-    public static final int    DEFAULT_SCOPE = LDAPv3.SCOPE_SUB;
+    public static final int    DEFAULT_SCOPE = LDAPConnection.SCOPE_SUB;
     public static final String DEFAULT_HOST = "localhost";
-    public static final int    DEFAULT_PORT = LDAPv2.DEFAULT_PORT;
+    public static final int    DEFAULT_PORT = LDAPConnection.DEFAULT_PORT;
     public static final int    DEFAULT_SSL_PORT = 636;
 
     private LDAPConnection m_ld;
@@ -166,7 +164,7 @@ class LdapService {
 
         try {
             if (ldCtrls != null) {
-                m_ld.setOption(LDAPv3.SERVERCONTROLS, ldCtrls);
+                m_ld.setOption(LDAPConnection.SERVERCONTROLS, ldCtrls);
             }
 
             if (saslMechanisms != null) { // sasl Auth

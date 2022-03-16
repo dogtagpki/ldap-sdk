@@ -564,10 +564,10 @@ public class LDAPException extends java.lang.Exception
      * the client may be referred first from LDAP server A to
      * LDAP server B, then from LDAP server B to LDAP server C,
      * and so on) has exceeded the maximum number of referrals
-     * (the <CODE>LDAPv2.REFERRALS_HOP_LIMIT</CODE> option).
+     * (the <CODE>LDAPConnection.REFERRALS_HOP_LIMIT</CODE> option).
      * <P>
      *
-     * @see netscape.ldap.LDAPv2#REFERRALS_HOP_LIMIT
+     * @see netscape.ldap.LDAPConnection#REFERRALS_HOP_LIMIT
      * @see netscape.ldap.LDAPConnection#getOption
      * @see netscape.ldap.LDAPConnection#setOption
      */

@@ -870,7 +870,7 @@ public class LDAPSchema implements java.io.Serializable {
     private static LDAPEntry readSchema( LDAPConnection ld, String dn,
                                          String[] attrs )
                                          throws LDAPException {
-        LDAPSearchResults results = ld.search (dn, LDAPv2.SCOPE_BASE,
+        LDAPSearchResults results = ld.search (dn, LDAPConnection.SCOPE_BASE,
                                                "objectclass=subschema",
                                                attrs, false);
         if ( !results.hasMoreElements() ) {

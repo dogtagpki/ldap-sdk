@@ -178,8 +178,8 @@ import netscape.ldap.util.LDIF;
  * <P>
  *
  * @version 1.0
- * @see netscape.ldap.LDAPv3#CLIENTCONTROLS
- * @see netscape.ldap.LDAPv3#SERVERCONTROLS
+ * @see netscape.ldap.LDAPConnection#CLIENTCONTROLS
+ * @see netscape.ldap.LDAPConnection#SERVERCONTROLS
  * @see netscape.ldap.LDAPConnection#search(java.lang.String, int, java.lang.String, java.lang.String[], boolean)
  * @see netscape.ldap.LDAPConnection#getOption
  * @see netscape.ldap.LDAPConnection#setOption

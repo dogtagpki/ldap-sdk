@@ -54,7 +54,6 @@ import netscape.ldap.LDAPRebind;
 import netscape.ldap.LDAPRebindAuth;
 import netscape.ldap.LDAPSearchConstraints;
 import netscape.ldap.LDAPUrl;
-import netscape.ldap.LDAPv2;
 
 /**
  * Context Environment
@@ -62,7 +61,7 @@ import netscape.ldap.LDAPv2;
 class ContextEnv extends ShareableEnv  {
 
     public static final String DEFAULT_HOST = "localhost";
-    public static final int    DEFAULT_PORT = LDAPv2.DEFAULT_PORT;
+    public static final int    DEFAULT_PORT = LDAPConnection.DEFAULT_PORT;
     public static final int    DEFAULT_SSL_PORT = 636;
     public static final int    DEFAULT_LDAP_VERSION = 3;
 
@@ -285,16 +284,16 @@ class ContextEnv extends ShareableEnv  {
         String deref = (String)getProperty(P_DEREF_ALIASES);
         if(deref != null) {
             if(deref.equalsIgnoreCase(V_DEREF_NEVER)) {
-                cons.setDereference(LDAPv2.DEREF_NEVER);
+                cons.setDereference(LDAPConnection.DEREF_NEVER);
             }
             else if(deref.equalsIgnoreCase(V_DEREF_SEARCHING)) {
-                        cons.setDereference(LDAPv2.DEREF_SEARCHING);
+                        cons.setDereference(LDAPConnection.DEREF_SEARCHING);
                     }
             else if(deref.equalsIgnoreCase(V_DEREF_FINDING)) {
-                cons.setDereference(LDAPv2.DEREF_FINDING);
+                cons.setDereference(LDAPConnection.DEREF_FINDING);
             }
             else if(deref.equalsIgnoreCase(V_DEREF_ALWAYS)) {
-                cons.setDereference(LDAPv2.DEREF_ALWAYS);
+                cons.setDereference(LDAPConnection.DEREF_ALWAYS);
             }
             else {
                 throw new IllegalArgumentException("Illegal value for " + P_DEREF_ALIASES);
