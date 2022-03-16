@@ -2429,7 +2429,7 @@ public class LDAPConnection
      *
      * LDAPSearchResults myResults = null;
      * try {
-     *    myResults = myConn.search( myBaseDN, LDAPv2.SCOPE_SUB, myFilter, myAttrs, false );
+     *    myResults = myConn.search( myBaseDN, LDAPConnection.SCOPE_SUB, myFilter, myAttrs, false );
      * } catch ( LDAPException e ) {
      *    int errCode = e.getLDAPResultCode();
      *    System.out.println( "LDAPException: return code:" + errCode );
@@ -2462,10 +2462,10 @@ public class LDAPConnection
      * @param scope the scope of the entries to search.  You can specify one
      * of the following: <P>
      * <UL>
-     * <LI><CODE>LDAPv2.SCOPE_BASE</CODE> (search only the base DN) <P>
-     * <LI><CODE>LDAPv2.SCOPE_ONE</CODE>
+     * <LI><CODE>LDAPConnection.SCOPE_BASE</CODE> (search only the base DN) <P>
+     * <LI><CODE>LDAPConnection.SCOPE_ONE</CODE>
      * (search only entries under the base DN) <P>
-     * <LI><CODE>LDAPv2.SCOPE_SUB</CODE>
+     * <LI><CODE>LDAPConnection.SCOPE_SUB</CODE>
      * (search the base DN and all entries within its subtree) <P>
      * </UL>
      * <P>
@@ -2511,7 +2511,7 @@ public class LDAPConnection
      *
      * LDAPSearchResults myResults = null;
      * try {
-     *    myResults = myConn.search( myBaseDN, LDAPv2.SCOPE_SUB, myFilter, myAttrs, false, mySearchConstraints );
+     *    myResults = myConn.search( myBaseDN, LDAPConnection.SCOPE_SUB, myFilter, myAttrs, false, mySearchConstraints );
      * } catch ( LDAPException e ) {
      *    int errCode = e.getLDAPResultCode();
      *    System.out.println( "LDAPException: return code:" + errCode );
@@ -2526,10 +2526,10 @@ public class LDAPConnection
      * @param scope the scope of the entries to search.  You can specify one
      * of the following: <P>
      * <UL>
-     * <LI><CODE>LDAPv2.SCOPE_BASE</CODE> (search only the base DN) <P>
-     * <LI><CODE>LDAPv2.SCOPE_ONE</CODE>
+     * <LI><CODE>LDAPConnection.SCOPE_BASE</CODE> (search only the base DN) <P>
+     * <LI><CODE>LDAPConnection.SCOPE_ONE</CODE>
      * (search only entries under the base DN) <P>
-     * <LI><CODE>LDAPv2.SCOPE_SUB</CODE>
+     * <LI><CODE>LDAPConnection.SCOPE_SUB</CODE>
      * (search the base DN and all entries within its subtree) <P>
      * </UL>
      * <P>
@@ -2583,7 +2583,7 @@ public class LDAPConnection
         /* Is this a persistent search? */
         boolean isPersistentSearch = false;
         LDAPControl[] controls =
-            (LDAPControl[])getOption(LDAPv3.SERVERCONTROLS, cons);
+            (LDAPControl[])getOption(SERVERCONTROLS, cons);
         for (int i = 0; (controls != null) && (i < controls.length); i++) {
             if ( controls[i] instanceof
                  netscape.ldap.controls.LDAPPersistSearchControl ) {
@@ -3916,10 +3916,10 @@ public class LDAPConnection
      * @param scope the scope of the entries to search.  You can specify one
      * of the following: <P>
      * <UL>
-     * <LI><CODE>LDAPv2.SCOPE_BASE</CODE> (search only the base DN) <P>
-     * <LI><CODE>LDAPv2.SCOPE_ONE</CODE>
+     * <LI><CODE>LDAPConnection.SCOPE_BASE</CODE> (search only the base DN) <P>
+     * <LI><CODE>LDAPConnection.SCOPE_ONE</CODE>
      * (search only entries under the base DN) <P>
-     * <LI><CODE>LDAPv2.SCOPE_SUB</CODE>
+     * <LI><CODE>LDAPConnection.SCOPE_SUB</CODE>
      * (search the base DN and all entries within its subtree) <P>
      * </UL>
      * <P>
@@ -3959,10 +3959,10 @@ public class LDAPConnection
      * @param scope the scope of the entries to search.  You can specify one
      * of the following: <P>
      * <UL>
-     * <LI><CODE>LDAPv2.SCOPE_BASE</CODE> (search only the base DN) <P>
-     * <LI><CODE>LDAPv2.SCOPE_ONE</CODE>
+     * <LI><CODE>LDAPConnection.SCOPE_BASE</CODE> (search only the base DN) <P>
+     * <LI><CODE>LDAPConnection.SCOPE_ONE</CODE>
      * (search only entries under the base DN) <P>
-     * <LI><CODE>LDAPv2.SCOPE_SUB</CODE>
+     * <LI><CODE>LDAPConnection.SCOPE_SUB</CODE>
      * (search the base DN and all entries within its subtree) <P>
      * </UL>
      * <P>
@@ -4151,7 +4151,7 @@ public class LDAPConnection
      *
      * <PRE>
      * LDAPConnection ld = new LDAPConnection();
-     * int sizeLimit = ( (Integer)ld.getOption( LDAPv2.SIZELIMIT ) ).intValue();
+     * int sizeLimit = ( (Integer)ld.getOption( LDAPConnection.SIZELIMIT ) ).intValue();
      * System.out.println( "Maximum number of results: " + sizeLimit );
      * </PRE>
      *
@@ -4160,13 +4160,13 @@ public class LDAPConnection
      * <TR VALIGN=BASELINE ALIGN=LEFT>
      * <TH>Option</TH><TH>Data Type</TH><TH>Description</TH></TR>
      * <TR VALIGN=BASELINE><TD>
-     * <CODE>LDAPv2.PROTOCOL_VERSION</CODE></TD>
+     * <CODE>LDAPConnection.PROTOCOL_VERSION</CODE></TD>
      * <TD><CODE>Integer</CODE></TD>
      * <TD>Specifies the version of the LDAP protocol used by the
      * client.
      * <P>By default, the value of this option is 2.</TD></TR>
      * <TR VALIGN=BASELINE><TD>
-     * <CODE>LDAPv2.DEREF</CODE></TD>
+     * <CODE>LDAPConnection.DEREF</CODE></TD>
      * <TD><CODE>Integer</CODE></TD>
      * <TD>Specifies when your client dereferences aliases.
      *<PRE>
@@ -4190,20 +4190,20 @@ public class LDAPConnection
      * <P>By default, the value of this option is
      * <CODE>DEREF_NEVER</CODE>.</TD></TR>
      * <TR VALIGN=BASELINE><TD>
-     * <CODE>LDAPv2.SIZELIMIT</CODE></TD>
+     * <CODE>LDAPConnection.SIZELIMIT</CODE></TD>
      * <TD><CODE>Integer</CODE></TD>
      * <TD>Specifies the maximum number of search results to return.
      * If this option is set to 0, there is no maximum limit.
      * <P>By default, the value of this option is 1000.</TD></TR>
      * <TR VALIGN=BASELINE><TD>
-     * <CODE>LDAPv2.TIMELIMIT</CODE></TD>
+     * <CODE>LDAPConnection.TIMELIMIT</CODE></TD>
      * <TD><CODE>Integer</CODE></TD>
      * <TD>Specifies the maximum number of milliseconds to wait for results
      * before timing out. If this option is set to 0, there is no maximum
      * time limit.
      * <P>By default, the value of this option is 0.</TD></TR>
      * <TR VALIGN=BASELINE><TD>
-     * <CODE>LDAPv2.REFERRALS</CODE></TD>
+     * <CODE>LDAPConnection.REFERRALS</CODE></TD>
      * <TD><CODE>Boolean</CODE></TD>
      * <TD>Specifies whether or not your client follows referrals automatically.
      * If <CODE>true</CODE>, your client follows referrals automatically.
@@ -4211,26 +4211,26 @@ public class LDAPConnection
      * when referral is detected.
      * <P>By default, the value of this option is <CODE>false</CODE>.</TD></TR>
      * <TR VALIGN=BASELINE><TD>
-     * <CODE>LDAPv2.REFERRALS_REBIND_PROC</CODE></TD>
+     * <CODE>LDAPConnection.REFERRALS_REBIND_PROC</CODE></TD>
      * <TD><CODE>LDAPRebind</CODE></TD>
      * <TD>Specifies an object with a class that implements the
      * <CODE>LDAPRebind</CODE> interface.  You must define this class and
      * the <CODE>getRebindAuthentication</CODE> method that will be used to
      * get the distinguished name and password to use for authentication.
-     * Modifying this option sets the <CODE>LDAPv2.BIND</CODE> option to null.
+     * Modifying this option sets the <CODE>LDAPConnection.BIND</CODE> option to null.
      * <P>By default, the value of this option is <CODE>null</CODE>.</TD></TR>
      * <TR VALIGN=BASELINE><TD>
-     * <CODE>LDAPv2.BIND</CODE></TD>
+     * <CODE>LDAPConnection.BIND</CODE></TD>
      * <TD><CODE>LDAPBind</CODE></TD>
      * <TD>Specifies an object with a class that implements the
      * <CODE>LDAPBind</CODE>
      * interface.  You must define this class and the
      * <CODE>bind</CODE> method that will be used to authenticate
      * to the server on referrals. Modifying this option sets the
-     * <CODE>LDAPv2.REFERRALS_REBIND_PROC</CODE> to null.
+     * <CODE>LDAPConnection.REFERRALS_REBIND_PROC</CODE> to null.
      * <P>By default, the value of this option is <CODE>null</CODE>.</TD></TR>
      * <TR VALIGN=BASELINE><TD>
-     * <CODE>LDAPv2.REFERRALS_HOP_LIMIT</CODE></TD>
+     * <CODE>LDAPConnection.REFERRALS_HOP_LIMIT</CODE></TD>
      * <TD><CODE>Integer</CODE></TD>
      * <TD>Specifies the maximum number of referrals in a sequence that
      * your client will follow.  (For example, if REFERRALS_HOP_LIMIT is 5,
@@ -4238,7 +4238,7 @@ public class LDAPConnection
      * a single LDAP request.)
      * <P>By default, the value of this option is 10.</TD></TR>
      * <TR VALIGN=BASELINE><TD>
-     * <CODE>LDAPv2.BATCHSIZE</CODE></TD>
+     * <CODE>LDAPConnection.BATCHSIZE</CODE></TD>
      * <TD><CODE>Integer</CODE></TD>
      * <TD>Specifies the number of search results to return at a time.
      * (For example, if BATCHSIZE is 1, results are returned one at a time.)
@@ -4279,7 +4279,7 @@ public class LDAPConnection
      * @see netscape.ldap.LDAPConnection#search(java.lang.String, int, java.lang.String, java.lang.String[], boolean, netscape.ldap.LDAPSearchConstraints)
      */
     public Object getOption( int option ) throws LDAPException {
-        if (option == LDAPv2.PROTOCOL_VERSION) {
+        if (option == PROTOCOL_VERSION) {
             return m_protocolVersion;
         }
 
@@ -4289,25 +4289,25 @@ public class LDAPConnection
     private static Object getOption( int option, LDAPSearchConstraints cons )
         throws LDAPException {
         switch (option) {
-            case LDAPv2.DEREF:
+            case DEREF:
               return cons.getDereference();
-            case LDAPv2.SIZELIMIT:
+            case SIZELIMIT:
               return cons.getMaxResults();
-            case LDAPv2.TIMELIMIT:
+            case TIMELIMIT:
               return cons.getServerTimeLimit();
-            case LDAPv2.REFERRALS:
+            case REFERRALS:
               return cons.getReferrals();
-            case LDAPv2.REFERRALS_REBIND_PROC:
+            case REFERRALS_REBIND_PROC:
               return cons.getRebindProc();
-            case LDAPv2.BIND:
+            case BIND:
               return cons.getBindProc();
-            case LDAPv2.REFERRALS_HOP_LIMIT:
+            case REFERRALS_HOP_LIMIT:
               return cons.getHopLimit();
-            case LDAPv2.BATCHSIZE:
+            case BATCHSIZE:
               return cons.getBatchSize();
-            case LDAPv3.CLIENTCONTROLS:
+            case CLIENTCONTROLS:
               return cons.getClientControls();
-            case LDAPv3.SERVERCONTROLS:
+            case SERVERCONTROLS:
               return cons.getServerControls();
             case MAXBACKLOG:
               return cons.getMaxBacklog();
@@ -4347,7 +4347,7 @@ public class LDAPConnection
      * <PRE>
      * LDAPConnection ld = new LDAPConnection();
      * Integer newLimit = new Integer( 20 );
-     * ld.setOption( LDAPv2.SIZELIMIT, newLimit );
+     * ld.setOption( LDAPConnection.SIZELIMIT, newLimit );
      * System.out.println( "Changed the maximum number of results to " + newLimit.intValue() );
      * </PRE>
      *
@@ -4356,7 +4356,7 @@ public class LDAPConnection
      * <TR VALIGN=BASELINE ALIGN=LEFT>
      * <TH>Option</TH><TH>Data Type</TH><TH>Description</TH></TR>
      * <TR VALIGN=BASELINE><TD>
-     * <CODE>LDAPv2.PROTOCOL_VERSION</CODE></TD>
+     * <CODE>LDAPConnection.PROTOCOL_VERSION</CODE></TD>
      * <TD><CODE>Integer</CODE></TD>
      * <TD>Specifies the version of the LDAP protocol used by the
      * client.
@@ -4364,7 +4364,7 @@ public class LDAPConnection
      * to use LDAP v3 features (such as extended operations or
      * controls), you need to set this value to 3. </TD></TR>
      * <TR VALIGN=BASELINE><TD>
-     * <CODE>LDAPv2.DEREF</CODE></TD>
+     * <CODE>LDAPConnection.DEREF</CODE></TD>
      * <TD><CODE>Integer</CODE></TD>
      * <TD>Specifies when your client dereferences aliases.
      *<PRE>
@@ -4388,20 +4388,20 @@ public class LDAPConnection
      * <P>By default, the value of this option is
      * <CODE>DEREF_NEVER</CODE>.</TD></TR>
      * <TR VALIGN=BASELINE><TD>
-     * <CODE>LDAPv2.SIZELIMIT</CODE></TD>
+     * <CODE>LDAPConnection.SIZELIMIT</CODE></TD>
      * <TD><CODE>Integer</CODE></TD>
      * <TD>Specifies the maximum number of search results to return.
      * If this option is set to 0, there is no maximum limit.
      * <P>By default, the value of this option is 1000.</TD></TR>
      * <TR VALIGN=BASELINE><TD>
-     * <CODE>LDAPv2.TIMELIMIT</CODE></TD>
+     * <CODE>LDAPConnection.TIMELIMIT</CODE></TD>
      * <TD><CODE>Integer</CODE></TD>
      * <TD>Specifies the maximum number of milliseconds to wait for results
      * before timing out. If this option is set to 0, there is no maximum
      * time limit.
      * <P>By default, the value of this option is 0.</TD></TR>
      * <TR VALIGN=BASELINE><TD>
-     * <CODE>LDAPv2.REFERRALS</CODE></TD>
+     * <CODE>LDAPConnection.REFERRALS</CODE></TD>
      * <TD><CODE>Boolean</CODE></TD>
      * <TD>Specifies whether or not your client follows referrals automatically.
      * If <CODE>true</CODE>, your client follows referrals automatically.
@@ -4409,27 +4409,27 @@ public class LDAPConnection
      * raised when a referral is detected.
      * <P>By default, the value of this option is <CODE>false</CODE>.</TD></TR>
      * <TR VALIGN=BASELINE><TD>
-     * <CODE>LDAPv2.REFERRALS_REBIND_PROC</CODE></TD>
+     * <CODE>LDAPConnection.REFERRALS_REBIND_PROC</CODE></TD>
      * <TD><CODE>LDAPRebind</CODE></TD>
      * <TD>Specifies an object with a class that implements the
      * <CODE>LDAPRebind</CODE>
      * interface.  You must define this class and the
      * <CODE>getRebindAuthentication</CODE> method that will be used to get
      * the distinguished name and password to use for authentication.
-     * Modifying this option sets the <CODE>LDAPv2.BIND</CODE> option to null.
+     * Modifying this option sets the <CODE>LDAPConnection.BIND</CODE> option to null.
      * <P>By default, the value of this option is <CODE>null</CODE>.</TD></TR>
      * <TR VALIGN=BASELINE><TD>
-     * <CODE>LDAPv2.BIND</CODE></TD>
+     * <CODE>LDAPConnection.BIND</CODE></TD>
      * <TD><CODE>LDAPBind</CODE></TD>
      * <TD>Specifies an object with a class that implements the
      * <CODE>LDAPBind</CODE>
      * interface.  You must define this class and the
      * <CODE>bind</CODE> method that will be used to autheniticate
      * to the server on referrals. Modifying this option sets the
-     * <CODE>LDAPv2.REFERRALS_REBIND_PROC</CODE> to null.
+     * <CODE>LDAPConnection.REFERRALS_REBIND_PROC</CODE> to null.
      * <P>By default, the value of this option is <CODE>null</CODE>.</TD></TR>
      * <TR VALIGN=BASELINE><TD>
-     * <CODE>LDAPv2.REFERRALS_HOP_LIMIT</CODE></TD>
+     * <CODE>LDAPConnection.REFERRALS_HOP_LIMIT</CODE></TD>
      * <TD><CODE>Integer</CODE></TD>
      * <TD>Specifies the maximum number of referrals in a sequence that
      * your client will follow.  (For example, if REFERRALS_HOP_LIMIT is 5,
@@ -4437,7 +4437,7 @@ public class LDAPConnection
      * a single LDAP request.)
      * <P>By default, the value of this option is 10.</TD></TR>
      * <TR VALIGN=BASELINE><TD>
-     * <CODE>LDAPv2.BATCHSIZE</CODE></TD>
+     * <CODE>LDAPConnection.BATCHSIZE</CODE></TD>
      * <TD><CODE>Integer</CODE></TD>
      * <TD>Specifies the number of search results to return at a time.
      * (For example, if BATCHSIZE is 1, results are returned one at a time.)
@@ -4477,7 +4477,7 @@ public class LDAPConnection
      * @see netscape.ldap.LDAPConnection#search(java.lang.String, int, java.lang.String, java.lang.String[], boolean, netscape.ldap.LDAPSearchConstraints)
      */
     public void setOption( int option, Object value ) throws LDAPException {
-        if (option == LDAPv2.PROTOCOL_VERSION) {
+        if (option == PROTOCOL_VERSION) {
             setProtocolVersion(((Integer)value).intValue());
             return;
         }
@@ -4487,34 +4487,34 @@ public class LDAPConnection
     private static void setOption( int option, Object value, LDAPSearchConstraints cons ) throws LDAPException {
       try {
         switch (option) {
-        case LDAPv2.DEREF:
+        case DEREF:
           cons.setDereference(((Integer)value).intValue());
           return;
-        case LDAPv2.SIZELIMIT:
+        case SIZELIMIT:
           cons.setMaxResults(((Integer)value).intValue());
           return;
-        case LDAPv2.TIMELIMIT:
+        case TIMELIMIT:
           cons.setTimeLimit(((Integer)value).intValue());
           return;
-        case LDAPv2.SERVER_TIMELIMIT:
+        case SERVER_TIMELIMIT:
           cons.setServerTimeLimit(((Integer)value).intValue());
           return;
-        case LDAPv2.REFERRALS:
+        case REFERRALS:
           cons.setReferrals(((Boolean)value).booleanValue());
           return;
-        case LDAPv2.BIND:
+        case BIND:
           cons.setBindProc((LDAPBind)value);
           return;
-        case LDAPv2.REFERRALS_REBIND_PROC:
+        case REFERRALS_REBIND_PROC:
           cons.setRebindProc((LDAPRebind)value);
           return;
-        case LDAPv2.REFERRALS_HOP_LIMIT:
+        case REFERRALS_HOP_LIMIT:
           cons.setHopLimit(((Integer)value).intValue());
           return;
-        case LDAPv2.BATCHSIZE:
+        case BATCHSIZE:
           cons.setBatchSize(((Integer)value).intValue());
           return;
-        case LDAPv3.CLIENTCONTROLS:
+        case CLIENTCONTROLS:
           if ( value == null )
             cons.setClientControls( (LDAPControl[]) null );
           else if ( value instanceof LDAPControl )
@@ -4525,7 +4525,7 @@ public class LDAPConnection
             throw new LDAPException ( "invalid LDAPControl",
                                       LDAPException.PARAM_ERROR );
           return;
-        case LDAPv3.SERVERCONTROLS:
+        case SERVERCONTROLS:
           if ( value == null )
             cons.setServerControls( (LDAPControl[]) null );
           else if ( value instanceof LDAPControl )
@@ -4698,7 +4698,7 @@ public class LDAPConnection
      * myOptions.setMaxResults( 10 );
      * String[] myAttrs = { "objectclass" };
      * LDAPSearchResults myResults = ld.search( "o=Ace Industry,c=US",
-     *                                          LDAPv2.SCOPE_SUB,
+     *                                          LDAPConnection.SCOPE_SUB,
      *                                          "(objectclass=*)",
      *                                          myAttrs,
      *                                          false,

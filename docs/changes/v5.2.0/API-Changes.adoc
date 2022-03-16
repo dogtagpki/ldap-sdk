@@ -1,0 +1,6 @@
+= API Changes =
+
+== Deprecate LDAPv2 ==
+
+The `netscape.ldap.LDAPv2` interface has been deprecated.
+Use `netscape.ldap.LDAPConnection` instead.

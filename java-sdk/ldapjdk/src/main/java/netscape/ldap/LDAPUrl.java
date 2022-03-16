@@ -125,7 +125,7 @@ public class LDAPUrl implements java.io.Serializable {
      */
     public LDAPUrl (String url) throws java.net.MalformedURLException {
         m_attributes = null;
-        m_scope = LDAPv2.SCOPE_BASE;
+        m_scope = LDAPConnection.SCOPE_BASE;
         m_filter = defaultFilter;
         m_URL = url;
 
@@ -176,7 +176,7 @@ public class LDAPUrl implements java.io.Serializable {
         // host-port
         if (currentToken.equals ("/")) {
             m_hostName = null;
-            m_portNumber = m_secure ? DEFAULT_SECURE_PORT : LDAPv2.DEFAULT_PORT;
+            m_portNumber = m_secure ? DEFAULT_SECURE_PORT : LDAPConnection.DEFAULT_PORT;
             usingDefaultHostPort = true;
         } else if (currentToken.equals (":")) {
                 // port number without host name is not allowed
@@ -200,7 +200,7 @@ public class LDAPUrl implements java.io.Serializable {
         if (usingDefaultHostPort == false) {
             // Set the port
             if (urlParser.countTokens() == 0) {
-                m_portNumber = m_secure ? DEFAULT_SECURE_PORT : LDAPv2.DEFAULT_PORT;
+                m_portNumber = m_secure ? DEFAULT_SECURE_PORT : LDAPConnection.DEFAULT_PORT;
                 return;
             }
 
@@ -222,7 +222,7 @@ public class LDAPUrl implements java.io.Serializable {
                     throw new MalformedURLException ();
                 }
             } else if (currentToken.equals ("/")) {
-                m_portNumber = m_secure ? DEFAULT_SECURE_PORT : LDAPv2.DEFAULT_PORT;
+                m_portNumber = m_secure ? DEFAULT_SECURE_PORT : LDAPConnection.DEFAULT_PORT;
             } else {
                 // expecting ":" or "/"
                 throw new MalformedURLException ();
@@ -314,7 +314,7 @@ public class LDAPUrl implements java.io.Serializable {
      * @param DN distinguished name of the object
      */
     public LDAPUrl (String host, int port, String DN) {
-        initialize(host, port, DN, null, LDAPv2.SCOPE_BASE, defaultFilter, false);
+        initialize(host, port, DN, null, LDAPConnection.SCOPE_BASE, defaultFilter, false);
     }
 
     /**
@@ -440,11 +440,11 @@ public class LDAPUrl implements java.io.Serializable {
 
             switch (scope) {
               default:
-              case LDAPv2.SCOPE_BASE:
+              case LDAPConnection.SCOPE_BASE:
                 url.append ("base"); break;
-              case LDAPv2.SCOPE_ONE:
+              case LDAPConnection.SCOPE_ONE:
                 url.append ("one"); break;
-              case LDAPv2.SCOPE_SUB:
+              case LDAPConnection.SCOPE_SUB:
                 url.append ("sub"); break;
             }
 
@@ -541,11 +541,11 @@ public class LDAPUrl implements java.io.Serializable {
 
         int s = -1;
         if (str.equalsIgnoreCase("base"))
-            s = LDAPv2.SCOPE_BASE;
+            s = LDAPConnection.SCOPE_BASE;
         else if (str.equalsIgnoreCase("one"))
-            s = LDAPv2.SCOPE_ONE;
+            s = LDAPConnection.SCOPE_ONE;
         else if (str.equalsIgnoreCase("sub"))
-            s = LDAPv2.SCOPE_SUB;
+            s = LDAPConnection.SCOPE_SUB;
 
         return s;
     }

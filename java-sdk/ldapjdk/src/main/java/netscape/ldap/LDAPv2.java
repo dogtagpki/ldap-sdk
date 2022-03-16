@@ -58,7 +58,9 @@ package netscape.ldap;
  * sequence (Strings or binary values).
  *
  * @version 1.0
+ * @deprecated Use netscape.ldap.LDAPConnection instead.
  */
+@Deprecated(since = "5.2.0", forRemoval = true)
 public interface LDAPv2 {
     /**
      * The default port number for LDAP servers.  You can specify
