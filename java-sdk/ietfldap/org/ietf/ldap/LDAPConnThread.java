@@ -490,7 +490,7 @@ class LDAPConnThread extends Thread {
         JDAPBERTagDecoder decoder = new JDAPBERTagDecoder();
 
         while ( _doRun ) {
-            yield();
+            Thread.yield();
             int[] nread = new int[1];
             nread[0] = 0;
             try  {
