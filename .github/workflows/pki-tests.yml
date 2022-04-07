@@ -44,13 +44,13 @@ jobs:
             BUILD_OPTS=--with-timestamp --with-commit-id
           tags: ldapjdk-runner
           target: ldapjdk-runner
-          outputs: type=docker,dest=/tmp/ldapjdk-runner.tar
+          outputs: type=docker,dest=pki-runner.tar
 
-      - name: Upload runner image
-        uses: actions/upload-artifact@v2
+      - name: Store runner image
+        uses: actions/cache@v3
         with:
-          name: ldapjdk-runner-${{ matrix.os }}
-          path: /tmp/ldapjdk-runner.tar
+          key: pki-runner-${{ matrix.os }}-${{ github.run_id }}
+          path: pki-runner.tar
 
   ca-test:
     name: Installing CA
@@ -64,14 +64,14 @@ jobs:
       - name: Clone the repository
         uses: actions/checkout@v2
 
-      - name: Download runner image
-        uses: actions/download-artifact@v2
+      - name: Retrieve runner image
+        uses: actions/cache@v3
         with:
-          name: ldapjdk-runner-${{ matrix.os }}
-          path: /tmp
+          key: pki-runner-${{ matrix.os }}-${{ github.run_id }}
+          path: pki-runner.tar
 
       - name: Load runner image
-        run: docker load --input /tmp/ldapjdk-runner.tar
+        run: docker load --input pki-runner.tar
 
       - name: Run container
         run: |
