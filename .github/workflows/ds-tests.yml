@@ -104,3 +104,67 @@ jobs:
           name: ds-${{ matrix.os }}
           path: |
             /tmp/artifacts/ds
+
+  ds-ssl-test:
+    name: Testing DS with SSL
+    needs: [init, build]
+    runs-on: ubuntu-latest
+    env:
+      SHARED: /tmp/workdir/ldapjdk
+    strategy:
+      matrix: ${{ fromJSON(needs.init.outputs.matrix) }}
+    steps:
+      - name: Clone the repository
+        uses: actions/checkout@v2
+
+      - name: Retrieve runner image
+        uses: actions/cache@v3
+        with:
+          key: ds-runner-${{ matrix.os }}-${{ github.run_id }}
+          path: ds-runner.tar
+
+      - name: Load runner image
+        run: docker load --input ds-runner.tar
+
+      - name: Run container
+        run: |
+          IMAGE=ldapjdk-runner \
+          NAME=server \
+          HOSTNAME=server.example.com \
+          tests/bin/runner-init.sh
+
+      - name: Install DS package
+        run: docker exec server dnf install -y 389-ds-base dogtag-pki
+
+      - name: Create DS instance
+        run: docker exec server ${SHARED}/tests/bin/ds-create.sh
+
+      - name: Create signing cert
+        run: docker exec server ${SHARED}/tests/bin/ds-cert-signing-create.sh
+
+      - name: Create server cert
+        run: docker exec server ${SHARED}/tests/bin/ds-cert-server-create.sh
+
+      - name: Enable SSL connection
+        run: docker exec server ${SHARED}/tests/bin/ds-ssl-enable.sh
+
+      - name: Verify LDAP tools with SSL
+        run: |
+          # TODO: use SSL
+          docker exec server ${SHARED}/tests/bin/tools-test.sh
+
+      - name: Remove DS instance
+        run: docker exec server ${SHARED}/tests/bin/ds-remove.sh
+
+      - name: Gather artifacts
+        if: always()
+        run: |
+          tests/bin/ds-artifacts-save.sh server
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: ds-ssl-${{ matrix.os }}
+          path: |
+            /tmp/artifacts/server

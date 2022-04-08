@@ -11,7 +11,7 @@ fi
 ARTIFACTS=/tmp/artifacts/$CONTAINER
 
 mkdir -p $ARTIFACTS/etc
-mkdir -p $ARTIFACTS/var/log
+mkdir -p $ARTIFACTS/var/log/dirsrv/slapd-$INSTANCE
 
 docker exec $CONTAINER ls -la /etc/dirsrv
 docker cp $CONTAINER:/etc/dirsrv $ARTIFACTS/etc
