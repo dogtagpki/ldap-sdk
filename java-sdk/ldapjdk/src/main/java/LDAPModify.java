@@ -493,15 +493,17 @@ public class LDAPModify extends LDAPTool { /* LDAPModify */
           while ( e.hasMoreElements() ) {
             String val = e.nextElement();
             if ( (val != null) && (val.length() > 1)) {
-                try {
-                    File file = new File( val );
-                    FileInputStream fi =
-                        new FileInputStream( file );
+
+                File file = new File( val );
+
+                try (FileInputStream fi = new FileInputStream(file)) {
                     byte[] bval = new byte[(int)file.length()];
                     fi.read( bval, 0, (int)file.length() );
                     newAttr.addValue( bval );
+
                 } catch (FileNotFoundException ex) {
                     newAttr.addValue(val) ;
+
                 } catch ( IOException ex ) {
                     System.err.println( "Unable to read value " +
                         "from file " + val );
@@ -509,6 +511,7 @@ public class LDAPModify extends LDAPTool { /* LDAPModify */
                         System.exit(1);
                     newAttr = null;
                 }
+
             } else {
                 newAttr.addValue( val );
             }
