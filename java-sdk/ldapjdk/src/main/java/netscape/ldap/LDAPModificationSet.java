@@ -57,7 +57,7 @@ public class LDAPModificationSet implements java.io.Serializable {
 
     static final long serialVersionUID = 4650238666753391214L;
     private int current = 0;
-    private Vector modifications;
+    private Vector<LDAPModification> modifications;
 
     /**
      * Constructs a new, empty set of modifications.
@@ -65,7 +65,7 @@ public class LDAPModificationSet implements java.io.Serializable {
      * <CODE>LDAPModificationsSet.add</CODE> method.
      */
     public LDAPModificationSet() {
-        modifications = new Vector();
+        modifications = new Vector<>();
         current = 0;
     }
 
@@ -88,7 +88,7 @@ public class LDAPModificationSet implements java.io.Serializable {
      * a change to make to an attribute.
      */
     public LDAPModification elementAt (int index) {
-        return (LDAPModification)modifications.elementAt(index);
+        return modifications.elementAt(index);
     }
 
     /**
@@ -127,7 +127,7 @@ public class LDAPModificationSet implements java.io.Serializable {
      */
     public synchronized void remove( String name ) {
         for( int i = 0; i < modifications.size(); i++ ) {
-            LDAPModification mod = (LDAPModification)modifications.elementAt( i );
+            LDAPModification mod = modifications.elementAt( i );
             LDAPAttribute attr = mod.getAttribute();
             if ( name.equalsIgnoreCase( attr.getName() ) ) {
                 modifications.removeElementAt( i );

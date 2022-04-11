@@ -259,7 +259,7 @@ public class LDAPModify extends LDAPTool { /* LDAPModify */
         LDAPConstraints baseCons = null;
         if (!m_justShow) {
             baseCons = m_client.getConstraints();
-            Vector controlVector = new Vector();
+            Vector<LDAPControl> controlVector = new Vector<>();
             if (m_proxyControl != null)
                 controlVector.addElement(m_proxyControl);
             if (m_ordinary) {

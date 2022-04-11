@@ -78,11 +78,10 @@ public abstract class LDAPWriter implements Serializable {
         printEntryStart( entry.getDN() );
 		/* Get the attributes of the entry */
 		LDAPAttributeSet attrs = entry.getAttributeSet();
-		Iterator enumAttrs = attrs.iterator();
+		Iterator<LDAPAttribute> enumAttrs = attrs.iterator();
 		/* Loop on attributes */
 		while ( enumAttrs.hasNext() ) {
-			LDAPAttribute anAttr =
-				(LDAPAttribute)enumAttrs.next();
+		    LDAPAttribute anAttr = enumAttrs.next();
             printAttribute( anAttr );
 		}
         printEntryEnd( entry.getDN() );

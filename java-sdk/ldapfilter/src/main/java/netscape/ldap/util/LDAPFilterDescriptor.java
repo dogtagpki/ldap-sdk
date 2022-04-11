@@ -127,7 +127,7 @@ import netscape.ldap.LDAPConnection;
  */
 public class LDAPFilterDescriptor {
 
-    private Vector m_vFilterSet = new Vector();
+    private Vector<LDAPIntFilterSet> m_vFilterSet = new Vector<>();
 
     private String m_strLine;
     private int m_nLine;
@@ -208,7 +208,7 @@ public class LDAPFilterDescriptor {
         String strDataPattern = "\\s*(?:\"([^\"]*)\")|([^\\s]*)\\s*";
         Pattern patComment;
         Pattern patData;
-        Vector vStrings = new Vector ( 5 );
+        Vector<String> vStrings = new Vector<>(5);
 
         try {
             patComment = Pattern.compile ( strCommentPattern );
@@ -254,7 +254,7 @@ public class LDAPFilterDescriptor {
     }
 
     private void setFilter(Pattern patComment, Pattern patData,
-      Vector vStrings) throws IOException, BadFilterException {
+      Vector<String> vStrings) throws IOException, BadFilterException {
         Matcher dataMatcher;
         LDAPFilter tmpFilter = null;
 
@@ -298,7 +298,7 @@ public class LDAPFilterDescriptor {
 
                 // Now create a new filterset.
                 m_tmpFilterSet = new LDAPIntFilterSet
-                    ( (String)vStrings.elementAt ( 0 ) );
+                    ( vStrings.elementAt ( 0 ) );
 
             break;
 
@@ -313,8 +313,8 @@ public class LDAPFilterDescriptor {
                     tmpFilter = new LDAPFilter(
                     m_strLastMatchPattern,
                     m_strLastDelimiter,
-                    (String)vStrings.elementAt ( 0 ),
-                    (String)vStrings.elementAt ( 1 ),
+                    vStrings.elementAt ( 0 ),
+                    vStrings.elementAt ( 1 ),
                     DEFAULT_SCOPE );
                     tmpFilter.setLine ( m_nLine );
                     if ( m_tmpFilterSet != null ) {
@@ -337,9 +337,9 @@ public class LDAPFilterDescriptor {
                     tmpFilter = new LDAPFilter (
                         m_strLastMatchPattern,
                         m_strLastDelimiter,
-                        (String)vStrings.elementAt ( 0 ),
-                        (String)vStrings.elementAt ( 1 ),
-                        (String)vStrings.elementAt ( 2 ) );
+                        vStrings.elementAt ( 0 ),
+                        vStrings.elementAt ( 1 ),
+                        vStrings.elementAt ( 2 ) );
                     tmpFilter.setLine ( m_nLine );
 
 
@@ -361,14 +361,14 @@ public class LDAPFilterDescriptor {
             // the default scope.
             case 4:
                 tmpFilter = new LDAPFilter (
-                    (String)vStrings.elementAt ( 0 ),
-                    (String)vStrings.elementAt ( 1 ),
-                    (String)vStrings.elementAt ( 2 ),
-                    (String)vStrings.elementAt ( 3 ),
+                    vStrings.elementAt ( 0 ),
+                    vStrings.elementAt ( 1 ),
+                    vStrings.elementAt ( 2 ),
+                    vStrings.elementAt ( 3 ),
                     DEFAULT_SCOPE );
                 tmpFilter.setLine ( m_nLine );
-                m_strLastMatchPattern = (String)vStrings.elementAt ( 0 );
-                m_strLastDelimiter = (String)vStrings.elementAt ( 1 );
+                m_strLastMatchPattern = vStrings.elementAt ( 0 );
+                m_strLastDelimiter = vStrings.elementAt ( 1 );
                 if ( m_tmpFilterSet != null ) {
                     m_tmpFilterSet.newFilter ( tmpFilter );
                 } else {
@@ -381,14 +381,14 @@ public class LDAPFilterDescriptor {
             // token.   All data is new.
             case 5:
                 tmpFilter = new LDAPFilter (
-                    (String)vStrings.elementAt ( 0 ),
-                    (String)vStrings.elementAt ( 1 ),
-                    (String)vStrings.elementAt ( 2 ),
-                    (String)vStrings.elementAt ( 3 ),
-                    (String)vStrings.elementAt ( 4 ) );
+                    vStrings.elementAt ( 0 ),
+                    vStrings.elementAt ( 1 ),
+                    vStrings.elementAt ( 2 ),
+                    vStrings.elementAt ( 3 ),
+                    vStrings.elementAt ( 4 ) );
                 tmpFilter.setLine ( m_nLine );
-                m_strLastMatchPattern = (String)vStrings.elementAt ( 0 );
-                m_strLastDelimiter = (String)vStrings.elementAt ( 1 );
+                m_strLastMatchPattern = vStrings.elementAt ( 0 );
+                m_strLastDelimiter = vStrings.elementAt ( 1 );
                 if ( m_tmpFilterSet != null ) {
                     m_tmpFilterSet.newFilter ( tmpFilter );
                 } else {
@@ -430,7 +430,7 @@ public class LDAPFilterDescriptor {
         for ( int i = 0; i < m_vFilterSet.size(); i++ ) {
             strBuf.append ( "Filter Set number: " + i + "\n" );
             strBuf.append (
-                ((LDAPIntFilterSet)m_vFilterSet.elementAt ( i )).toString() +
+                m_vFilterSet.elementAt ( i ).toString() +
             "\n" );
             strBuf.append ( "\n" );
             //System.out.println ( (m_vFilterSet.elementAt ( i )).toString());
@@ -477,16 +477,15 @@ public class LDAPFilterDescriptor {
         boolean bMatched = false;
         int i = 0;
         while ( ! bMatched ) {
-            Vector vMatchingFilters =
-            ((LDAPIntFilterSet)m_vFilterSet.elementAt ( i )).getFilters
+            Vector<LDAPFilter> vMatchingFilters =
+            m_vFilterSet.elementAt ( i ).getFilters
                 (patTag, strValue );
 
             if ( vMatchingFilters.size() > 0 ) {
                 for ( int j = 0; j < vMatchingFilters.size(); j++ ) {
                     LDAPFilter tmpFilter =
                     (LDAPFilter)
-                        ((LDAPFilter)
-                        vMatchingFilters.elementAt ( j )).clone();
+                        vMatchingFilters.elementAt ( j ).clone();
                     tmpFilter.setupFilter ( strValue, m_strPrefix,
                                   m_strAffix );
                     bMatched = true; // this really doesn't matter.

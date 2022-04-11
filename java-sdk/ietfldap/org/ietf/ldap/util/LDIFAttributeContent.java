@@ -38,6 +38,7 @@
 package org.ietf.ldap.util;
 
 import java.util.Vector;
+
 import org.ietf.ldap.LDAPAttribute;
 
 /**
@@ -59,7 +60,7 @@ public class LDIFAttributeContent extends LDIFBaseContent {
     /**
      * Internal variables
      */
-    private Vector m_attrs = new Vector();
+    private Vector<LDAPAttribute> m_attrs = new Vector<>();
     static final long serialVersionUID = -2912294697848028220L;
 
     /**
@@ -100,7 +101,7 @@ public class LDIFAttributeContent extends LDIFBaseContent {
     public LDAPAttribute[] getAttributes() {
         LDAPAttribute attrs[] = new LDAPAttribute[m_attrs.size()];
         for (int i = 0; i < m_attrs.size(); i++) {
-            attrs[i] = (LDAPAttribute)m_attrs.elementAt(i);
+            attrs[i] = m_attrs.elementAt(i);
         }
         return attrs;
     }
@@ -112,7 +113,7 @@ public class LDIFAttributeContent extends LDIFBaseContent {
     public String toString() {
         String s = "";
         for (int i = 0; i < m_attrs.size(); i++) {
-            s = s + ((LDAPAttribute)m_attrs.elementAt(i)).toString();
+            s = s + m_attrs.elementAt(i).toString();
         }
         if ( getControls() != null ) {
             s += getControlString();

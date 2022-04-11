@@ -185,7 +185,7 @@ public class ConnectionPool {
     public void destroy() {
         for ( int i = 0; i < pool.size(); i++ ) {
             disconnect(
-                (LDAPConnectionObject)pool.elementAt(i) );
+                pool.elementAt(i) );
         }
         pool.removeAllElements();
     }
@@ -271,7 +271,7 @@ public class ConnectionPool {
 
             // Get the ConnectionObject from the pool
             LDAPConnectionObject co =
-                (LDAPConnectionObject)pool.elementAt(i);
+                pool.elementAt(i);
 
             if ( co.isAvailable() ) {  // Conn available?
                 ldapconnobj = co;
@@ -292,7 +292,7 @@ public class ConnectionPool {
                 // If a new connection was created, use it
                 if ( i >= 0 ) {
                     ldapconnobj =
-                        (LDAPConnectionObject)pool.elementAt(i);
+                        pool.elementAt(i);
                 }
             } else {
                 debug("All pool connections in use");
@@ -317,7 +317,7 @@ public class ConnectionPool {
         int index = find( ld );
         if ( index != -1 ) {
             LDAPConnectionObject co =
-                (LDAPConnectionObject)pool.elementAt(index);
+                pool.elementAt(index);
             co.setInUse( false );  // Mark as available
             synchronized( pool ) {
                 pool.notifyAll();
@@ -332,7 +332,7 @@ public class ConnectionPool {
         System.out.println("--ConnectionPool--");
         for ( int i = 0; i < pool.size(); i++ ) {
             LDAPConnectionObject co =
-                (LDAPConnectionObject)pool.elementAt(i);
+                pool.elementAt(i);
             System.out.println( "" + i + "=" + co );
         }
     }
@@ -371,7 +371,7 @@ public class ConnectionPool {
         debug("Maximum number of connections="+poolMax);
         debug("******");
 
-        pool = new java.util.Vector(); // Create pool vector
+        pool = new java.util.Vector<>(); // Create pool vector
         setUpPool( poolSize ); // Initialize it
     }
 
@@ -430,7 +430,7 @@ public class ConnectionPool {
         if ( con != null ) {
             for ( int i = 0; i < pool.size(); i++ ) {
                 LDAPConnectionObject co =
-                    (LDAPConnectionObject)pool.elementAt(i);
+                    pool.elementAt(i);
                 if ( co.getLDAPConn() == con ) {
                     return i;
                 }
@@ -535,6 +535,6 @@ public class ConnectionPool {
     private String authdn;  // Identity of connections
     private byte[] authpw;  // Password for authdn
     private LDAPConnection ldc = null; // Connection to clone
-    private java.util.Vector pool;  // the actual pool
+    private java.util.Vector<LDAPConnectionObject> pool;  // the actual pool
     private boolean debugMode;
 }

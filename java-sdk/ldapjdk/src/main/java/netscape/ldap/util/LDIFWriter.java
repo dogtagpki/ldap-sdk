@@ -111,14 +111,14 @@ public class LDIFWriter extends LDAPWriter {
 		}
 
 		/* Loop on values for this attribute */
-		Enumeration enumVals = attr.getByteValues();
+		Enumeration<byte[]> enumVals = attr.getByteValues();
 
 		if ( enumVals != null ) {
 			while (enumVals.hasMoreElements()) {
 				if ( m_toFiles ) {
 					try {
 						FileOutputStream f = getTempFile( attrName );
-						f.write( (byte[])enumVals.nextElement() );
+						f.write( enumVals.nextElement() );
 					} catch ( Exception e ) {
 						System.err.println( "Error writing values " +
 								"of " + attrName + ", " +
@@ -126,7 +126,7 @@ public class LDIFWriter extends LDAPWriter {
 						System.exit(1);
 					}
 				} else {
-					byte[] b = (byte[])enumVals.nextElement();
+					byte[] b = enumVals.nextElement();
 					String s;
 					if ( LDIF.isPrintable(b) ) {
 						try {

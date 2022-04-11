@@ -239,7 +239,7 @@ public class LDAPMatchingRuleSchema extends LDAPAttributeSchema {
         }
 	Object p = properties.get( "APPLIES" );
 	if ( p instanceof Vector ) {
-		Vector v = (Vector) p;
+		Vector<String> v = (Vector<String>) p;
 		if ( v != null ) {
 			attributes = new String[v.size()];
 			v.copyInto( attributes );

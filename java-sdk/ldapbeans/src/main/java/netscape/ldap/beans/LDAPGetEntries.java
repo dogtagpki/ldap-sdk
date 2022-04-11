@@ -280,7 +280,7 @@ public class LDAPGetEntries extends LDAPBasePropertySupport implements Serializa
                                                           false);
 
                 // Create a vector for the results
-                Vector v = new Vector();
+                Vector<String> v = new Vector<>();
                 LDAPEntry entry = null;
                 while ( results.hasMoreElements() ) {
                     try {

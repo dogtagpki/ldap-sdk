@@ -184,8 +184,8 @@ public class LDAPDelete extends LDAPTool { /* LDAPDelete */
 		} /* input file */
 
 		if (m_reader == null) {
-			Enumeration pa = options.getParameters().elements();
-			Vector vec = new Vector();
+			Enumeration<String> pa = options.getParameters().elements();
+			Vector<String> vec = new Vector<>();
 			while (pa.hasMoreElements()) { /* while */
 				vec.addElement(pa.nextElement());
 			}
@@ -207,7 +207,7 @@ public class LDAPDelete extends LDAPTool { /* LDAPDelete */
 		int msgid = 0;
 		LDAPConstraints cons = m_client.getConstraints();
 
-		Vector controlVector = new Vector();
+		Vector<LDAPControl> controlVector = new Vector<>();
 		if (m_proxyControl != null)
 			controlVector.addElement(m_proxyControl);
 		if (m_ordinary) {

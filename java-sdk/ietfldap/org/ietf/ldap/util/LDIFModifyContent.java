@@ -38,6 +38,7 @@
 package org.ietf.ldap.util;
 
 import java.util.Vector;
+
 import org.ietf.ldap.LDAPModification;
 
 /**
@@ -58,7 +59,7 @@ public class LDIFModifyContent extends LDIFBaseContent {
     /**
      * Internal variables
      */
-    private Vector m_mods = new Vector();
+    private Vector<LDAPModification> m_mods = new Vector<>();
     static final long serialVersionUID = -710573832339780084L;
 
     /**
@@ -103,7 +104,7 @@ public class LDIFModifyContent extends LDIFBaseContent {
     public LDAPModification[] getModifications() {
         LDAPModification mods[] = new LDAPModification[m_mods.size()];
         for (int i = 0; i < m_mods.size(); i++) {
-            mods[i] = (LDAPModification)m_mods.elementAt(i);
+            mods[i] = m_mods.elementAt(i);
         }
         return mods;
     }
@@ -115,7 +116,7 @@ public class LDIFModifyContent extends LDIFBaseContent {
     public String toString() {
         String s = "";
         for (int i = 0; i < m_mods.size(); i++) {
-            s = s + ((LDAPModification)m_mods.elementAt(i)).toString();
+            s = s + m_mods.elementAt(i).toString();
         }
         if ( getControls() != null ) {
             s += getControlString();

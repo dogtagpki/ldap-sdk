@@ -122,7 +122,7 @@ public class JDAPFilterOpers {
      */
     static byte[] getByteValues(String str) {
         int pos = 0;
-        Vector v = new Vector();
+        Vector<byte[]> v = new Vector<>();
         String val = new String(str);
         int totalSize = 0;
 
@@ -177,7 +177,7 @@ public class JDAPFilterOpers {
         byte[] result = new byte[totalSize];
         pos = 0;
         for (int i=0; i<v.size(); i++) {
-            byte[] b = (byte[])v.elementAt(i);
+            byte[] b = v.elementAt(i);
             System.arraycopy(b, 0, result, pos, b.length);
             pos = pos+b.length;
         }

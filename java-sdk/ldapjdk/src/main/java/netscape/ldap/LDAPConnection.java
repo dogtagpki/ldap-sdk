@@ -2555,7 +2555,7 @@ public class LDAPConnection
         LDAPSearchResults returnValue =
             new LDAPSearchResults(this, cons, base, scope, filter,
                                   attrs, attrsOnly);
-        Vector cacheValue = null;
+        Vector<Object> cacheValue = null;
         Long key = null;
         boolean isKeyValid = true;
 
@@ -2566,7 +2566,7 @@ public class LDAPConnection
                 key = m_cache.createKey(getHost(), getPort(),base, filter,
                                         scope, attrs, m_boundDN, cons);
 
-                cacheValue = (Vector)m_cache.getEntry(key);
+                cacheValue = (Vector<Object>)m_cache.getEntry(key);
 
                 if (cacheValue != null) {
                     return (new LDAPSearchResults(cacheValue, this, cons, base, scope,

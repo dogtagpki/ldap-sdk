@@ -140,7 +140,7 @@ public class LDAPReferralException extends LDAPException {
         if (error == null)
             return null;
         StringTokenizer st = new StringTokenizer(error, "\n");
-        Vector v = new Vector();
+        Vector<String> v = new Vector<>();
         boolean referrals = false;
         while (st.hasMoreTokens()) {
             String token = st.nextToken();
@@ -156,7 +156,7 @@ public class LDAPReferralException extends LDAPException {
             return null;
         String res[] = new String[v.size()];
         for (int i = 0; i < v.size(); i++) {
-            res[i] = (String)v.elementAt(i);
+            res[i] = v.elementAt(i);
         }
         return res;
     }

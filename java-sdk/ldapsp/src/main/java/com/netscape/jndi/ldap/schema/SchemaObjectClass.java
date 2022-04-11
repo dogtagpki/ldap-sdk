@@ -176,7 +176,7 @@ public class SchemaObjectClass extends SchemaElement {
             }
             else if (attrIds[i].equals(MAY)) {
                 BasicAttribute optional = new BasicAttribute(MAY);
-                for (Enumeration e = m_ldapObjectClass.getOptionalAttributes(); e.hasMoreElements();) {
+                for (Enumeration<String> e = m_ldapObjectClass.getOptionalAttributes(); e.hasMoreElements();) {
                     optional.add(e.nextElement());
                 }
                 if (optional.size() != 0) {
@@ -185,7 +185,7 @@ public class SchemaObjectClass extends SchemaElement {
             }
             else if (attrIds[i].equals(MUST)) {
                 BasicAttribute required = new BasicAttribute(MUST);
-                for (Enumeration e = m_ldapObjectClass.getRequiredAttributes(); e.hasMoreElements();) {
+                for (Enumeration<String> e = m_ldapObjectClass.getRequiredAttributes(); e.hasMoreElements();) {
                     required.add(e.nextElement());
                 }
                 if (required.size() != 0) {

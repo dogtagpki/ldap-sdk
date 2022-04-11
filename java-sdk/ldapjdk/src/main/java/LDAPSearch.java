@@ -282,8 +282,8 @@ public class LDAPSearch extends LDAPTool {
 		parseVlv(options);
 
 		/* extract the filter string and attributes */
-		Enumeration pa = options.getParameters().elements();
-		Vector vec = new Vector();
+		Enumeration<String> pa = options.getParameters().elements();
+		Vector<String> vec = new Vector<>();
 
 		while (pa.hasMoreElements()) { /* while */
 			vec.addElement(pa.nextElement());
@@ -300,7 +300,7 @@ public class LDAPSearch extends LDAPTool {
 		if (counter == 1) { /* Has filter but no attributes */
 
 			/* gets filter string */
-			m_filter = (String)vec.elementAt(0);
+			m_filter = vec.elementAt(0);
 			if (m_verbose)
 				System.err.println("filter pattern: "+m_filter);
 
@@ -315,7 +315,7 @@ public class LDAPSearch extends LDAPTool {
 		if (counter > 1) { /* Has filter and attributes */
 
 			/* gets filter string */
-			m_filter = (String)vec.elementAt(0);
+			m_filter = vec.elementAt(0);
 			if (m_verbose) {
 				System.err.println("filter pattern: "+m_filter);
 				System.err.print("returning:");
@@ -324,7 +324,7 @@ public class LDAPSearch extends LDAPTool {
 			/* gets attributes */
 			m_attrs = new String[counter];
 			for (int j = 1; j < counter; j++) {
-				m_attrs[j-1] = (String)vec.elementAt(j);
+				m_attrs[j-1] = vec.elementAt(j);
                 if (m_verbose)
 					System.err.print(" "+m_attrs[j-1]);
 			}
@@ -385,12 +385,12 @@ public class LDAPSearch extends LDAPTool {
 
         LDAPControl[] controls = null;
 		try {
-        	Vector cons = new Vector();
+			Vector<LDAPControl> cons = new Vector<>();
 			LDAPSortControl sort = null;
 			if ( m_sortOnServer && (m_sort.size() > 0) ) {
 				LDAPSortKey[] keys = new LDAPSortKey[m_sort.size()];
 				for( int i = 0; i < keys.length; i++ ) {
-					keys[i] = new LDAPSortKey( (String)m_sort.elementAt(i) );
+					keys[i] = new LDAPSortKey( m_sort.elementAt(i) );
 				}
 				sort = new LDAPSortControl( keys, true );
 				cons.addElement(sort);
@@ -459,7 +459,7 @@ public class LDAPSearch extends LDAPTool {
 		if ( (m_sort.size() > 0) && !m_sortOnServer ) {
 			String[] sortAttrs = new String[m_sort.size()];
 			for( int i = 0; i < sortAttrs.length; i++ )
-				sortAttrs[i] = (String)m_sort.elementAt( i );
+				sortAttrs[i] = m_sort.elementAt( i );
 			res.sort( new LDAPCompareAttrNames( sortAttrs ) );
 		}
 
@@ -615,7 +615,7 @@ public class LDAPSearch extends LDAPTool {
   private static String m_base = "o=ace industry,c=us";
   private static String m_filter = null;
   private static String m_sep = ":";
-  private static Vector m_sort = new Vector();
+  private static Vector<String> m_sort = new Vector<>();
   private static boolean m_sortOnServer = false;
   private static boolean m_tempFiles = false;
   private static int m_beforeCount = 0;

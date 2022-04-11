@@ -75,7 +75,7 @@ import netscape.ldap.controls.LDAPPersistSearchControl;
 class EventService implements Runnable{
 
     LdapService m_ldapSvc;
-    Vector m_eventList = new Vector();
+    Vector<EventEntry> m_eventList = new Vector<>();
     Thread m_monitorThread;
     LDAPSearchListener m_msgQueue; // for asynch ldap search
 
@@ -129,7 +129,7 @@ class EventService implements Runnable{
 
         // Check if such change is already monitored, search for the event entry
         for (int i=0; i < m_eventList.size(); i++) {
-            EventEntry ee = (EventEntry) m_eventList.elementAt(i);
+            EventEntry ee = m_eventList.elementAt(i);
             if (ee.isEqualEvent(base, scope, filter, attrs, cons)) {
                 event = ee;
                 break;
@@ -182,7 +182,7 @@ class EventService implements Runnable{
         // Check and the listener against all event entries. If an event is
         // left with no listeners, abandon associated ldap request
         for(int i = m_eventList.size()-1; i>=0; i--) {
-            EventEntry ee = (EventEntry)m_eventList.elementAt(i);
+            EventEntry ee = m_eventList.elementAt(i);
             if (ee.removeListener(listener)) {
                 removed = true;
 
@@ -286,7 +286,7 @@ class EventService implements Runnable{
     private void processNetworkError(LDAPException ex) {
         NamingException nameEx = ExceptionMapper.getNamingException(ex);
         for(int i=0; i<m_eventList.size(); i++) {
-            EventEntry ee = (EventEntry)m_eventList.elementAt(i);
+            EventEntry ee = m_eventList.elementAt(i);
             dispatchEvent(new NamingExceptionEvent(ee.ctx, nameEx), ee);
         }
     }
@@ -371,7 +371,7 @@ class EventService implements Runnable{
      */
     private EventEntry getEventEntry(int id) {
         for (int i=0; i < m_eventList.size(); i++) {
-            EventEntry ee = (EventEntry) m_eventList.elementAt(i);
+            EventEntry ee = m_eventList.elementAt(i);
             if (ee.id == id) {
                 return ee;
             }
@@ -389,7 +389,7 @@ class EventService implements Runnable{
         synchronized (eventEntry) {
             dispatchList = new NamingListener[eventEntry.listeners.size()];
             for (int i=0; i < dispatchList.length; i++) {
-                dispatchList[i] = (NamingListener)eventEntry.listeners.elementAt(i);
+                dispatchList[i] = eventEntry.listeners.elementAt(i);
             }
         }
 
@@ -498,7 +498,7 @@ class EventService implements Runnable{
         int scope;
         LDAPSearchConstraints cons;
         int id; // ldap message id
-        Vector listeners   = new Vector(); // vector of NamingListener
+        Vector<NamingListener> listeners = new Vector<>(); // vector of NamingListener
 
         /**
          * Constructor

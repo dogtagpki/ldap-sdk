@@ -71,7 +71,7 @@ public final class DN implements Serializable {
      * List of RDNs. DN consists of one or more RDNs.
      * RDNs follow RFC1485 order.
      */
-    private Vector m_rdns = new Vector();
+    private Vector<RDN> m_rdns = new Vector<>();
 
     /**
      * Type specifying a DN in the RFC format.
@@ -122,7 +122,7 @@ public final class DN implements Serializable {
         else if (dn.indexOf('/') != -1) { /* OSF */
             m_dnType = OSF;
             StringTokenizer st = new StringTokenizer(dn, "/");
-            Vector rdns = new Vector();
+            Vector<RDN> rdns = new Vector<>();
             while (st.hasMoreTokens()) {
                 String rdn = st.nextToken();
                 if (RDN.isRDN(rdn))
@@ -272,7 +272,7 @@ public final class DN implements Serializable {
      * @return a list of the components of this DN.
      * @see org.ietf.ldap.util.RDN
      */
-    public Vector getRDNs() {
+    public Vector<RDN> getRDNs() {
         return m_rdns;
     }
 
@@ -288,9 +288,9 @@ public final class DN implements Serializable {
         String str[] = new String[m_rdns.size()];
         for (int i = 0; i < m_rdns.size(); i++) {
             if (noTypes)
-                str[i] = ((RDN)m_rdns.elementAt(i)).getValue();
+                str[i] = m_rdns.elementAt(i).getValue();
             else
-                str[i] = ((RDN)m_rdns.elementAt(i)).toString();
+                str[i] = m_rdns.elementAt(i).toString();
         }
         return str;
     }
@@ -312,7 +312,7 @@ public final class DN implements Serializable {
         for (int i = 0; i < m_rdns.size(); i++) {
             if (i != 0)
                 dn += ",";
-            dn = dn + ((RDN)m_rdns.elementAt(i)).toString();
+            dn = dn + m_rdns.elementAt(i).toString();
         }
         return dn;
     }
@@ -327,7 +327,7 @@ public final class DN implements Serializable {
             if (i != 0) {
                 dn = "/" + dn;
             }
-            RDN rdn = (RDN)m_rdns.elementAt(i);
+            RDN rdn = m_rdns.elementAt(i);
             dn = rdn.toString() + dn;
         }
         return dn;
@@ -389,7 +389,7 @@ public final class DN implements Serializable {
     public DN getParent() {
         DN newdn = new DN();
         for (int i = m_rdns.size() - 1; i > 0; i--) {
-            newdn.addRDN((RDN)m_rdns.elementAt(i));
+            newdn.addRDN(m_rdns.elementAt(i));
         }
         return newdn;
     }
@@ -451,9 +451,9 @@ public final class DN implements Serializable {
 
     public boolean isDescendantOf(DN dn) {
 
-        Vector rdns1 = dn.m_rdns;
+        Vector<RDN> rdns1 = dn.m_rdns;
 
-        Vector rdns2 = this.m_rdns;
+        Vector<RDN> rdns2 = this.m_rdns;
 
         int i = rdns1.size() - 1;
         int j = rdns2.size() - 1;
@@ -462,8 +462,8 @@ public final class DN implements Serializable {
           return false;
 
         for (; i>=0 && j>=0; i--, j--) {
-            RDN rdn1 = (RDN)rdns1.elementAt(i);
-            RDN rdn2 = (RDN)rdns2.elementAt(j);
+            RDN rdn1 = rdns1.elementAt(i);
+            RDN rdn2 = rdns2.elementAt(j);
             if (!rdn2.equals(rdn1)) {
                 return false;
             }

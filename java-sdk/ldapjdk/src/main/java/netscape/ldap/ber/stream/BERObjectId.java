@@ -89,7 +89,7 @@ public class BERObjectId extends BERElement {
         bytes_read[0] += contents_length;
         int[] contents_read = new int[1];
 
-        Vector oid = new Vector(10);
+        Vector<Integer> oid = new Vector<>(10);
         contents_read[0] = 0;
         int sub_id = readSubIdentifier(stream, contents_read);
 
@@ -100,7 +100,7 @@ public class BERObjectId extends BERElement {
             oid.addElement(1);
         else
             oid.addElement(2);
-        oid.addElement(sub_id - (((Integer)oid.elementAt(oid.size()-1)).intValue() * 40));
+        oid.addElement(sub_id - (oid.elementAt(oid.size()-1).intValue() * 40));
 
         while (contents_length > 0) {
             contents_read[0] = 0;
@@ -111,7 +111,7 @@ public class BERObjectId extends BERElement {
         }
         m_value = new int[oid.size()];
         for (int i = 0; i<oid.size(); i++)
-            m_value[i] = ((Integer)oid.elementAt(i)).intValue();
+            m_value[i] = oid.elementAt(i).intValue();
     }
 
     /**

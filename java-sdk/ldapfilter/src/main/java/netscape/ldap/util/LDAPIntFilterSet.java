@@ -48,7 +48,7 @@ import java.util.regex.Pattern;
 
 public class LDAPIntFilterSet {
 
-    private Vector m_vLDAPIntFilterList;
+    private Vector<LDAPIntFilterList> m_vLDAPIntFilterList;
     private String m_strTag;
 
     private Matcher m_matcher = null;
@@ -60,9 +60,9 @@ public class LDAPIntFilterSet {
 
      // remember, we have the string (m_strTag), the pattern has
      // been precompiled by the LDAPFilterDescriptor (patTag)
-    Vector getFilters ( Pattern patTag,
+    Vector<LDAPFilter> getFilters ( Pattern patTag,
                 String matcherValue ) {
-        Vector vRet = new Vector();
+        Vector<LDAPFilter> vRet = new Vector<>();
 
         if ( m_matcher == null ) {
             m_matcher = patTag.matcher(m_strTag);
@@ -76,7 +76,7 @@ public class LDAPIntFilterSet {
             LDAPFilter tmpFilter;
             for ( int i = 0; i < m_vLDAPIntFilterList.size(); i++ ) {
                 tmpIntFilterList =
-                  (LDAPIntFilterList)m_vLDAPIntFilterList.elementAt ( i );
+                  m_vLDAPIntFilterList.elementAt ( i );
 
                 if ( tmpIntFilterList.MatchFilter ( matcherValue ) ) {
                     for (int j=0; j < tmpIntFilterList.numFilters(); j++ ) {
@@ -104,7 +104,7 @@ public class LDAPIntFilterSet {
      */
     public LDAPIntFilterSet ( String strTag ) {
         m_strTag = strTag;
-        m_vLDAPIntFilterList = new Vector();
+        m_vLDAPIntFilterList = new Vector<>();
     }
 
     /**
@@ -125,7 +125,7 @@ public class LDAPIntFilterSet {
      * configuration file that has 2 or 3 tokens.
      */
     void appendFilter ( LDAPFilter filter ) {
-        ((LDAPIntFilterList)m_vLDAPIntFilterList.lastElement()).AddFilter ( filter );
+        m_vLDAPIntFilterList.lastElement().AddFilter ( filter );
     }
 
 
@@ -151,7 +151,7 @@ public class LDAPIntFilterSet {
         for ( int i = 0; i < m_vLDAPIntFilterList.size(); i++ ) {
             strBuf.append ( "  filter #: " + i + "\n" );
             strBuf.append (
-                ((LDAPIntFilterList)m_vLDAPIntFilterList.elementAt(i)).toString() );
+                m_vLDAPIntFilterList.elementAt(i).toString() );
             strBuf.append ( "\n" );
         }
         return strBuf.toString();

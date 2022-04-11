@@ -54,7 +54,7 @@ public abstract class BERConstruct extends BERElement {
     /**
      * List of BER elements in the construct.
      */
-    private Vector m_elements = new Vector();
+    private Vector<BERElement> m_elements = new Vector<>();
 
     /**
      * Constructs a construct element.
@@ -118,7 +118,7 @@ public abstract class BERConstruct extends BERElement {
      * @return BER element.
      */
     public BERElement elementAt(int index) {
-        return (BERElement)m_elements.elementAt(index);
+        return m_elements.elementAt(index);
     }
 
     /**

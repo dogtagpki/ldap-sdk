@@ -151,7 +151,7 @@ public abstract class JDAPFilter {
         int level = 0;
         int start = 0;
         int end = 0;
-        Vector v = new Vector();
+        Vector<JDAPFilter> v = new Vector<>();
 
         for (int i = 0; i < list.length(); i++) {
             if (list.charAt(i) == '(') {
@@ -174,7 +174,7 @@ public abstract class JDAPFilter {
 
         JDAPFilter f[] = new JDAPFilter[v.size()];
         for (int i = 0; i < v.size(); i++) {
-            f[i] = (JDAPFilter)v.elementAt(i);
+            f[i] = v.elementAt(i);
         }
 
         return f;

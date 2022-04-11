@@ -50,8 +50,8 @@ import java.util.Vector;
  * @version 1.0
  */
 
-public class LDAPFilterList implements Enumeration {
-    private Vector m_vFilterList;
+public class LDAPFilterList implements Enumeration<LDAPFilter> {
+    private Vector<LDAPFilter> m_vFilterList;
     private static int DEFAULT_LIST_SIZE = 2;
 
     /**
@@ -62,7 +62,7 @@ public class LDAPFilterList implements Enumeration {
      *
      */
     public LDAPFilterList () {
-        m_vFilterList = new Vector ( DEFAULT_LIST_SIZE );
+        m_vFilterList = new Vector<>(DEFAULT_LIST_SIZE);
     }
 
 
@@ -89,8 +89,8 @@ public class LDAPFilterList implements Enumeration {
      * @see LDAPFilterList#next()
      * @return The next LDAPFilter object (as an instance of Object)
      */
-    public Object nextElement() {
-        Object o = m_vFilterList.firstElement();
+    public LDAPFilter nextElement() {
+        LDAPFilter o = m_vFilterList.firstElement();
         m_vFilterList.removeElementAt ( 0 );
         return o;
     }

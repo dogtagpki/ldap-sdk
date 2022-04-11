@@ -53,7 +53,7 @@ public class LdapContextFactory implements InitialContextFactory {
         // Read system properties as well. Add a system property to the
         // env if it's name start with "java.naming." and it is not already
         // present in the env (env has precedence over the System properties)
-        for (Enumeration e = System.getProperties().keys(); e.hasMoreElements();) {
+        for (Enumeration<Object> e = System.getProperties().keys(); e.hasMoreElements();) {
             String key = (String) e.nextElement();
             if (key.startsWith("java.naming.")||
                 key.startsWith("com.netscape.")) {

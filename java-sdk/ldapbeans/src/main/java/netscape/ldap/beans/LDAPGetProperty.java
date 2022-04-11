@@ -116,9 +116,9 @@ public class LDAPGetProperty extends LDAPBasePropertySupport implements
         _result = newResult;
     }
 
-    private void notifyResult( Vector newResult ) {
+    private void notifyResult( Vector<byte[]> newResult ) {
         firePropertyChange( "result", _resultV, newResult );
-        _resultV = (Vector)newResult.clone();
+        _resultV = (Vector<byte[]>)newResult.clone();
     }
 
     private void notifyResult( String error ) {
@@ -269,7 +269,7 @@ public class LDAPGetProperty extends LDAPBasePropertySupport implements
                         Enumeration<String> valuesenum = attr.getStringValues();
                         if (valuesenum != null) {
                           // Create a string array for the results
-                            Vector v = new Vector();
+                            Vector<String> v = new Vector<>();
                             while (valuesenum.hasMoreElements()) {
                                 String val = valuesenum.nextElement();
                                 v.addElement( val );
@@ -279,10 +279,10 @@ public class LDAPGetProperty extends LDAPBasePropertySupport implements
                             v.copyInto( res );
                             setErrorCode( OK );
                         } else {
-                            Enumeration byteEnum = attr.getByteValues();
-                            Vector v = new Vector();
+                            Enumeration<byte[]> byteEnum = attr.getByteValues();
+                            Vector<byte[]> v = new Vector<>();
                             while (byteEnum.hasMoreElements()) {
-                                byte[] val = (byte[])byteEnum.nextElement();
+                                byte[] val = byteEnum.nextElement();
                                 v.addElement( val );
                                 printDebug( "\t\t" + val );
                             }
@@ -351,7 +351,7 @@ public class LDAPGetProperty extends LDAPBasePropertySupport implements
     private String[] _dns = null;
     private String _attribute = new String("cn");
     transient private String[] _result;
-    private Vector _resultV = null;
+    private Vector<byte[]> _resultV = null;
     private String _sResult = null;
     private String _errorMsg = null;
 }

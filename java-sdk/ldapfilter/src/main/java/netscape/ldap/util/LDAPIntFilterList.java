@@ -48,7 +48,7 @@ import java.util.regex.PatternSyntaxException;
  */
 
 public class LDAPIntFilterList {
-    private Vector m_vFilter;
+    private Vector<LDAPFilter> m_vFilter;
     private String m_strMatchPattern;
         // a regexp pattern of m_strMatchPattern
     private Pattern m_patMatch = null;
@@ -66,7 +66,7 @@ public class LDAPIntFilterList {
             "Line number: " + filter.getLineNumber() );
         }
 
-        m_vFilter = new Vector();
+        m_vFilter = new Vector<>();
         m_vFilter.addElement ( filter );
     }
 
@@ -98,7 +98,7 @@ public class LDAPIntFilterList {
         strBuf.append ( "    Match Pattern: \"" + m_strMatchPattern + "\"\n" );
 
         for ( int i = 0; i < m_vFilter.size(); i++ ) {
-            strBuf.append ( ((LDAPFilter)m_vFilter.elementAt(i)).toString() );
+            strBuf.append ( m_vFilter.elementAt(i).toString() );
             strBuf.append ( "\n" );
         }
         return strBuf.toString();
@@ -108,7 +108,7 @@ public class LDAPIntFilterList {
      * Return the requested filter.
      */
     LDAPFilter getFilter ( int nFilter ) {
-        return (LDAPFilter)m_vFilter.elementAt ( nFilter );
+        return m_vFilter.elementAt ( nFilter );
     }
 
     /**
