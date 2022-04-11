@@ -120,9 +120,6 @@ public class LDAPReferralException extends LDAPException {
             return null;
         }
         LDAPUrl u[] = new LDAPUrl[referrals.length];
-        if (u == null) {
-            return null;
-        }
         for (int i = 0; i < referrals.length; i++) {
             try {
                 u[i] = new LDAPUrl(referrals[i]);
