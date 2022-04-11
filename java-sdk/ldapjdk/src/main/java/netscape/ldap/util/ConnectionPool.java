@@ -443,7 +443,7 @@ public class ConnectionPool {
                     }
                     catch (LDAPException connEx) {
                         // fallback to ldap v2 if v3 is not supported
-                        if (connEx.getLDAPResultCode() == connEx.PROTOCOL_ERROR) {
+                        if (connEx.getLDAPResultCode() == LDAPException.PROTOCOL_ERROR) {
                             newConn.connect( 2, host, port, authdn, authpw);
                         }
                         else {

@@ -158,7 +158,7 @@ class LdapNameParser implements NameParser {
         try {
             Name name = getParser().parse(args[0]);
             System.out.println(name);
-            System.out.println("rdn: " + getParser().getRDN(args[0]));
+            System.out.println("rdn: " + LdapNameParser.getRDN(args[0]));
             name.add("attr=val");
             System.out.println(name);
             System.out.println(name.get(0));
@@ -177,7 +177,7 @@ class LdapNameParser implements NameParser {
             System.exit(1);
         }
         try {
-            System.out.println("relativeName: " + getParser().getRelativeName(args[0], args[1]));
+            System.out.println("relativeName: " + LdapNameParser.getRelativeName(args[0], args[1]));
         }
         catch (Exception e) {
             System.err.println(e);

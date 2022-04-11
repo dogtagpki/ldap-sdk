@@ -467,7 +467,7 @@ class LDAPMessageQueueImpl implements Serializable, LDAPMessageQueue {
 
         // Mark conn as bound for asych bind operations
         if ( isAsynchOp() &&
-             (msg.getType() == msg.BIND_RESPONSE) ) {
+             (msg.getType() == LDAPMessage.BIND_RESPONSE) ) {
             if ( ((LDAPResponse)msg).getResultCode() == 0 ) {
                 getConnection( msg.getMessageID() ).markConnAsBound();
             }

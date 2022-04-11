@@ -161,7 +161,7 @@ public class LDAPAttributeSchema extends LDAPSchemaElement {
                                 int syntax, boolean single ) {
         this( name, oid, description, cisString, single );
         syntaxElement.syntax = syntax;
-        String syntaxType = syntaxElement.internalSyntaxToString( syntax );
+        String syntaxType = LDAPSyntaxSchemaElement.internalSyntaxToString( syntax );
         if ( syntaxType != null ) {
             syntaxElement.syntaxString = syntaxType;
         }

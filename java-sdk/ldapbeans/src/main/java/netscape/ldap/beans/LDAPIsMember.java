@@ -388,7 +388,7 @@ public class LDAPIsMember extends LDAPBasePropertySupport
         }
 
         try {
-            LDAPSearchResults results = ld.search(ldapurl);
+            LDAPSearchResults results = LDAPConnection.search(ldapurl);
             String entry = "";
             while ( results.hasMoreElements() && !isMember ) {
                 try {

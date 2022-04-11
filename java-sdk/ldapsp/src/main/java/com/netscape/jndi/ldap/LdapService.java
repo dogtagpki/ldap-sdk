@@ -180,11 +180,10 @@ class LdapService {
         catch (LDAPException e) {
            // If ldapVersion is not specified in ctx env
            // fallback to ldap v2 if v3 is bot supported
-            if (e.getLDAPResultCode() == e.PROTOCOL_ERROR &&
+            if (e.getLDAPResultCode() == LDAPException.PROTOCOL_ERROR &&
                 ldapVersion == 3 &&
                 saslMechanisms == null &&
-                ctx.m_ctxEnv.getProperty(
-                     ctx.m_ctxEnv.P_LDAP_VERSION) == null) {
+                ctx.m_ctxEnv.getProperty(ContextEnv.P_LDAP_VERSION) == null) {
 
                 try {
                     m_ld.connect(2, host, port, user, passwd);
@@ -615,7 +614,7 @@ class LdapService {
      */
     void setTraceOutput(Object out) throws NamingException {
         try {
-            m_ld.setProperty(m_ld.TRACE_PROPERTY, out);
+            m_ld.setProperty(LDAPConnection.TRACE_PROPERTY, out);
         }
         catch (Exception e) {
             throw new IllegalArgumentException("Can not open trace output " + e);

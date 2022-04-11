@@ -146,7 +146,7 @@ public class LDAPMatchingRuleSchema extends LDAPAttributeSchema {
                                    String[] attributes, int syntax ) {
         this( name, oid, description, attributes, cisString );
         syntaxElement.syntax = syntax;
-        String syntaxType = syntaxElement.internalSyntaxToString( syntax );
+        String syntaxType = LDAPSyntaxSchemaElement.internalSyntaxToString( syntax );
         if ( syntaxType != null ) {
             syntaxElement.syntaxString = syntaxType;
         }

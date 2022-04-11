@@ -322,7 +322,7 @@ class LDAPMessageQueue implements java.io.Serializable {
         m_messageQueue.addElement(msg);
 
         // Mark conn as bound for asych bind operations
-        if (isAsynchOp() && msg.getType() == msg.BIND_RESPONSE) {
+        if (isAsynchOp() && msg.getType() == LDAPMessage.BIND_RESPONSE) {
             if (((LDAPResponse) msg).getResultCode() == 0) {
                 getConnection(msg.getMessageID()).setBound(true);
             }
