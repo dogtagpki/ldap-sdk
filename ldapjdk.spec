@@ -58,6 +58,10 @@ Requires:         slf4j
 Requires:         slf4j-jdk14
 Requires:         jss >= 5.2.0
 
+%if "%{name}" != "ldapjdk"
+Provides:         ldapjdk = %{version}-%{release}
+%endif
+
 %description
 The Mozilla LDAP SDKs enable you to write applications which access,
 manage, and update the information stored in an LDAP directory.

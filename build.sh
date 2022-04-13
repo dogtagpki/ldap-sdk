@@ -10,7 +10,8 @@ SCRIPT_NAME="$(basename "$SCRIPT_PATH")"
 SRC_DIR="$(dirname "$SCRIPT_PATH")"
 
 NAME=ldapjdk
-WORK_DIR="$HOME/build/$NAME"
+WORK_DIR=
+
 JAVA_LIB_DIR="/usr/share/java"
 JAVADOC_DIR="/usr/share/javadoc"
 MAVEN_POM_DIR="/usr/share/maven-poms"
@@ -35,7 +36,7 @@ usage() {
     echo
     echo "Options:"
     echo "    --name=<name>          Package name (default: $NAME)."
-    echo "    --work-dir=<path>      Working directory (default: $WORK_DIR)."
+    echo "    --work-dir=<path>      Working directory (default: ~/build/$NAME)."
     echo "    --java-lib-dir=<path>  Java library directory (default: $JAVA_LIB_DIR)."
     echo "    --javadoc-dir=<path>   Javadoc directory (default: $JAVADOC_DIR)."
     echo "    --maven-pom-dir=<path> Maven POM directory (default: $MAVEN_POM_DIR)."
@@ -127,6 +128,8 @@ generate_patch() {
 
 generate_rpm_spec() {
 
+    SPEC_FILE="$WORK_DIR/SPECS/$NAME.spec"
+
     if [ "$VERBOSE" = true ] ; then
         echo "Creating $SPEC_FILE"
     fi
@@ -172,7 +175,7 @@ while getopts v-: arg ; do
             NAME="$LONG_OPTARG"
             ;;
         work-dir=?*)
-            WORK_DIR="$(readlink -f "$LONG_OPTARG")"
+            WORK_DIR=$(readlink -f "$LONG_OPTARG")
             ;;
         java-lib-dir=?*)
             JAVA_LIB_DIR="$(readlink -f "$LONG_OPTARG")"
@@ -246,6 +249,10 @@ else
     BUILD_TARGET=$1
 fi
 
+if [ "$WORK_DIR" = "" ] ; then
+    WORK_DIR="$HOME/build/$NAME"
+fi
+
 if [ "$DEBUG" = true ] ; then
     echo "NAME: $NAME"
     echo "WORK_DIR: $WORK_DIR"
@@ -266,8 +273,20 @@ if [ "$BUILD_TARGET" != "dist" ] &&
     exit 1
 fi
 
+################################################################################
+# Initialization
+################################################################################
+
+if [ "$VERBOSE" = true ] ; then
+    echo "Initializing $WORK_DIR"
+fi
+
 mkdir -p $WORK_DIR
 cd $WORK_DIR
+
+################################################################################
+# Build LDAP SDK
+################################################################################
 
 if [ "$BUILD_TARGET" = "dist" ] ; then
 
@@ -294,6 +313,10 @@ if [ "$BUILD_TARGET" = "dist" ] ; then
 
     exit
 fi
+
+################################################################################
+# Install LDAP SDK
+################################################################################
 
 if [ "$BUILD_TARGET" = "install" ] ; then
 
@@ -322,8 +345,6 @@ fi
 ################################################################################
 # Prepare RPM build
 ################################################################################
-
-SPEC_FILE="$WORK_DIR/SPECS/$NAME.spec"
 
 if [ "$VERSION" = "" ] ; then
     # if version not specified, get from spec template
