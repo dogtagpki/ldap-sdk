@@ -2,6 +2,8 @@
 Name:             ldapjdk
 ################################################################################
 
+%global           product_id dogtag-ldapjdk
+
 # Upstream version number:
 %global           major_version 5
 %global           minor_version 2
@@ -62,9 +64,15 @@ BuildRequires:    slf4j
 BuildRequires:    slf4j-jdk14
 BuildRequires:    jss >= 5.2.0
 
+%description
+The Mozilla LDAP SDKs enable you to write applications which access,
+manage, and update the information stored in an LDAP directory.
+
 ################################################################################
-# Runtime Dependencies
+%package -n %{product_id}
 ################################################################################
+
+Summary:          LDAP SDK
 
 Requires:         %{java_headless}
 Requires:         jpackage-utils >= 0:1.5
@@ -72,23 +80,25 @@ Requires:         slf4j
 Requires:         slf4j-jdk14
 Requires:         jss >= 5.2.0
 
-%if "%{name}" != "ldapjdk"
+Obsoletes:        ldapjdk < %{version}-%{release}
 Provides:         ldapjdk = %{version}-%{release}
-%endif
 
-%description
+%description -n %{product_id}
 The Mozilla LDAP SDKs enable you to write applications which access,
 manage, and update the information stored in an LDAP directory.
 
 %license docs/ldapjdk/license.txt
 
 ################################################################################
-%package javadoc
+%package -n %{product_id}-javadoc
 ################################################################################
 
-Summary:        Javadoc for LDAP SDK
+Summary:          Javadoc for LDAP SDK
 
-%description javadoc
+Obsoletes:        ldapjdk-javadoc < %{version}-%{release}
+Provides:         ldapjdk-javadoc = %{version}-%{release}
+
+%description -n %{product_id}-javadoc
 Javadoc for LDAP SDK
 
 ################################################################################
@@ -121,7 +131,7 @@ export JAVA_HOME=%{java_home}
     install
 
 ################################################################################
-%files
+%files -n %{product_id}
 ################################################################################
 
 %{_javadir}/ldapjdk.jar
@@ -134,7 +144,7 @@ export JAVA_HOME=%{java_home}
 %{_mavenpomdir}/JPP-ldapbeans.pom
 
 ################################################################################
-%files javadoc
+%files -n %{product_id}-javadoc
 ################################################################################
 
 %dir %{_javadocdir}/ldapjdk
