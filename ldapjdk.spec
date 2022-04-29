@@ -2,6 +2,12 @@
 Name:             ldapjdk
 ################################################################################
 
+# Development phase:
+# - development (unsupported): alpha<n> where n >= 1
+# - stabilization (unsupported): beta<n> where n >= 1
+# - GA/update (supported): <none>
+%global           phase beta1
+
 %undefine         timestamp
 %undefine         commit_id
 
@@ -14,8 +20,7 @@ BuildArch:        noarch
 # For development (i.e. unsupported) releases, use x.y.z-0.n.<phase>.
 # For official (i.e. supported) releases, use x.y.z-r where r >=1.
 Version:          5.2.0
-Release:          0.2.beta1%{?timestamp:.}%{?timestamp}%{?commit_id:.}%{?commit_id}%{?dist}
-%global           _phase -beta1
+Release:          0.2%{?phase:.}%{?phase}%{?timestamp:.}%{?timestamp}%{?commit_id:.}%{?commit_id}%{?dist}
 
 # To create a tarball from a version tag:
 # $ git archive \
@@ -23,7 +28,7 @@ Release:          0.2.beta1%{?timestamp:.}%{?timestamp}%{?commit_id:.}%{?commit_
 #     --prefix ldap-sdk-<version>/ \
 #     -o ldap-sdk-<version>.tar.gz \
 #     <version tag>
-Source: https://github.com/dogtagpki/ldap-sdk/archive/v%{version}%{?_phase}/ldap-sdk-%{version}%{?_phase}.tar.gz
+Source: https://github.com/dogtagpki/ldap-sdk/archive/v%{version}%{?phase:-}%{?phase}/ldap-sdk-%{version}%{?phase:-}%{?phase}.tar.gz
 
 # To create a patch for all changes since a version tag:
 # $ git format-patch \
@@ -84,7 +89,7 @@ Javadoc for LDAP SDK
 %prep
 ################################################################################
 
-%autosetup -n ldap-sdk-%{version}%{?_phase} -p 1
+%autosetup -n ldap-sdk-%{version}%{?phase:-}%{?phase} -p 1
 
 ################################################################################
 %build
