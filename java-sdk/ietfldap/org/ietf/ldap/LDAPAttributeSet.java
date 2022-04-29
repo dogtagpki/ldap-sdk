@@ -103,24 +103,19 @@ public class LDAPAttributeSet implements Cloneable, Serializable, Set<LDAPAttrib
      * @return true if this set changed as a result of the call
      */
     public synchronized boolean add( LDAPAttribute attr ) {
-        if ( attr instanceof LDAPAttribute ) {
-            if ( contains( attr ) ) {
-                return false;
-            }
-            LDAPAttribute attrib = attr;
-            LDAPAttribute[] vals = new LDAPAttribute[_attrs.length+1];
-            for ( int i = 0; i < _attrs.length; i++ ) {
-                vals[i] = _attrs[i];
-            }
-            vals[_attrs.length] = attrib;
-            _attrs = vals;
-            if ( _attrHash != null ) {
-                _attrHash.put( attrib.getName().toLowerCase(), attr );
-            }
-            return true;
-        } else {
-            throw new ClassCastException( "Requires LDAPAttribute");
+        if ( contains( attr ) ) {
+            return false;
         }
+        LDAPAttribute[] vals = new LDAPAttribute[_attrs.length+1];
+        for ( int i = 0; i < _attrs.length; i++ ) {
+            vals[i] = _attrs[i];
+        }
+        vals[_attrs.length] = attr;
+        _attrs = vals;
+        if ( _attrHash != null ) {
+            _attrHash.put( attr.getName().toLowerCase(), attr );
+        }
+        return true;
     }
 
     /**
