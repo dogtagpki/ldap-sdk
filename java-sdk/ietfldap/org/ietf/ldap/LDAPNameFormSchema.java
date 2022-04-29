@@ -168,7 +168,7 @@ public class LDAPNameFormSchema extends LDAPSchemaElement {
             if ( o instanceof Vector ) {
                 may = (Vector<String>)o;
             } else {
-                may.addElement( o );
+                may.addElement( (String)o );
             }
         }
         o = properties.get( "MUST" );
@@ -176,7 +176,7 @@ public class LDAPNameFormSchema extends LDAPSchemaElement {
             if ( o instanceof Vector ) {
                 must = (Vector<String>)o;
             } else {
-                must.addElement( o );
+                must.addElement( (String)o );
             }
         }
         o = properties.get( "OC" );
@@ -272,10 +272,10 @@ public class LDAPNameFormSchema extends LDAPSchemaElement {
      * @param vals values for list
      * @return a String with a list of values.
      */
-    protected String vectorToList( Vector vals ) {
+    protected String vectorToList( Vector<String> vals ) {
         String val = "( ";
         for( int i = 0; i < vals.size(); i++ ) {
-            val += (String)vals.elementAt(i) + ' ';
+            val += vals.elementAt(i) + ' ';
             if ( i < (vals.size() - 1) ) {
                 val += "$ ";
             }
@@ -284,8 +284,8 @@ public class LDAPNameFormSchema extends LDAPSchemaElement {
         return val;
     }
 
-    private Vector must = new Vector();
-    private Vector may = new Vector();
+    private Vector<String> must = new Vector<>();
+    private Vector<String> may = new Vector<>();
     private String objectClass = null;
 
     // Qualifiers known to not have values; prepare a Hashtable

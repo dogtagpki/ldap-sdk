@@ -37,8 +37,10 @@
  * ***** END LICENSE BLOCK ***** */
 package com.netscape.jndi.ldap.schema;
 
+import javax.naming.Binding;
 import javax.naming.Context;
 import javax.naming.Name;
+import javax.naming.NameClassPair;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.OperationNotSupportedException;
@@ -68,13 +70,13 @@ public abstract class SchemaElementContainer extends SchemaDirContext {
     /**
      * Return a list of names for subordinate SchemaElement. Called by list()
      */
-    abstract NamingEnumeration getNameList(String name) throws NamingException;
+    abstract NamingEnumeration<NameClassPair> getNameList(String name) throws NamingException;
 
      /**
      * Return a list of bindings for subordinate SchemaElement. Called by
      * listBindings()
      */
-    abstract NamingEnumeration getBindingsList(String name) throws NamingException;
+    abstract NamingEnumeration<Binding> getBindingsList(String name) throws NamingException;
 
     /**
      * Get a SchemaElement by name
@@ -217,19 +219,19 @@ public abstract class SchemaElementContainer extends SchemaDirContext {
      * List Operations
      */
 
-    public NamingEnumeration list(String name) throws NamingException {
+    public NamingEnumeration<NameClassPair> list(String name) throws NamingException {
         return getNameList(name);
     }
 
-    public NamingEnumeration list(Name name) throws NamingException {
+    public NamingEnumeration<NameClassPair> list(Name name) throws NamingException {
         return list(name.toString());
     }
 
-    public NamingEnumeration listBindings(String name) throws NamingException {
+    public NamingEnumeration<Binding> listBindings(String name) throws NamingException {
         return getBindingsList(name);
     }
 
-    public NamingEnumeration listBindings(Name name) throws NamingException {
+    public NamingEnumeration<Binding> listBindings(Name name) throws NamingException {
         return listBindings(name.toString());
     }
 

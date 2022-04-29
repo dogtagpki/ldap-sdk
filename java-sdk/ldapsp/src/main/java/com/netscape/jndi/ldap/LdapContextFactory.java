@@ -47,8 +47,8 @@ import javax.naming.spi.InitialContextFactory;
 
 public class LdapContextFactory implements InitialContextFactory {
 
-    public Context getInitialContext(Hashtable env) throws NamingException {
-        Hashtable ctxEnv = (Hashtable)env.clone();
+    public Context getInitialContext(Hashtable<?, ?>  env) throws NamingException {
+        Hashtable<Object, Object>  ctxEnv = (Hashtable<Object, Object>) env.clone();
 
         // Read system properties as well. Add a system property to the
         // env if it's name start with "java.naming." and it is not already

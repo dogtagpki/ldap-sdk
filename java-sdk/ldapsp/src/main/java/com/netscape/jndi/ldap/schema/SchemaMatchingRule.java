@@ -81,7 +81,7 @@ public class SchemaMatchingRule extends SchemaElement {
     static LDAPMatchingRuleSchema parseDefAttributes(Attributes attrs) throws NamingException {
         String name=null, oid=null, desc=null, syntax=null;
         boolean obsolete = false;
-        Vector applies = new Vector();
+        Vector<Object> applies = new Vector<>();
 
         for (NamingEnumeration<? extends Attribute> attrEnum = attrs.getAll(); attrEnum.hasMoreElements(); ) {
             Attribute attr = attrEnum.nextElement();

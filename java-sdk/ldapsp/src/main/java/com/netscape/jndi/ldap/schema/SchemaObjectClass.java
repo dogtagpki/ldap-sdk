@@ -78,7 +78,7 @@ public class SchemaObjectClass extends SchemaElement {
     static LDAPObjectClassSchema parseDefAttributes(Attributes attrs) throws NamingException {
         String name=null, oid=null, desc=null, sup=null;
         boolean obsolete=false, abs=false, structural = false, aux = false;
-        Vector must=new Vector(), may=new Vector();
+        Vector<Object> must=new Vector<>(), may=new Vector<>();
 
         for (NamingEnumeration<? extends Attribute> attrEnum = attrs.getAll(); attrEnum.hasMoreElements(); ) {
             Attribute attr = attrEnum.nextElement();
