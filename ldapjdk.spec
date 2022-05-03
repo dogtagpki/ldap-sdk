@@ -10,9 +10,9 @@ BuildArch:        noarch
 
 # For development (i.e. unsupported) releases, use x.y.z-0.n.<phase>.
 # For official (i.e. supported) releases, use x.y.z-r where r >=1.
-Version:          4.23.0
-Release:          1%{?_timestamp}%{?_commit_id}%{?dist}
-#global           _phase -alpha1
+Version:          4.24.0
+Release:          0.1.alpha1%{?_timestamp}%{?_commit_id}%{?dist}
+%global           _phase -alpha1
 
 %global spname		ldapsp
 %global filtname	ldapfilt
