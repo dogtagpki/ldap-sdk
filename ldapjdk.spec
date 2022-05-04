@@ -24,7 +24,7 @@ Name:             ldapjdk
 %undefine         commit_id
 
 Summary:          LDAP SDK
-URL:              http://www.dogtagpki.org/
+URL:              https://github.com/dogtagpki/ldap-sdk
 License:          MPLv1.1 or GPLv2+ or LGPLv2+
 BuildArch:        noarch
 Version:          %{major_version}.%{minor_version}.%{update_version}
