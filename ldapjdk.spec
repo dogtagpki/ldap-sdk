@@ -2,6 +2,8 @@
 Name:             ldapjdk
 ################################################################################
 
+%global           product_id dogtag-ldapjdk
+
 Summary:          LDAP SDK
 URL:              http://www.dogtagpki.org/
 License:          MPLv1.1 or GPLv2+ or LGPLv2+
@@ -58,9 +60,15 @@ BuildRequires:    slf4j
 BuildRequires:    slf4j-jdk14
 BuildRequires:    jss >= 4.9.0, jss < 5.0.0
 
+%description
+The Mozilla LDAP SDKs enable you to write applications which access,
+manage, and update the information stored in an LDAP directory.
+
 ################################################################################
-# Runtime Dependencies
+%package -n %{product_id}
 ################################################################################
+
+Summary:          LDAP SDK
 
 Requires:         %{java_headless}
 Requires:         jpackage-utils >= 0:1.5
@@ -68,20 +76,26 @@ Requires:         slf4j
 Requires:         slf4j-jdk14
 Requires:         jss >= 4.9.0, jss < 5.0.0
 
-%description
+Obsoletes:        ldapjdk < %{version}-%{release}
+Provides:         ldapjdk = %{version}-%{release}
+
+%description -n %{product_id}
 The Mozilla LDAP SDKs enable you to write applications which access,
 manage, and update the information stored in an LDAP directory.
 
 %license docs/ldapjdk/license.txt
 
 ################################################################################
-%package javadoc
+%package -n %{product_id}-javadoc
 ################################################################################
 
-Summary:        Javadoc for %{name}
+Summary:          Javadoc for LDAP SDK
 
-%description javadoc
-Javadoc for %{name}
+Obsoletes:        ldapjdk-javadoc < %{version}-%{release}
+Provides:         ldapjdk-javadoc = %{version}-%{release}
+
+%description -n %{product_id}-javadoc
+Javadoc for LDAP SDK
 
 ################################################################################
 %prep
@@ -112,7 +126,7 @@ popd
 ################################################################################
 
 install -d -m 755 $RPM_BUILD_ROOT%{_javadir}
-install -m 644 java-sdk/dist/packages/%{name}.jar $RPM_BUILD_ROOT%{_javadir}/%{name}.jar
+install -m 644 java-sdk/dist/packages/ldapjdk.jar $RPM_BUILD_ROOT%{_javadir}/ldapjdk.jar
 install -m 644 java-sdk/dist/packages/%{spname}.jar $RPM_BUILD_ROOT%{_javadir}/%{spname}.jar
 install -m 644 java-sdk/dist/packages/%{filtname}.jar $RPM_BUILD_ROOT%{_javadir}/%{filtname}.jar
 install -m 644 java-sdk/dist/packages/%{beansname}.jar $RPM_BUILD_ROOT%{_javadir}/%{beansname}.jar
@@ -123,14 +137,14 @@ install -pm 644 java-sdk/ldapfilter/pom.xml %{buildroot}%{_mavenpomdir}/JPP-ldap
 install -pm 644 java-sdk/ldapbeans/pom.xml %{buildroot}%{_mavenpomdir}/JPP-ldapbeans.pom
 install -pm 644 java-sdk/ldapsp/pom.xml %{buildroot}%{_mavenpomdir}/JPP-ldapsp.pom
 
-install -d -m 755 $RPM_BUILD_ROOT%{_javadocdir}/%{name}
-cp -r java-sdk/dist/doc/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}
+install -d -m 755 $RPM_BUILD_ROOT%{_javadocdir}/ldapjdk
+cp -r java-sdk/dist/doc/* $RPM_BUILD_ROOT%{_javadocdir}/ldapjdk
 
 ################################################################################
-%files
+%files -n %{product_id}
 ################################################################################
 
-%{_javadir}/%{name}.jar
+%{_javadir}/ldapjdk.jar
 %{_javadir}/%{spname}*.jar
 %{_javadir}/%{filtname}*.jar
 %{_javadir}/%{beansname}*.jar
@@ -140,11 +154,11 @@ cp -r java-sdk/dist/doc/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 %{_mavenpomdir}/JPP-ldapbeans.pom
 
 ################################################################################
-%files javadoc
+%files -n %{product_id}-javadoc
 ################################################################################
 
-%dir %{_javadocdir}/%{name}
-%{_javadocdir}/%{name}/*
+%dir %{_javadocdir}/ldapjdk
+%{_javadocdir}/ldapjdk/*
 
 ################################################################################
 %changelog
