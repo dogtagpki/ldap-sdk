@@ -2,6 +2,10 @@
 Name:             ldapjdk
 ################################################################################
 
+%global           major_version 4
+%global           minor_version 23
+%global           update_version 0
+
 Summary:          LDAP SDK
 URL:              http://www.dogtagpki.org/
 License:          MPLv1.1 or GPLv2+ or LGPLv2+
@@ -10,7 +14,7 @@ BuildArch:        noarch
 
 # For development (i.e. unsupported) releases, use x.y.z-0.n.<phase>.
 # For official (i.e. supported) releases, use x.y.z-r where r >=1.
-Version:          4.23.0
+Version:          %{major_version}.%{minor_version}.%{update_version}
 Release:          1%{?_timestamp}%{?_commit_id}%{?dist}
 #global           _phase -alpha1
 
@@ -70,6 +74,8 @@ Requires:         slf4j-jdk14
 
 Requires:         jss = 4.9
 
+Provides:         ldapjdk = %{major_version}.%{minor_version}
+
 %description
 The Mozilla LDAP SDKs enable you to write applications which access,
 manage, and update the information stored in an LDAP directory.
@@ -80,7 +86,9 @@ manage, and update the information stored in an LDAP directory.
 %package javadoc
 ################################################################################
 
-Summary:        Javadoc for %{name}
+Summary:          Javadoc for %{name}
+
+Provides:         ldapjdk-javadoc = %{major_version}.%{minor_version}
 
 %description javadoc
 Javadoc for %{name}
