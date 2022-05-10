@@ -6,19 +6,19 @@ Name:             ldapjdk
 
 # Upstream version number:
 %global           major_version 5
-%global           minor_version 2
+%global           minor_version 3
 %global           update_version 0
 
 # Downstream release number:
 # - development/stabilization (unsupported): 0.<n> where n >= 1
 # - GA/update (supported): <n> where n >= 1
-%global           release_number 0.3
+%global           release_number 0.1
 
 # Development phase:
 # - development (unsupported): alpha<n> where n >= 1
 # - stabilization (unsupported): beta<n> where n >= 1
 # - GA/update (supported): <none>
-%global           phase beta2
+%global           phase alpha1
 
 %undefine         timestamp
 %undefine         commit_id
@@ -62,7 +62,7 @@ BuildRequires:    %{java_devel}
 BuildRequires:    javapackages-local
 BuildRequires:    slf4j
 BuildRequires:    slf4j-jdk14
-BuildRequires:    jss >= 5.2.0
+BuildRequires:    jss = 5.3
 
 %description
 The Mozilla LDAP SDKs enable you to write applications which access,
@@ -78,10 +78,12 @@ Requires:         %{java_headless}
 Requires:         jpackage-utils >= 0:1.5
 Requires:         slf4j
 Requires:         slf4j-jdk14
-Requires:         jss >= 5.2.0
+Requires:         jss = 5.3
 
 Obsoletes:        ldapjdk < %{version}-%{release}
 Provides:         ldapjdk = %{version}-%{release}
+Provides:         ldapjdk = %{major_version}.%{minor_version}
+Provides:         %{product_id} = %{major_version}.%{minor_version}
 
 %description -n %{product_id}
 The Mozilla LDAP SDKs enable you to write applications which access,
@@ -97,6 +99,8 @@ Summary:          Javadoc for LDAP SDK
 
 Obsoletes:        ldapjdk-javadoc < %{version}-%{release}
 Provides:         ldapjdk-javadoc = %{version}-%{release}
+Provides:         ldapjdk-javadoc = %{major_version}.%{minor_version}
+Provides:         %{product_id}-javadoc = %{major_version}.%{minor_version}
 
 %description -n %{product_id}-javadoc
 Javadoc for LDAP SDK
