@@ -125,7 +125,7 @@ class LDAPResourceBundle implements java.io.Serializable {
      */
     private static InputStream getStream( String baseName, String locale ) {
         String fStr = baseName + locale + _suffix;
-        return ClassLoader.getSystemResourceAsStream( fStr );
+        return Thread.currentThread().getContextClassLoader().getResourceAsStream(fStr);
     }
 
     /**
