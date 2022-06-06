@@ -1379,7 +1379,7 @@ LDAP v3 extension. You can check on the support of this control by looking
 at the root DSE <literal>supportedControl</literal> attribute. For example,
 the following command uses the <command>ldapsearch</command> utility to display
 the root DSE:</para>
-<screen>$ ldapsearch -h localhost -p 389 -b "" -s base "(objectclass=*)"</screen>
+<screen>$ ldapsearch -H ldap://localhost -b "" -s base "(objectclass=*)"</screen>
 <para>For the control to work, the server to connect to must support the server
 control for Proxy Authorization, OID <literal>2.16.840.1.113730.3.4.12</literal>.
 This control is <literal>LDAP_CONTROL_PROXYAUTH</literal> as defined in the <literal>
