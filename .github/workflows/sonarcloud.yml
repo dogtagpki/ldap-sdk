@@ -2,6 +2,7 @@ name: Sonarcloud
 on: [push, pull_request]
 jobs:
   init:
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
     name: Initializing Workflow
     runs-on: ubuntu-latest
     outputs:
@@ -93,3 +94,19 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  get-pr-ref:
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
+    name: Sonar cloud PR fork analyses deferring
+    runs-on: ubuntu-latest
+    steps:
+      - name: Save PR number
+        run: |
+          mkdir -p ./pr
+          echo ${{ github.event.number }} > ./pr/NR
+
+      - name: Upload pr as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: pr
+          path: pr/
