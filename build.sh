@@ -306,6 +306,7 @@ if [ "$BUILD_TARGET" = "dist" ] ; then
     echo "    $WORK_DIR/packages/ldapsp.jar"
     echo "    $WORK_DIR/packages/ldapfilt.jar"
     echo "    $WORK_DIR/packages/ldapbeans.jar"
+    echo "    $WORK_DIR/packages/ldaptools.jar"
     echo "- documentation: $WORK_DIR/doc"
     echo
     echo "To install the build: $0 install"
@@ -330,12 +331,14 @@ if [ "$BUILD_TARGET" = "install" ] ; then
     cp $WORK_DIR/packages/ldapsp.jar $INSTALL_DIR$JAVA_LIB_DIR/ldapsp.jar
     cp $WORK_DIR/packages/ldapfilt.jar $INSTALL_DIR$JAVA_LIB_DIR/ldapfilt.jar
     cp $WORK_DIR/packages/ldapbeans.jar $INSTALL_DIR$JAVA_LIB_DIR/ldapbeans.jar
+    cp $WORK_DIR/packages/ldaptools.jar $INSTALL_DIR$JAVA_LIB_DIR/ldaptools.jar
 
     mkdir -p $INSTALL_DIR$MAVEN_POM_DIR
     cp $SRC_DIR/java-sdk/ldapjdk/pom.xml $INSTALL_DIR$MAVEN_POM_DIR/JPP-ldapjdk.pom
     cp $SRC_DIR/java-sdk/ldapfilter/pom.xml $INSTALL_DIR$MAVEN_POM_DIR/JPP-ldapfilter.pom
     cp $SRC_DIR/java-sdk/ldapbeans/pom.xml $INSTALL_DIR$MAVEN_POM_DIR/JPP-ldapbeans.pom
     cp $SRC_DIR/java-sdk/ldapsp/pom.xml $INSTALL_DIR$MAVEN_POM_DIR/JPP-ldapsp.pom
+    cp $SRC_DIR/java-sdk/ldaptools/pom.xml $INSTALL_DIR$MAVEN_POM_DIR/JPP-ldaptools.pom
 
     mkdir -p $INSTALL_DIR$JAVADOC_DIR/ldapjdk
     cp -r $WORK_DIR/doc/* $INSTALL_DIR$JAVADOC_DIR/ldapjdk

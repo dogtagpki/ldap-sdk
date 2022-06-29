@@ -142,10 +142,12 @@ export JAVA_HOME=%{java_home}
 %{_javadir}/ldapsp.jar
 %{_javadir}/ldapfilt.jar
 %{_javadir}/ldapbeans.jar
+%{_javadir}/ldaptools.jar
 %{_mavenpomdir}/JPP-ldapjdk.pom
 %{_mavenpomdir}/JPP-ldapsp.pom
 %{_mavenpomdir}/JPP-ldapfilter.pom
 %{_mavenpomdir}/JPP-ldapbeans.pom
+%{_mavenpomdir}/JPP-ldaptools.pom
 
 ################################################################################
 %files -n %{product_id}-javadoc

@@ -14,6 +14,7 @@
         <module>ldapbeans</module>
         <module>ldapfilter</module>
         <module>ldapsp</module>
+        <module>ldaptools</module>
     </modules>
 
 </project>

@@ -50,6 +50,7 @@
     <property name="filtjarfilename"     value="ldapfilt.jar" />
     <property name="jdnijarfilename"     value="ldapsp.jar" />
     <property name="beansjarfilename"    value="ldapbeans.jar" />
+    <property name="toolsjarfilename"    value="ldaptools.jar" />
     <property name="doczipfilename"      value="ldapdoc.zip" />
 
 
@@ -59,6 +60,7 @@
     <property name="jdk.dist"            value="${dist}/classes"/>
     <property name="filter.dist"         value="${dist}/ldapfilt"/>
     <property name="jndi.dist"           value="${dist}/classes"/>
+    <property name="tools.dist"          value="${dist}/ldaptools"/>
     <property name="doc.dist"            value="${dist}/doc"/>
     <property name="package.dist"        value="${dist}/packages"/>
     <property name="src"                 value="."/>
@@ -78,6 +80,7 @@
    dist-filter  : will build only the ldap filter jar (ldapfilt.jar)
    dist-beans   : will build only the beans jar (ldapbeans.jar)
    dist-jndi    : will build only the jndi service provider (ldapsp.jar)
+   dist-tools   : will build only the ldap tools (ldaptools.jar)
    dist-docs    : will package up all the documentation (ldapdoc.zip)
 
    build        : will compile the entire sdk but not package
@@ -85,6 +88,7 @@
    build-filter : will compile only the filter classes
    build-beans  : will compile only the ldap beans
    build-jndi   : will compile only the jndi service provider
+   build-tools  : will compile only the ldap tools
    build-docs   : will compile the complete javadocs
 
    clean        : will remove all compiled files and packages
@@ -98,11 +102,12 @@
         <mkdir dir="${jdk.dist}"/>
         <mkdir dir="${filter.dist}"/>
         <mkdir dir="${jndi.dist}"/>
+        <mkdir dir="${tools.dist}"/>
         <mkdir dir="${doc.dist}"/>
         <mkdir dir="${package.dist}"/>
     </target>
 
-  <target name="dist" depends="dist-jdk,dist-filter,dist-beans,dist-jndi,dist-docs">
+  <target name="dist" depends="dist-jdk,dist-filter,dist-beans,dist-jndi,dist-tools,dist-docs">
     <echo>Building all packages....</echo>
   </target>
 
@@ -141,6 +146,12 @@
     />
   </target>
 
+  <target name="dist-tools" depends="build-tools">
+    <jar jarfile="${package.dist}/${toolsjarfilename}"
+         basedir="${tools.dist}"
+    />
+  </target>
+
   <target name="dist-docs" depends="build-docs">
     <jar jarfile="${package.dist}/${doczipfilename}"
          update="no"
@@ -152,7 +163,7 @@
 
 <!-- The following targets do the builds (compiles of the source files) -->
 
-    <target name="build" depends="build-jdk,build-filter,build-beans,build-jndi"/>
+    <target name="build" depends="build-jdk,build-filter,build-beans,build-jndi,build-tools"/>
 
     <target name="build-jdk" depends="init">
         <!-- Compile the java jdk code from ${src} into ${dest} -->
@@ -181,13 +192,19 @@
         />
       </target>
 
+    <target name="build-tools" depends="init">
+        <javac srcdir="${basedir}/ldaptools/src/main/java" destdir="${tools.dist}"
+            classpath="${jdk.dist}:${jss.lib}:${slf4j.lib}"
+        />
+      </target>
+
     <target name="build-docs">
         <!-- Create the javadocs for the sdk -->
         
         <javadoc 
                 packagenames="netscape.ldap.*,netscape.ldap.beans.*,netscape.ldap.controls.*,netscape.ldap.util.*,netscape.ldap.factory.*,com.netscape.sasl.*,com.netscape.sasl.mechanisms.*,netscape.ldap.ber.stream.*"
                  sourcepath="${basedir}/ldapbeans/src/main/java:${basedir}/ldapjdk/src/main/java"
-                 sourcefiles="${basedir}/ldapjdk/src/main/java/LDAPDelete.java,${basedir}/ldapjdk/src/main/java/LDAPModify.java,${basedir}/ldapjdk/src/main/java/LDAPSearch.java,${basedir}/ldapjdk/src/main/java/LDAPTool.java"
+                 sourcefiles="${basedir}/ldaptools/src/main/java/LDAPDelete.java,${basedir}/ldaptools/src/main/java/LDAPModify.java,${basedir}/ldaptools/src/main/java/LDAPSearch.java,${basedir}/ldaptools/src/main/java/LDAPTool.java"
                  destdir="${doc.dist}"
                  author="true"
                  version="true"
