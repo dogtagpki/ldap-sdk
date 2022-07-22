@@ -1,4 +1,4 @@
-#!/bin\sh
+#!/bin/sh
 
 #
 # ***** BEGIN LICENSE BLOCK *****

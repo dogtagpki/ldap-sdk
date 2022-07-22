@@ -912,11 +912,10 @@ fi
 if test "${enable_n32+set}" = set; then
   enableval="$enable_n32"
    if test "$enableval" = "yes"; then
-	USE_N32=1
-      else if test "$enableval" = "no"; then
-	USE_N32=
-      fi
-    fi 
+     USE_N32=1
+   elif test "$enableval" = "no"; then
+     USE_N32=file
+   fi
 fi
 
 

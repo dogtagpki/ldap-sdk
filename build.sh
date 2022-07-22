@@ -452,7 +452,7 @@ if [ "$DIST" != "" ] ; then
 fi
 
 if [ "$DEBUG" = true ] ; then
-    echo "rpmbuild -bs ${OPTIONS[@]} $SPEC_FILE"
+    echo "rpmbuild -bs" "${OPTIONS[@]}" "$SPEC_FILE"
 fi
 
 # build SRPM with user-provided options
@@ -487,7 +487,7 @@ fi
 OPTIONS+=(--define "_topdir ${WORK_DIR}")
 
 if [ "$DEBUG" = true ] ; then
-    echo "rpmbuild --rebuild ${OPTIONS[@]} $SRPM"
+    echo "rpmbuild --rebuild" "${OPTIONS[@]}" "$SRPM"
 fi
 
 # rebuild RPM with hard-coded options in SRPM
