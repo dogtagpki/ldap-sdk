@@ -45,8 +45,8 @@
 REP_PREFIX1=/cvsroot/
 REP_PREFIX2=/anothercvsroot/
 
-GREP=grep
-SED=sed
+GREP="grep"
+SED="sed"
 
 $GREP -v '^Checking in' | grep -v '^done$' | grep -v '^Removing ' | \
 	grep -v '^cvs commit: Examining ' | \

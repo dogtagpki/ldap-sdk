@@ -121,3 +121,5 @@ jobs:
         uses: ludeeus/action-shellcheck@master
         with:
           severity: warning
+          ignore_paths: c-sdk # We don't build and ship this so no need to check it'
+          ignore_names: test-c-sdk
