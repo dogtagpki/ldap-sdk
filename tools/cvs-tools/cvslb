@@ -25,7 +25,7 @@
 # the Initial Developer. All Rights Reserved.
 # 
 # Contributor(s):
-#	Mark Smith <MarkCSmithWork@aol.com>
+#   Mark Smith <MarkCSmithWork@aol.com>
 # 
 # Alternatively, the contents of this file may be used under the terms of
 # either of the GNU General Public License Version 2 or later (the "GPL"),
@@ -51,7 +51,7 @@
 # options can also be passed in the CVSLBOPTIONS environment variable.
 #
 
-PROG=`basename $0`
+PROG=$(basename "$0")
 USAGE="$0 [-v] [ -l count ] [ -b branch ] [ file... ]"
 SEP="=============================================================================="
 REVLIMIT=0
@@ -60,158 +60,160 @@ VERBOSE=0
 
 
 # process arguments
-set -- `getopt vb:l: $CVSLBOPTIONS $*`
+set -- "$(getopt vb:l: "$CVSLBOPTIONS" "$*")"
 if [ $? != 0 ]; then
-   echo $USAGE
+   echo "$USAGE"
    exit 2
 fi
 
-for i in $*; do
+for i in "$@"; do
     case $i in
        -l) REVLIMIT=$2; shift 2;;
        -b) BRANCH=$2; shift 2;;
-       -v) VERBOSE=`expr $VERBOSE + 1`; shift;;
+       -v) VERBOSE=$(expr "$VERBOSE" + 1); shift;;
        --) shift; break;;
    esac
 done
 
 if [ $# -eq 0 ]; then
+    # Requires array support to fix this issue, not provided by this shell
+    # shellcheck disable=SC2125
     FILES=*
 else
     FILES=$*
 fi
 
 for FN in $FILES; do
-    if [ -d $FN ]; then
-	echo "$PROG: Skipping directory $FN..."
+    if [ -d "$FN" ]; then
+    echo "$PROG: Skipping directory $FN..."
     else
-	if [ -z "$BRANCH" ]; then
-	    LINE=`cvs -n stat $FN | grep 'Sticky Tag:'`
-	    RC=$?
-	    if [ $RC != 0 ]; then
-		echo "$PROG: skipping $FN (cvs stat failed or no sticky tag)..."
-		continue
-	    fi
+    if [ -z "$BRANCH" ]; then
+        LINE=$(cvs -n stat "$FN" | grep 'Sticky Tag:')
+        RC=$?
+        if [ $RC != 0 ]; then
+        echo "$PROG: skipping $FN (cvs stat failed or no sticky tag)..."
+        continue
+        fi
 
-	    CURTAG=`echo $LINE | awk '{print $3}'`
-	    if [ $CURTAG = "(none)" ]; then
-		    CURTAG="";
-	    fi
-	else
-	    if [ $BRANCH = "TRUNK" ]; then
-		CURTAG=""
-	    else
-		CURTAG=$BRANCH
-	    fi
-	fi
+        CURTAG=$(echo "$LINE" | awk '{print $3}')
+        if [ "$CURTAG" = "(none)" ]; then
+            CURTAG="";
+        fi
+    else
+        if [ "$BRANCH" = "TRUNK" ]; then
+        CURTAG=""
+        else
+        CURTAG=$BRANCH
+        fi
+    fi
 
-	if [ -z "$CURTAG" ]; then
-		DISPLAY_CURTAG="the trunk";
-	else
-		DISPLAY_CURTAG="$CURTAG";
-	fi
+    if [ -z "$CURTAG" ]; then
+        DISPLAY_CURTAG="the trunk";
+    else
+        DISPLAY_CURTAG="$CURTAG";
+    fi
 
-	if [ $VERBOSE -gt 0 ]; then
-	    echo $FN: current revision: $DISPLAY_CURTAG
-	fi
+    if [ "$VERBOSE" -gt 0 ]; then
+        echo "$FN": current revision: "$DISPLAY_CURTAG"
+    fi
 
-	cvs -n log $FN | awk '
-	BEGIN			{
-	    echoing = 1;
-	    no_more = 0;
-	}
-	/^symbolic names:/	{
-	    looking_for_branch = 1;
-	    echoing = 0;
-	    next;
-	}
-	/^description:/	{
-	    print;
-	    echoing = 1;
-	    if ( revlimit > 0 ) {
-		printf( "Displaying at most %d revisions from %s:\n", \
-			revlimit, display_curtag );
-	    } else {
-		printf( "Displaying all revisions from %s:\n", display_curtag );
-	    }
-	    next;
-	}
-	/^========================================================/ {
-	    next;
-	}
-	/^total revisions:/	{
-	    if ( looking_for_branch ) {
-		if ( curtag == "" ) {
-		    looking_for_branch = 0;
-		} else {
-		    printf( "This file not on branch %s (?)\n", display_curtag );
-		    exit;
-		}
-	    }
-	}
-	/^revision [0-9]*\.[0-9]*$/ {
-	    found_rev = 0;
-	    if ( !no_more && !looking_for_branch && curtag == "" ) {
-		if ( revlimit > 0 && --revlimit <= 0 ) {
-		    no_more = 1;
-		}
-		print;
-		echoing = 1;
-	    } else {
-		echoing = 0;
-	    }
-	    next;
-	}
-	/^revision [0-9]/	{
-	    found_rev = 0;
-	    if ( !no_more && !looking_for_branch ) {
-		 if ( length( $2 ) > numerictaglen &&		\
-			substr( $2, 1, numerictaglen ) == numerictag &&	\
-			index( substr( $2, numerictaglen + 1 ), "." ) == 0 ) {
-		    found_rev = 1;
-		}
-	    }
-	    if ( found_rev ) {
-		if ( revlimit > 0 && --revlimit <= 0 ) {
-		    no_more = 1;
-		}
-		print;
-		echoing = 1;
-	    } else {
-		echoing = 0;
-	    }
-	    next;
-	}
-	/	.*: [0-9]/	{
-	    tag = substr( $1, 1, length( $1 ) - 1 );
-	    if ( looking_for_branch && tag == curtag ) {
-		print;
-		count = split($2,digits,".");
-		numerictag="";
-		zero_suppressed = 0;
-		for ( i = 1; i <= count; ++i ) {
-		    if ( !zero_suppressed && digits[i] == "0" ) {
-			zero_suppressed = 1;
-		    } else {
-			numerictag = numerictag digits[i] ".";
-		    }
-		}
-		numerictaglen = length( numerictag );
-		looking_for_branch = 0;
-#		printf( "got branch: %s ($2 was %s)\n", numerictag, $2 );
-	    } else if ( echoing ) {
-		print;
-	    }
-	    next;
-	 }
-	/.*/			{
-	    if ( echoing ) {
-		print;
-	    }
-	    next;
-	}
-	' curtag="$CURTAG" display_curtag="$DISPLAY_CURTAG" revlimit="$REVLIMIT"
-	echo $SEP
+    cvs -n log "$FN" | awk '
+    BEGIN           {
+        echoing = 1;
+        no_more = 0;
+    }
+    /^symbolic names:/  {
+        looking_for_branch = 1;
+        echoing = 0;
+        next;
+    }
+    /^description:/ {
+        print;
+        echoing = 1;
+        if ( revlimit > 0 ) {
+        printf( "Displaying at most %d revisions from %s:\n", \
+            revlimit, display_curtag );
+        } else {
+        printf( "Displaying all revisions from %s:\n", display_curtag );
+        }
+        next;
+    }
+    /^========================================================/ {
+        next;
+    }
+    /^total revisions:/ {
+        if ( looking_for_branch ) {
+        if ( curtag == "" ) {
+            looking_for_branch = 0;
+        } else {
+            printf( "This file not on branch %s (?)\n", display_curtag );
+            exit;
+        }
+        }
+    }
+    /^revision [0-9]*\.[0-9]*$/ {
+        found_rev = 0;
+        if ( !no_more && !looking_for_branch && curtag == "" ) {
+        if ( revlimit > 0 && --revlimit <= 0 ) {
+            no_more = 1;
+        }
+        print;
+        echoing = 1;
+        } else {
+        echoing = 0;
+        }
+        next;
+    }
+    /^revision [0-9]/   {
+        found_rev = 0;
+        if ( !no_more && !looking_for_branch ) {
+         if ( length( $2 ) > numerictaglen &&       \
+            substr( $2, 1, numerictaglen ) == numerictag && \
+            index( substr( $2, numerictaglen + 1 ), "." ) == 0 ) {
+            found_rev = 1;
+        }
+        }
+        if ( found_rev ) {
+        if ( revlimit > 0 && --revlimit <= 0 ) {
+            no_more = 1;
+        }
+        print;
+        echoing = 1;
+        } else {
+        echoing = 0;
+        }
+        next;
+    }
+    /   .*: [0-9]/  {
+        tag = substr( $1, 1, length( $1 ) - 1 );
+        if ( looking_for_branch && tag == curtag ) {
+        print;
+        count = split($2,digits,".");
+        numerictag="";
+        zero_suppressed = 0;
+        for ( i = 1; i <= count; ++i ) {
+            if ( !zero_suppressed && digits[i] == "0" ) {
+            zero_suppressed = 1;
+            } else {
+            numerictag = numerictag digits[i] ".";
+            }
+        }
+        numerictaglen = length( numerictag );
+        looking_for_branch = 0;
+#       printf( "got branch: %s ($2 was %s)\n", numerictag, $2 );
+        } else if ( echoing ) {
+        print;
+        }
+        next;
+     }
+    /.*/            {
+        if ( echoing ) {
+        print;
+        }
+        next;
+    }
+    ' curtag="$CURTAG" display_curtag="$DISPLAY_CURTAG" revlimit="$REVLIMIT"
+    echo $SEP
     fi
 done
 

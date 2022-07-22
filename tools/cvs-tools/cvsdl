@@ -25,7 +25,7 @@
 # the Initial Developer. All Rights Reserved.
 # 
 # Contributor(s):
-#	Mark Smith <MarkCSmithWork@aol.com>
+#   Mark Smith <MarkCSmithWork@aol.com>
 # 
 # Alternatively, the contents of this file may be used under the terms of
 # either of the GNU General Public License Version 2 or later (the "GPL"),
@@ -43,7 +43,7 @@
 
 #
 # cvsdl: perform a 'cvs diff' to examine the last change made to a file on the
-#	current branch.
+#   current branch.
 #
 # usage: cvsdl [-n] [-v] [-revs] [cvs-diff-options] [files...]
 #   where:
@@ -68,28 +68,30 @@ EXECUTE=1
 VERBOSE=0
 
 while [ $# -ne 0 ]; do
-    if [ `expr $1 : '\(.\)'` != "-" ]; then
-	break;
+    if [ "$(expr "$1" : '\(.\)')" != "-" ]; then
+    break;
     fi
-    OPTION=`echo $1 | sed -e 's/^-//'`
-    echo $OPTION | grep '^[0-9]*$' > /dev/null 2>&1
+    OPTION=$(echo "$1" | sed -e 's/^-//')
+    echo "$OPTION" | grep '^[0-9]*$' > /dev/null 2>&1
     if [ $? -eq 0 ]; then
-	REVSBACK=$OPTION
-    elif [ $OPTION = "n" ]; then
-	EXECUTE=0
-    elif [ $OPTION = "v" ]; then
-	VERBOSE=1
+    REVSBACK=$OPTION
+    elif [ "$OPTION" = "n" ]; then
+    EXECUTE=0
+    elif [ "$OPTION" = "v" ]; then
+    VERBOSE=1
     else
-	if [ -z "$DIFFOPTIONS" ]; then
-	    DIFFOPTIONS=$1
-	else
-	    DIFFOPTIONS="$DIFFOPTIONS "$1
-	fi
+    if [ -z "$DIFFOPTIONS" ]; then
+        DIFFOPTIONS=$1
+    else
+        DIFFOPTIONS="$DIFFOPTIONS "$1
+    fi
     fi
     shift;
 done
 
 if [ $# -eq 0 ]; then
+    # Requires array support to fix this issue, not provided by this shell
+    # shellcheck disable=SC2125
     FILES=*
 else
     FILES=$*
@@ -97,48 +99,48 @@ fi
 
 
 if [ $VERBOSE -ne 0 ]; then
-    echo revsback=$REVSBACK
-    echo diffoptions=$DIFFOPTIONS
-    echo files=$FILES
+    echo revsback="$REVSBACK"
+    echo diffoptions="$DIFFOPTIONS"
+    echo files="$FILES"
 fi
 
 for FN in $FILES; do
     if [ -d "$FN" ]; then
-	echo "Skipping directory $FN"
+    echo "Skipping directory $FN"
     else
-	CURREV=`cvs -n stat $FN | grep 'Working revision' | awk '{print $3}'`
-	RC=$?
-	if [ "$RC" != 0 ]; then
-	    exit $RC;
-	fi
-	if [ "$CURREV" = "No" ]; then
-	    echo "$FN:  No CVS entry"
-	    continue;
-	fi
+    CURREV=$(cvs -n stat "$FN" | grep 'Working revision' | awk '{print $3}')
+    RC=$?
+    if [ "$RC" != 0 ]; then
+        exit $RC;
+    fi
+    if [ "$CURREV" = "No" ]; then
+        echo "$FN:  No CVS entry"
+        continue;
+    fi
 
-	LASTDIGITOFCUR=`echo $CURREV | awk -F. '{print ($NF)}'`
-	LASTDIGITOFPREV=`echo $CURREV | awk -F. '{print ($NF)-1}'`
-	if [ "$LASTDIGITOFCUR" -lt "$REVSBACK" ]; then
-	    echo "$FN:  there are only $LASTDIGITOFCUR revision(s) on this branch.  Nothing to diff."
-	    continue;
-	elif [ "$LASTDIGITOFCUR" -eq "$REVSBACK" ]; then
-	    PREVREV=`echo  $CURREV | sed -e 's/\.[0-9]*\.[0-9]*$//'`
-	    echo "$FN:  diffing with branch point..."
-	elif [ "$LASTDIGITOFPREV" -eq 0 ]; then
-	    PREVREV=`echo  $CURREV | sed -e 's/\.[0-9]*\.[0-9]*$//'`
-	    if [ -z "$PREVREV" ]; then
-		echo "$FN:  the current revision is the first one.  Nothing to diff."
-		continue;
-	    fi
-#	    echo "$FN:  the current revision is the first one on this branch..."
-#	    diff PREVREV and CURREV
-	else
-	    PREVREV=`echo $CURREV | awk -F. '{for (i=1; i < NF; ++i) \
-		    printf( "%s.", $i ); print ($NF)-revsback}' revsback=$REVSBACK`
-	fi
-	echo cvs -n diff $DIFFOPTIONS -r $PREVREV -r $CURREV $FN
-	if [ $EXECUTE -ne 0 ]; then
-	    cvs -n diff $DIFFOPTIONS -r $PREVREV -r $CURREV $FN
-	fi
+    LASTDIGITOFCUR=$(echo "$CURREV" | awk -F. '{print ($NF)}')
+    LASTDIGITOFPREV=$(echo "$CURREV" | awk -F. '{print ($NF)-1}')
+    if [ "$LASTDIGITOFCUR" -lt "$REVSBACK" ]; then
+        echo "$FN:  there are only $LASTDIGITOFCUR revision(s) on this branch.  Nothing to diff."
+        continue;
+    elif [ "$LASTDIGITOFCUR" -eq "$REVSBACK" ]; then
+        PREVREV=$(echo  "$CURREV" | sed -e 's/\.[0-9]*\.[0-9]*$//')
+        echo "$FN:  diffing with branch point..."
+    elif [ "$LASTDIGITOFPREV" -eq 0 ]; then
+        PREVREV=$(echo  "$CURREV" | sed -e 's/\.[0-9]*\.[0-9]*$//')
+        if [ -z "$PREVREV" ]; then
+        echo "$FN:  the current revision is the first one.  Nothing to diff."
+        continue;
+        fi
+#       echo "$FN:  the current revision is the first one on this branch..."
+#       diff PREVREV and CURREV
+    else
+        PREVREV=$(echo "$CURREV" | awk -F. '{for (i=1; i < NF; ++i) \
+            printf( "%s.", $i ); print ($NF)-revsback}' revsback="$REVSBACK")
+    fi
+    echo cvs -n diff "$DIFFOPTIONS" -r "$PREVREV" -r "$CURREV" "$FN"
+    if [ $EXECUTE -ne 0 ]; then
+        cvs -n diff "$DIFFOPTIONS" -r "$PREVREV" -r "$CURREV" "$FN"
+    fi
     fi
 done
