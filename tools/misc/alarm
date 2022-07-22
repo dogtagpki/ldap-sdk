@@ -22,7 +22,7 @@
 # the Initial Developer. All Rights Reserved.
 # 
 # Contributor(s):
-#	Mark Smith <MarkCSmithWork@aol.com>
+#   Mark Smith <MarkCSmithWork@aol.com>
 # 
 # Alternatively, the contents of this file may be used under the terms of
 # either of the GNU General Public License Version 2 or later (the "GPL"),
@@ -45,31 +45,31 @@
 #
 # where:
 # relativetime is a number in seconds or a number followed by 
-#	a unit character (s for seconds, m for minutes, h for hours), e.g., +2h
+#   a unit character (s for seconds, m for minutes, h for hours), e.g., +2h
 # absolutetime is a precise time for the alarm, e.g., 3pm
 # msg is an optional text message to be displayed when the alarm fires.
 #
 
 ECHO_MINUS_N="/usr/ucb/echo -n"
 if [ ! -x /usr/ucb/echo ]; then
-	ECHO_MINUS_N="/bin/echo -n"
+    ECHO_MINUS_N="/bin/echo -n"
 fi
 
-ECHO=echo
-GETDATE=$HOME/usr/bin-`uname`/getdate
+ECHO="echo"
+GETDATE=$HOME/usr/bin-$(uname)/getdate
 
 ring_bell()
 {
-    for i in a b c d e; do
-	$ECHO_MINUS_N 
-	sleep 1
+    for _ in a b c d e; do
+    $ECHO_MINUS_N 
+    sleep 1
     done 
     sleep 2;
-    for i in a b c d e; do
-	$ECHO_MINUS_N 
-	sleep 1
+    for _ in a b c d e; do
+    $ECHO_MINUS_N 
+    sleep 1
     done 
-	$ECHO ""
+    $ECHO ""
 }
 
 if [ $# -lt 1 ]; then
@@ -80,85 +80,81 @@ fi
 
 RAWTIME=$1
 if [ -z "$2" ]; then
-	MSG="Alarm!"
+    MSG="Alarm!"
 else
-	shift
-	MSG="Alarm: $*"
+    shift
+    MSG="Alarm: $*"
 fi
 
-FIRSTCHAR=`$ECHO $RAWTIME | sed -e 's/\(.\).*$/\1/'`
-if [ $FIRSTCHAR = "+" ]; then
+FIRSTCHAR=$($ECHO "$RAWTIME" | sed -e 's/\(.\).*$/\1/')
+if [ "$FIRSTCHAR" = "+" ]; then
 # relative time
-	ALLBUTFIRST=`$ECHO $RAWTIME | sed -e 's/^.//'`
-	LASTCHAR=`$ECHO $ALLBUTFIRST | sed -e 's/^.*\(.\)$/\1/'`
-	ALLBUTLAST=`$ECHO $ALLBUTFIRST | sed -e 's/.$//'`
-	case $LASTCHAR in
-		s)
-			SLEEPTIME=$ALLBUTLAST
-			break;
-			;;
-		m)
-			SLEEPTIME=`expr $ALLBUTLAST \* 60`
-			break;
-			;;
-		h)
-			SLEEPTIME=`expr $ALLBUTLAST \* 60 \* 60`
-			break;
-			;;
-		[0-9])
-			SLEEPTIME=$ALLBUTFIRST
-			break;
-			;;
-		*)
-			$ECHO "time must be in the form [0-9]*s, [0-9]*m, [0-9]*h"
-			exit 1
-	esac
+    ALLBUTFIRST=$($ECHO "$RAWTIME" | sed -e 's/^.//')
+    LASTCHAR=$($ECHO "$ALLBUTFIRST" | sed -e 's/^.*\(.\)$/\1/')
+    ALLBUTLAST=$($ECHO "$ALLBUTFIRST" | sed -e 's/.$//')
+    case $LASTCHAR in
+        s)
+            SLEEPTIME=$ALLBUTLAST
+            ;;
+        m)
+            SLEEPTIME=$(expr "$ALLBUTLAST" \* 60)
+            ;;
+        h)
+            SLEEPTIME=$(expr "$ALLBUTLAST" \* 60 \* 60)
+            ;;
+        [0-9])
+            SLEEPTIME=$ALLBUTFIRST
+            ;;
+        *)
+            $ECHO "time must be in the form [0-9]*s, [0-9]*m, [0-9]*h"
+            exit 1
+    esac
 
 else
 # absolute time
-	if [ -z "$DATEMSK" ]; then
-		DATEMSK=$HOME/.datemsk; export DATEMSK
-	fi
-	CURRENT_TIME=`date`;
-	CURRENT_TIME_SECS=`$GETDATE "$CURRENT_TIME"`
-	if [ $? -ne 0 ]; then
-		$ECHO "$GETDATE failed for current time"
-		exit 1
-	fi
-	ALARM_TIME_SECS=`$GETDATE "$RAWTIME"`
-	if [ $? -ne 0 ]; then
-		ALARM_TIME_SECS="";
+    if [ -z "$DATEMSK" ]; then
+        DATEMSK=$HOME/.datemsk; export DATEMSK
+    fi
+    CURRENT_TIME=$(date);
+    CURRENT_TIME_SECS=$($GETDATE "$CURRENT_TIME")
+    if [ $? -ne 0 ]; then
+        $ECHO "$GETDATE failed for current time"
+        exit 1
+    fi
+    ALARM_TIME_SECS=$($GETDATE "$RAWTIME")
+    if [ $? -ne 0 ]; then
+        ALARM_TIME_SECS="";
 # try adding an 'm' if the last char. is an 'a' or a 'p' (so 5am and 5pm work)
-		LASTCHAR=`$ECHO $RAWTIME | sed -e 's/^.*\(.\)$/\1/'`
-		if [ "$LASTCHAR" = "p" -o "$LASTCHAR" = "a" ]; then
-			ALARM_TIME_SECS=`$GETDATE "$RAWTIME"m`
-			if [ $? -ne 0 ]; then
-				ALARM_TIME_SECS="";
-			fi
-		fi
-	fi
+        LASTCHAR=$($ECHO "$RAWTIME" | sed -e 's/^.*\(.\)$/\1/')
+        if [ "$LASTCHAR" = "p" ] || [ "$LASTCHAR" = "a" ]; then
+            ALARM_TIME_SECS=$($GETDATE "$RAWTIME"m)
+            if [ $? -ne 0 ]; then
+                ALARM_TIME_SECS="";
+            fi
+        fi
+    fi
 
-	if [ -z "$ALARM_TIME_SECS" ]; then
-		$ECHO "$GETDATE failed for $RAWTIME; try one of these formats:"
-		cat $DATEMSK
-		exit 1
-	fi
-	SLEEPTIME=`expr $ALARM_TIME_SECS - $CURRENT_TIME_SECS`
-	if [ $SLEEPTIME -le 0 ]; then
-		SECONDS_AGO=`expr 0 - $SLEEPTIME`;
-		$ECHO "$RAWTIME seems to be in the past ($SECONDS_AGO seconds ago)"
-		exit 1
-	fi
+    if [ -z "$ALARM_TIME_SECS" ]; then
+        $ECHO "$GETDATE failed for $RAWTIME; try one of these formats:"
+        cat "$DATEMSK"
+        exit 1
+    fi
+    SLEEPTIME=$(expr "$ALARM_TIME_SECS" - "$CURRENT_TIME_SECS")
+    if [ "$SLEEPTIME" -le 0 ]; then
+        SECONDS_AGO=$(expr 0 - "$SLEEPTIME");
+        $ECHO "$RAWTIME seems to be in the past ($SECONDS_AGO seconds ago)"
+        exit 1
+    fi
 fi
 
 #$ECHO rt=$RAWTIME fc=$FIRSTCHAR lc=$LASTCHAR sl=$SLEEPTIME
 
-if [ $SLEEPTIME != "$ALLBUTLAST" ]; then
+if [ "$SLEEPTIME" != "$ALLBUTLAST" ]; then
     $ECHO "$MSG in $SLEEPTIME seconds ($RAWTIME)..."
 else
     $ECHO "$MSG in $SLEEPTIME seconds..."
 fi
-sleep $SLEEPTIME
+sleep "$SLEEPTIME"
 $ECHO_MINUS_N "$MSG"
 ring_bell
 exit 0
