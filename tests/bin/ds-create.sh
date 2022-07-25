@@ -11,7 +11,7 @@ sed -i \
     -e "s/;self_sign_cert = .*/self_sign_cert = False/g" \
     ds.inf
 
-dscreate from-file ds.inf
+dscreate -v from-file ds.inf
 
 ldapadd -H ldap://$HOSTNAME -x -D "cn=Directory Manager" -w Secret.123 << EOF
 dn: dc=example,dc=com

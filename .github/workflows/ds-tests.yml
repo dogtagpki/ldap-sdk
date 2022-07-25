@@ -81,7 +81,9 @@ jobs:
           tests/bin/runner-init.sh
 
       - name: Install DS package
-        run: docker exec ds dnf install -y 389-ds-base
+        # TODO: Remove nss-tools once the DS bug is fixed:
+        # https://bugzilla.redhat.com/show_bug.cgi?id=2110630
+        run: docker exec ds dnf install -y 389-ds-base nss-tools
 
       - name: Create DS instance
         run: docker exec ds ${SHARED}/tests/bin/ds-create.sh
