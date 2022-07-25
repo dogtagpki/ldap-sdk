@@ -4,8 +4,8 @@ on:
     workflows: ["Code Analysis"]
     types:
       - completed
-jobs:
 
+jobs:
   retrieve-pr:
     if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
