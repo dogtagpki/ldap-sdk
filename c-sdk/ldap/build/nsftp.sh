@@ -51,20 +51,21 @@
 SERVER=$COMPONENT_FTP_SERVER
 USER=ftpman
 PASSWD=ftpman
-TMPFILE=tmp.foo
 
 SRC=$1
 DEST=$2
-if [ -z "$3" ]; then 
+if [ -z "$3" ]; then
+  # Fixing this requires changing shell as arrays are not supported with /sh
+  # shellcheck disable=SC2125
   FILENAME=*
 else
   FILENAME=$3
 fi
 
-echo ${USER} contents of ${SRC} to ${DEST}
+echo ${USER} contents of "${SRC}" to "${DEST}"
 
-cd ${DEST}
-ftp -n ${SERVER} << -=EOF=-
+cd "${DEST}" || exit
+ftp -n "${SERVER}" << -=EOF=-
 user ${USER} ${PASSWD}
 binary
 hash
@@ -73,4 +74,3 @@ cd ${SRC}
 mget ${FILENAME}
 quit
 -=EOF=-
-

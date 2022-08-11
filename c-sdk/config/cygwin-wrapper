@@ -6,6 +6,9 @@
 # and look at the older versions of this file that are easier to read, but
 # do basically the same thing
 #
+# There are /sh compatibility issues that require changing shell to fix
+# Disable these checks as altering shell could have unintended consequences 
+# shellcheck disable=SC3000-SC4000
 
 prog=$1
 shift
@@ -16,7 +19,7 @@ fi
 # If $CYGDRIVE_MOUNT was not set in configure, give $mountpoint the results of mount -p
 mountpoint=$CYGDRIVE_MOUNT
 if test -z "$mountpoint"; then
-    mountpoint=`mount -p`
+    mountpoint=$(mount -p)
     if test -z "$mountpoint"; then
        print "Cannot determine cygwin mount points. Exiting"
        exit 1
@@ -56,24 +59,24 @@ do
                         driveletter=${no_i%%:*}
                         i=-I${mountpoint}/${driveletter}/${pathname}
                     elif test "${pathname:0:1}" = "/" -a -e "${pathname}" ; then
-			i=-I`cygpath -m "${pathname}"`
+            i=-I$(cygpath -m "${pathname}")
                     fi
                 else
-                    eval 'leader=${i%%'${mountpoint}'/[a-zA-Z]/*}'
+                    leader=$(eval '${i%%'"${mountpoint}"'/[a-zA-Z]/*}')
                     if ! test "${leader}" = "${i}"; then
-                        eval 'pathname=${i#'${leader}${mountpoint}'/[a-zA-Z]/}'
-                        eval 'no_mountpoint=${i#'${leader}${mountpoint}'/}'
+                        pathname=$(eval '${i#'"${leader}""${mountpoint}"'/[a-zA-Z]/}')
+                        no_mountpoint=$(eval '${i#'"${leader}""${mountpoint}"'/}')
                         driveletter=${no_mountpoint%%/*}
                         i=${leader}${driveletter}:/${pathname}
                     elif test "${i:0:1}" = "/" -a -e "${i}" ; then
-			i=`cygpath -m "${i}"`
-		    elif test "${i:0:2}" = "-I" -a -e "${i:2}" ; then
-			i=/I`cygpath -m "${i:2}"`
-		    elif test "${i:0:2}" = "-L" -a -e "${i:2}" ; then
-			i=/L`cygpath -m "${i:2}"`
-		    elif test "${i:0:5}" = "-DEF:" -a -e "${i:5}" ; then
-			i=/DEF:`cygpath -m "${i:5}"`
-		    fi
+            i=$(cygpath -m "${i}")
+            elif test "${i:0:2}" = "-I" -a -e "${i:2}" ; then
+            i=/I$(cygpath -m "${i:2}")
+            elif test "${i:0:2}" = "-L" -a -e "${i:2}" ; then
+            i=/L$(cygpath -m "${i:2}")
+            elif test "${i:0:5}" = "-DEF:" -a -e "${i:5}" ; then
+            i=/DEF:$(cygpath -m "${i:5}")
+            fi
                 fi
             fi
 
@@ -82,4 +85,4 @@ do
     fi
 done
 
-exec $prog $args
+exec $prog "$args"

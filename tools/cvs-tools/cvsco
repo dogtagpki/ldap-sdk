@@ -25,7 +25,7 @@
 # the Initial Developer. All Rights Reserved.
 # 
 # Contributor(s):
-#	Mark Smith <MarkCSmithWork@aol.com>
+#   Mark Smith <MarkCSmithWork@aol.com>
 # 
 # Alternatively, the contents of this file may be used under the terms of
 # either of the GNU General Public License Version 2 or later (the "GPL"),
@@ -59,56 +59,56 @@ GET_EMPTY_DIRS=0
 
 if [ $# -gt 0 ]; then
     if [ "$1" = "-H" ]; then
-	echo "usage: $0 [-dry] [-d] [cvsco-flags]";
-	exit 1;
+    echo "usage: $0 [-dry] [-d] [cvsco-flags]";
+    exit 1;
     fi
 
     if [ "$1" = "-dry" ]; then
-	shift;
-	DRYRUN=1;
+    shift;
+    DRYRUN=1;
     fi
 
     if [ "$1" = "-d" ]; then
-	shift;
-	GET_EMPTY_DIRS=1;
+    shift;
+    GET_EMPTY_DIRS=1;
     fi
 
-	
+    
 fi
 
-if [ ! -r $BRANCH_FILENAME -o ! -s $BRANCH_FILENAME ]; then
+if [ ! -r $BRANCH_FILENAME ] || [ ! -s $BRANCH_FILENAME ]; then
     echo "Please put the branch name in $BRANCH_FILENAME and try again."
     echo "Use the name -TRUNK- to pull from the trunk (no branch)."
     exit 1
 fi
 
-BRANCH=`cat $BRANCH_FILENAME`
+BRANCH=$(cat $BRANCH_FILENAME)
 if [ "$BRANCH" = "-TRUNK-" ]; then
     if [ $GET_EMPTY_DIRS -eq 0 ]; then
-	BRANCH_ARGS="-P"
+    BRANCH_ARGS="-P"
     fi
 else
     BRANCH_ARGS="-r $BRANCH"
 fi
 
-if [ -r $DATE_FILENAME -a -s $DATE_FILENAME ]; then
-    DATE=`cat $DATE_FILENAME`
+if [ -r $DATE_FILENAME ] && [ -s $DATE_FILENAME ]; then
+    DATE=$(cat $DATE_FILENAME)
     BRANCH_ARGS="$BRANCH_ARGS -D $DATE"
 fi
 
-if [ ! -r $MODULE_FILENAME -o ! -s $MODULE_FILENAME ]; then
+if [ ! -r $MODULE_FILENAME ] || [ ! -s $MODULE_FILENAME ]; then
     echo "Please put the module name in $MODULE_FILENAME and try again."
     exit 1
 fi
 
-if [ -r $REPOSITORY_FILENAME -a -s $REPOSITORY_FILENAME ]; then
-    CVSROOT=`cat $REPOSITORY_FILENAME`
+if [ -r $REPOSITORY_FILENAME ] && [ -s $REPOSITORY_FILENAME ]; then
+    CVSROOT=$(cat $REPOSITORY_FILENAME)
     export CVSROOT
     echo "Repository (CVSROOT): $CVSROOT"
 fi
 
 
-echo cvs $EXTRAOPTS co $* $BRANCH_ARGS `cat $MODULE_FILENAME`
+echo cvs $EXTRAOPTS co "$*" "$BRANCH_ARGS" "$(cat $MODULE_FILENAME)"
 if [ $DRYRUN -eq 0 ]; then
-    cvs $EXTRAOPTS co $* $BRANCH_ARGS `cat $MODULE_FILENAME`
+    cvs $EXTRAOPTS co "$*" "$BRANCH_ARGS" "$(cat $MODULE_FILENAME)"
 fi
