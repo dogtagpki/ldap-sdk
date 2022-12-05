@@ -69,16 +69,16 @@ public class LDAPSSLSocketFactory
     /**
      * Indicates if client authentication is on.
      */
-    private boolean m_clientAuth = false;
+    private boolean clientAuth = false;
     /**
      * Name of class implementing SSLSocket.
      */
-    private String m_packageName = "netscape.net.SSLSocket";
+    private String packageName = "netscape.net.SSLSocket";
 
     /**
      * The cipher suites
      */
-    private Object m_cipherSuites = null;
+    private transient Object cipherSuites = null;
 
     /**
      * Constructs an <CODE>LDAPSSLSocketFactory</CODE> object using
@@ -99,7 +99,7 @@ public class LDAPSSLSocketFactory
      * not used.
      */
     public LDAPSSLSocketFactory(boolean clientAuth) {
-        m_clientAuth = clientAuth;
+        this.clientAuth = clientAuth;
     }
 
     /**
@@ -114,7 +114,7 @@ public class LDAPSSLSocketFactory
      * Netscape Communicator 4.05 and higher.
      */
     public LDAPSSLSocketFactory(String className) {
-        m_packageName = new String(className);
+        this.packageName = className;
     }
 
     /**
@@ -132,8 +132,8 @@ public class LDAPSSLSocketFactory
      * not used.
      */
     public LDAPSSLSocketFactory(String className, boolean clientAuth) {
-        m_packageName = new String(className);
-        m_clientAuth = clientAuth;
+        this.packageName = className;
+        this.clientAuth = clientAuth;
     }
 
     /**
@@ -148,8 +148,8 @@ public class LDAPSSLSocketFactory
      * @param cipherSuites the cipher suites to use for SSL connections
      */
     public LDAPSSLSocketFactory(String className, Object cipherSuites) {
-        m_packageName = new String(className);
-        m_cipherSuites = cipherSuites;
+        this.packageName = className;
+        this.cipherSuites = cipherSuites;
     }
 
     /**
@@ -168,9 +168,9 @@ public class LDAPSSLSocketFactory
      */
     public LDAPSSLSocketFactory(String className, Object cipherSuites,
       boolean clientAuth) {
-        m_packageName = new String(className);
-        m_cipherSuites = cipherSuites;
-        m_clientAuth = clientAuth;
+        this.packageName = className;
+        this.cipherSuites = cipherSuites;
+        this.clientAuth = clientAuth;
     }
 
     /**
@@ -189,7 +189,7 @@ public class LDAPSSLSocketFactory
      * <CODE>LDAPSSLSocketFactory(java.lang.String, java.lang.Object, boolean)</CODE>
      */
     public void enableClientAuth() {
-        m_clientAuth = true;
+        this.clientAuth = true;
     }
 
 
@@ -223,8 +223,9 @@ public class LDAPSSLSocketFactory
      * Returns <code>true</code> if client authentication is enabled.
      * @see netscape.ldap.LDAPSSLSocketFactory
      */
+    @Override
     public boolean isClientAuth() {
-        return m_clientAuth;
+        return clientAuth;
     }
 
     /**
@@ -233,7 +234,7 @@ public class LDAPSSLSocketFactory
      * @return the name of the class that implements SSL sockets for this factory.
      */
     public String getSSLSocketImpl() {
-        return m_packageName;
+        return packageName;
     }
 
     /**
@@ -242,8 +243,9 @@ public class LDAPSSLSocketFactory
      *
      * @return the suite of ciphers used.
      */
+    @Override
     public Object getCipherSuites() {
-        return m_cipherSuites;
+        return cipherSuites;
     }
 
     /**
@@ -256,12 +258,11 @@ public class LDAPSSLSocketFactory
      * could not be created.
      * @see netscape.ldap.LDAPSSLSocketFactory
      */
+    @Override
     public Socket makeSocket(String host, int port)
       throws LDAPException {
 
-        Socket s = null;
-
-        if (m_clientAuth) {
+        if (clientAuth) {
             try {
                 /* Check if running in Communicator; if so, enable client
                    auth */
@@ -273,7 +274,7 @@ public class LDAPSSLSocketFactory
                         types );
                 if (m != null) {
                     Object[] args = new Object[1];
-                    args[0] = new String("ClientAuth");
+                    args[0] = "ClientAuth";
                     m.invoke( null, args);
                 }
             } catch (Exception e) {
@@ -286,18 +287,18 @@ public class LDAPSSLSocketFactory
         try {
             /* Instantiate the SSLSocketFactory implementation, and
                find the right constructor */
-            Class<?> c = Class.forName(m_packageName);
-            if (m_cipherSuites == null) {
+            Class<?> c = Class.forName(packageName);
+            if (cipherSuites == null) {
                 Constructor<?> m = c.getConstructor(String.class, int.class);
                 return (Socket) m.newInstance(host, port);
             }
-            Constructor<?> m = c.getConstructor(String.class, int.class, m_cipherSuites.getClass());
-            return (Socket) m.newInstance(host, port, m_cipherSuites);
+            Constructor<?> m = c.getConstructor(String.class, int.class, cipherSuites.getClass());
+            return (Socket) m.newInstance(host, port, cipherSuites);
         } catch (NoSuchMethodException e) {
             throw new LDAPException("No appropriate constructor in " +
-                    m_packageName, LDAPException.PARAM_ERROR);
+                    packageName, LDAPException.PARAM_ERROR);
         } catch (ClassNotFoundException e) {
-            throw new LDAPException("Class " + m_packageName + " not found",
+            throw new LDAPException("Class " + packageName + " not found",
                                   LDAPException.PARAM_ERROR);
         } catch (Exception e) {
             throw new LDAPException("Failed to create SSL socket",
