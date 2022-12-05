@@ -72,7 +72,7 @@ public class LDAPSSLSocketWrapFactory
      * of the SSL Socket extending Object class
      */
     public LDAPSSLSocketWrapFactory(String className) {
-        m_packageName = new String(className);
+        this.packageName = className;
     }
 
     /**
@@ -83,8 +83,8 @@ public class LDAPSSLSocketWrapFactory
      * @param cipherSuites the cipher suites
      */
     public LDAPSSLSocketWrapFactory(String className, Object cipherSuites) {
-        m_packageName = new String(className);
-        m_cipherSuites = cipherSuites;
+        this.packageName = className;
+        this.cipherSuites = cipherSuites;
     }
 
     /**
@@ -95,16 +95,17 @@ public class LDAPSSLSocketWrapFactory
      * @exception LDAPException A socket to the specified host and port
      * could not be created.
      */
+    @Override
     public Socket makeSocket(String host, int port) throws LDAPException {
 
         LDAPSSLSocket s = null;
 
         try {
-            if (m_cipherSuites == null)
-                s = new LDAPSSLSocket(host, port, m_packageName);
+            if (cipherSuites == null)
+                s = new LDAPSSLSocket(host, port, packageName);
             else
-                s = new LDAPSSLSocket(host, port, m_packageName,
-                  m_cipherSuites);
+                s = new LDAPSSLSocket(host, port, packageName,
+                  cipherSuites);
             return s;
         } catch (Exception e) {
             System.err.println("Exception: "+e.toString());
@@ -118,8 +119,9 @@ public class LDAPSSLSocketWrapFactory
      * @return <code>true</code> if client authentication is enabled;
      * <code>false</code>if client authentication is disabled.
      */
+    @Override
     public boolean isClientAuth() {
-        return m_clientAuth;
+        return clientAuth;
     }
 
     /**
@@ -141,7 +143,7 @@ public class LDAPSSLSocketWrapFactory
      * @return the name of the class that implements SSL sockets for this factory.
      */
     public String getSSLSocketImpl() {
-        return m_packageName;
+        return packageName;
     }
 
     /**
@@ -150,24 +152,25 @@ public class LDAPSSLSocketWrapFactory
      *
      * @return the suite of ciphers used.
      */
+    @Override
     public Object getCipherSuites() {
-        return m_cipherSuites;
+        return cipherSuites;
     }
 
     /**
      * Indicates if client authentication is on.
      */
-    private boolean m_clientAuth = false;
+    private boolean clientAuth = false;
 
     /**
      * Name of class implementing SSLSocket.
      */
-    private String m_packageName = null;
+    private String packageName = null;
 
     /**
      * The cipher suites
      */
-    private Object m_cipherSuites = null;
+    private transient Object cipherSuites = null;
 }
 
 // LDAPSSLSocket class wraps the implementation of the SSL socket
@@ -176,18 +179,18 @@ class LDAPSSLSocket extends Socket {
     public LDAPSSLSocket(String host, int port, String packageName)
       throws LDAPException {
         super();
-        m_packageName = packageName;
+        this.packageName = packageName;
         try {
             // instantiate the SSLSocketFactory implementation, and
             // find the right constructor
-            Class<?> c = Class.forName(m_packageName);
+            Class<?> c = Class.forName(packageName);
             Constructor<?> m = c.getConstructor(String.class, int.class);
-            m_socket = m.newInstance(host, port);
+            this.socket = m.newInstance(host, port);
         } catch (NoSuchMethodException e) {
             throw new LDAPException("No appropriate constructor in " +
-                    m_packageName, LDAPException.PARAM_ERROR);
+                    packageName, LDAPException.PARAM_ERROR);
         } catch (ClassNotFoundException e) {
-            throw new LDAPException("Class " + m_packageName + " not found",
+            throw new LDAPException("Class " + packageName + " not found",
               LDAPException.OTHER);
         } catch (Exception e) {
             throw new LDAPException("Failed to create SSL socket",
@@ -198,21 +201,21 @@ class LDAPSSLSocket extends Socket {
     public LDAPSSLSocket(String host, int port, String packageName,
       Object cipherSuites) throws LDAPException {
         super();
-        m_packageName = packageName;
+        this.packageName = packageName;
 
         try {
             // instantiate the SSLSocketFactory implementation, and
             // find the right constructor
-            Class<?> c = Class.forName(m_packageName);
+            Class<?> c = Class.forName(packageName);
             if (cipherSuites == null)
                 throw new LDAPException("Cipher Suites is required");
             Constructor<?> m = c.getConstructor(String.class, int.class, cipherSuites.getClass());
-            m_socket = m.newInstance(host, port, cipherSuites);
+            this.socket = m.newInstance(host, port, cipherSuites);
         } catch (NoSuchMethodException e) {
             throw new LDAPException("No appropriate constructor in " +
-                    m_packageName, LDAPException.PARAM_ERROR);
+                    packageName, LDAPException.PARAM_ERROR);
         } catch (ClassNotFoundException e) {
-            throw new LDAPException("Class " + m_packageName + " not found",
+            throw new LDAPException("Class " + packageName + " not found",
               LDAPException.OTHER);
         } catch (Exception e) {
             throw new LDAPException("Failed to create SSL socket",
@@ -220,9 +223,10 @@ class LDAPSSLSocket extends Socket {
         }
     }
 
+    @Override
     public InputStream getInputStream() {
         try {
-            Object obj = invokeMethod(m_socket, "getInputStream", null);
+            Object obj = invokeMethod(socket, "getInputStream", null);
             return (InputStream)obj;
         } catch (LDAPException e) {
             printDebug(e.toString());
@@ -231,9 +235,10 @@ class LDAPSSLSocket extends Socket {
         return null;
     }
 
+    @Override
     public OutputStream getOutputStream() {
         try {
-            Object obj = invokeMethod(m_socket, "getOutputStream", null);
+            Object obj = invokeMethod(socket, "getOutputStream", null);
             return (OutputStream)obj;
         } catch (LDAPException e) {
             printDebug(e.toString());
@@ -242,27 +247,29 @@ class LDAPSSLSocket extends Socket {
         return null;
     }
 
-    public void close() throws IOException {
+    @Override
+    public synchronized void close() throws IOException {
         try {
-            invokeMethod(m_socket, "close", null);
+            invokeMethod(socket, "close", null);
         } catch (LDAPException e) {
             printDebug(e.toString());
         }
     }
 
-    public void close(boolean wait) throws IOException {
+    public void close(boolean wait) {
         try {
             Object[] args = new Object[1];
             args[0] = wait;
-            invokeMethod(m_socket, "close", args);
+            invokeMethod(socket, "close", args);
         } catch (LDAPException e) {
             printDebug(e.toString());
         }
     }
 
+    @Override
     public InetAddress getInetAddress() {
         try {
-            Object obj = invokeMethod(m_socket, "getInetAddress", null);
+            Object obj = invokeMethod(socket, "getInetAddress", null);
             return (InetAddress)obj;
         } catch (LDAPException e) {
             printDebug(e.toString());
@@ -271,9 +278,10 @@ class LDAPSSLSocket extends Socket {
         return null;
     }
 
+    @Override
     public int getLocalPort() {
         try {
-            Object obj = invokeMethod(m_socket, "getLocalPort", null);
+            Object obj = invokeMethod(socket, "getLocalPort", null);
             return ((Integer)obj).intValue();
         } catch (LDAPException e) {
             printDebug(e.toString());
@@ -282,9 +290,10 @@ class LDAPSSLSocket extends Socket {
         return -1;
     }
 
+    @Override
     public int getPort() {
         try {
-            Object obj = invokeMethod(m_socket, "getPort", null);
+            Object obj = invokeMethod(socket, "getPort", null);
             return ((Integer)obj).intValue();
         } catch (LDAPException e) {
            printDebug(e.toString());
@@ -312,33 +321,33 @@ class LDAPSSLSocket extends Socket {
       LDAPException {
         try {
             Method method = null;
-            if ((method = m_methodLookup.get(name)) != null)
+            if ((method = methodLookup.get(name)) != null)
                 return method;
 
-            Class<?> c = Class.forName(m_packageName);
+            Class<?> c = Class.forName(packageName);
             Method[] m = c.getMethods();
             for (int i = 0; i < m.length; i++ ) {
                 if (m[i].getName().equals(name)) {
-                    m_methodLookup.put(name, m[i]);
+                    methodLookup.put(name, m[i]);
                     return m[i];
                 }
             }
             throw new LDAPException("Method " + name + " not found in " +
-              m_packageName);
+              packageName);
         } catch (ClassNotFoundException e) {
-            throw new LDAPException("Class "+ m_packageName + " not found");
+            throw new LDAPException("Class "+ packageName + " not found");
         }
     }
 
     private void printDebug(String msg) {
-        if (m_debug) {
+        if (DEBUG) {
             System.out.println(msg);
         }
     }
 
-    private final boolean m_debug = true;
-    private Object m_socket;
-    private Hashtable<String, Method> m_methodLookup = new Hashtable<>();
-    private String m_packageName = null;
+    private static final boolean DEBUG = true;
+    private Object socket;
+    private Hashtable<String, Method> methodLookup = new Hashtable<>();
+    private String packageName = null;
 }
 
