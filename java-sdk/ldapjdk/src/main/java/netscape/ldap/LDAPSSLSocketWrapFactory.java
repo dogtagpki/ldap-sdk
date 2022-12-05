@@ -181,24 +181,11 @@ class LDAPSSLSocket extends Socket {
             // instantiate the SSLSocketFactory implementation, and
             // find the right constructor
             Class<?> c = Class.forName(m_packageName);
-            Constructor<?>[] m = c.getConstructors();
-
-            for (int i = 0; i < m.length; i++) {
-                /* Check if the signature is right: String, int */
-                Class<?>[] params = m[i].getParameterTypes();
-
-                if ((params.length == 2) &&
-                    (params[0].getName().equals("java.lang.String")) &&
-                    (params[1].getName().equals("int"))) {
-                    Object[] args = new Object[2];
-                    args[0] = host;
-                    args[1] = port;
-                    m_socket = (m[i].newInstance(args));
-                    return;
-                }
-            }
+            Constructor<?> m = c.getConstructor(String.class, int.class);
+            m_socket = m.newInstance(host, port);
+        } catch (NoSuchMethodException e) {
             throw new LDAPException("No appropriate constructor in " +
-              m_packageName, LDAPException.PARAM_ERROR);
+                    m_packageName, LDAPException.PARAM_ERROR);
         } catch (ClassNotFoundException e) {
             throw new LDAPException("Class " + m_packageName + " not found",
               LDAPException.OTHER);
@@ -212,36 +199,18 @@ class LDAPSSLSocket extends Socket {
       Object cipherSuites) throws LDAPException {
         super();
         m_packageName = packageName;
-        String cipherClassName = null;
-        if (cipherSuites != null)
-            cipherClassName = cipherSuites.getClass().getName();
 
         try {
             // instantiate the SSLSocketFactory implementation, and
             // find the right constructor
             Class<?> c = Class.forName(m_packageName);
-            Constructor<?>[] m = c.getConstructors();
-
-            for (int i = 0; i < m.length; i++) {
-                /* Check if the signature is right: String, int */
-                Class<?>[] params = m[i].getParameterTypes();
-                if (cipherSuites == null)
-                    throw new LDAPException("Cipher Suites is required");
-
-                if ((params.length == 3) &&
-                    (params[0].getName().equals("java.lang.String")) &&
-                    (params[1].getName().equals("int")) &&
-                    (params[2].getName().equals(cipherClassName))) {
-                    Object[] args = new Object[3];
-                    args[0] = host;
-                    args[1] = port;
-                    args[2] = cipherSuites;
-                    m_socket = (m[i].newInstance(args));
-                    return;
-                }
-            }
+            if (cipherSuites == null)
+                throw new LDAPException("Cipher Suites is required");
+            Constructor<?> m = c.getConstructor(String.class, int.class, cipherSuites.getClass());
+            m_socket = m.newInstance(host, port, cipherSuites);
+        } catch (NoSuchMethodException e) {
             throw new LDAPException("No appropriate constructor in " +
-              m_packageName, LDAPException.PARAM_ERROR);
+                    m_packageName, LDAPException.PARAM_ERROR);
         } catch (ClassNotFoundException e) {
             throw new LDAPException("Class " + m_packageName + " not found",
               LDAPException.OTHER);

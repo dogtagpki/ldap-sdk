@@ -284,40 +284,18 @@ public class LDAPSSLSocketFactory
         }
 
         try {
-            String cipherClassName = null;
-            if (m_cipherSuites != null)
-                cipherClassName = m_cipherSuites.getClass().getName();
-
             /* Instantiate the SSLSocketFactory implementation, and
                find the right constructor */
             Class<?> c = Class.forName(m_packageName);
-            Constructor<?>[] m = c.getConstructors();
-            for (int i = 0; i < m.length; i++) {
-                /* Check if the signature is right: String, int */
-                Class<?>[] params = m[i].getParameterTypes();
-                if ( (m_cipherSuites == null) && (params.length == 2) &&
-                     (params[0].getName().equals("java.lang.String")) &&
-                     (params[1].getName().equals("int")) ) {
-                    Object[] args = new Object[2];
-                    args[0] = host;
-                    args[1] = port;
-                    s = (Socket)(m[i].newInstance(args));
-                    return s;
-                } else if ( (m_cipherSuites != null) && (params.length == 3) &&
-                     (params[0].getName().equals("java.lang.String")) &&
-                     (params[1].getName().equals("int")) &&
-                     (params[2].getName().equals(cipherClassName)) ) {
-                    Object[] args = new Object[3];
-                    args[0] = host;
-                    args[1] = port;
-                    args[2] = m_cipherSuites;
-                    s = (Socket)(m[i].newInstance(args));
-                    return s;
-                }
+            if (m_cipherSuites == null) {
+                Constructor<?> m = c.getConstructor(String.class, int.class);
+                return (Socket) m.newInstance(host, port);
             }
+            Constructor<?> m = c.getConstructor(String.class, int.class, m_cipherSuites.getClass());
+            return (Socket) m.newInstance(host, port, m_cipherSuites);
+        } catch (NoSuchMethodException e) {
             throw new LDAPException("No appropriate constructor in " +
-                                  m_packageName,
-                                  LDAPException.PARAM_ERROR);
+                    m_packageName, LDAPException.PARAM_ERROR);
         } catch (ClassNotFoundException e) {
             throw new LDAPException("Class " + m_packageName + " not found",
                                   LDAPException.PARAM_ERROR);
