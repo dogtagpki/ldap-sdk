@@ -19,7 +19,7 @@ jobs:
         with:
           result-encoding: string
           script: |
-            var artifacts = await github.actions.listWorkflowRunArtifacts({
+            var artifacts = await github.rest.actions.listWorkflowRunArtifacts({
               owner: context.repo.owner,
               repo: context.repo.repo,
               run_id: context.payload.workflow_run.id,
@@ -31,8 +31,8 @@ jobs:
               core.setFailed("No PR artifact");
               return "False";
             }
-            var download = await github.actions.downloadArtifact({
-              owner: context.repo.owne6r,
+            var download = await github.rest.actions.downloadArtifact({
+              owner: context.repo.owner,
               repo: context.repo.repo,
               artifact_id: matchArtifact.id,
               archive_format: 'zip',
