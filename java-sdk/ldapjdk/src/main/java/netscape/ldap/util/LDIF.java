@@ -47,6 +47,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.StringTokenizer;
@@ -79,7 +80,7 @@ public class LDIF implements Serializable {
     /**
      * Internal constants
      */
-    private final static char COMMENT = '#';
+    private static final char COMMENT = '#';
     static final long serialVersionUID = -2710382547996750924L;
 
     /**
@@ -89,7 +90,7 @@ public class LDIF implements Serializable {
      */
     public LDIF() throws IOException {
         DataInputStream ds = new DataInputStream(System.in);
-        BufferedReader d = new BufferedReader(new InputStreamReader(ds, "UTF8"));
+        BufferedReader d = new BufferedReader(new InputStreamReader(ds, StandardCharsets.UTF_8));
         m_reader = new LineReader(d);
         m_source = "System.in";
         m_decoder = new MimeBase64Decoder();
@@ -104,7 +105,7 @@ public class LDIF implements Serializable {
     public LDIF(String file) throws IOException {
         FileInputStream fs = new FileInputStream(file);
         DataInputStream ds = new DataInputStream(fs);
-        BufferedReader d = new BufferedReader(new InputStreamReader(ds, "UTF8"));
+        BufferedReader d = new BufferedReader(new InputStreamReader(ds, StandardCharsets.UTF_8));
         m_reader = new LineReader(d);
         m_source = file;
         m_decoder = new MimeBase64Decoder();
@@ -117,7 +118,7 @@ public class LDIF implements Serializable {
      * @exception IOException An I/O error has occurred.
      */
     public LDIF(DataInputStream ds) throws IOException {
-        BufferedReader d = new BufferedReader(new InputStreamReader(ds, "UTF8"));
+        BufferedReader d = new BufferedReader(new InputStreamReader(ds, StandardCharsets.UTF_8));
         m_reader = new LineReader(d);
         m_source = ds.toString();
         m_decoder = new MimeBase64Decoder();
@@ -134,10 +135,7 @@ public class LDIF implements Serializable {
      * @see netscape.ldap.util.LDIFRecord
      */
     public LDIFRecord nextRecord() throws IOException {
-        if ( m_done )
-            return null;
-        else
-            return parse_ldif_record( m_reader );
+        return m_done ? null : parse_ldif_record( m_reader );
     }
 
     /**
@@ -182,7 +180,7 @@ public class LDIF implements Serializable {
         dn = line.substring(3).trim();
         if (dn.startsWith(":") && (dn.length() > 1)) {
             String substr = dn.substring(1).trim();
-            dn = new String(getDecodedBytes(substr), "UTF8");
+            dn = new String(getDecodedBytes(substr), StandardCharsets.UTF_8);
         }
 
         LDIFContent content = parse_ldif_content(d);
@@ -353,7 +351,7 @@ public class LDIF implements Serializable {
         LDIFAttributeContent ac = (LDIFAttributeContent)parse_ldif_content(d);
         if (m_currEntryDone)
           m_currEntryDone = false;
-        LDAPAttribute attrs[] = ac.getAttributes();
+        LDAPAttribute[] attrs = ac.getAttributes();
         LDIFAddContent rc = new LDIFAddContent(attrs);
         LDAPControl[] controls = ac.getControls();
         if ( controls != null ) {
@@ -417,7 +415,7 @@ public class LDIF implements Serializable {
             LDIFAttributeContent ac =
                 (LDIFAttributeContent)parse_ldif_content(d);
             if (ac != null) {
-                LDAPAttribute attrs[] = ac.getAttributes();
+                LDAPAttribute[] attrs = ac.getAttributes();
                 for (int i = 0; i < attrs.length; i++) {
                     LDAPModification mod = new LDAPModification(oper, attrs[i]);
                     mc.addElement( mod );
@@ -471,7 +469,6 @@ public class LDIF implements Serializable {
         String line = null;
         line = d.readLine();
         LDIFModDNContent mc = new LDIFModDNContent();
-        String val = null;
         do {
             if (line.startsWith("newrdn:") &&
               (line.length() > ("newrdn:".length()+1))) {
@@ -594,7 +591,7 @@ public class LDIF implements Serializable {
                         }
                     } else {
                         try {
-                            val = line.substring(idx).trim().getBytes("UTF8");
+                            val = line.substring(idx).trim().getBytes(StandardCharsets.UTF_8);
                         } catch(Exception x) {
                         }
                     }
@@ -664,6 +661,7 @@ public class LDIF implements Serializable {
      * entire LDIF file.
      * @return the string representation of the entire LDIF data file.
      */
+    @Override
     public String toString() {
         return "LDIF {" + m_source + "}";
     }
@@ -701,7 +699,8 @@ public class LDIF implements Serializable {
         String readLine() throws IOException {
             String line = null;
             String result = null;
-            int readCnt = 0, continuationLength = 0;
+            int readCnt = 0;
+            int continuationLength = 0;
             do {
                 /* Leftover line from last time? */
                 if ( _next != null ) {
@@ -770,10 +769,7 @@ public class LDIF implements Serializable {
     public static String toPrintableString( byte[] b ) {
         String s = "";
         if (isPrintable(b)) {
-            try {
-                s = new String(b, "UTF8");
-            } catch ( java.io.UnsupportedEncodingException e ) {
-            }
+            s = new String(b, StandardCharsets.UTF_8);
         } else {
             ByteBuf inBuf = new ByteBuf( b, 0, b.length );
             ByteBuf encodedBuf = new ByteBuf();
