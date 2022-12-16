@@ -4,46 +4,62 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 #
 
-ARG OS_VERSION="latest"
+ARG BASE_IMAGE="registry.fedoraproject.org/fedora:latest"
 ARG COPR_REPO="@pki/master"
 
 ################################################################################
-FROM registry.fedoraproject.org/fedora:$OS_VERSION AS ldapjdk-builder
+FROM $BASE_IMAGE AS ldapjdk-base
 
-ARG COPR_REPO
-ARG BUILD_OPTS
-
-# Enable COPR repo if specified
-RUN if [ -n "$COPR_REPO" ]; then dnf install -y dnf-plugins-core; dnf copr enable -y $COPR_REPO; fi
-
-# Import LDAPJDK sources
-COPY . /tmp/ldapjdk/
-WORKDIR /tmp/ldapjdk
-
-# Build LDAPJDK packages
-RUN dnf install -y git rpm-build
-RUN dnf builddep -y --spec ldapjdk.spec
-RUN ./build.sh $BUILD_OPTS --work-dir=build rpm
-
-RUN ls -la && ls -la build
-
-################################################################################
-FROM registry.fedoraproject.org/fedora:$OS_VERSION AS ldapjdk-runner
-
-ARG COPR_REPO
-
-EXPOSE 389 8080 8443
-
-# Enable COPR repo if specified
-RUN if [ -n "$COPR_REPO" ]; then dnf install -y dnf-plugins-core; dnf copr enable -y $COPR_REPO; fi
-
-# Import LDAPJDK packages
-COPY --from=ldapjdk-builder /tmp/ldapjdk/build/RPMS /tmp/RPMS/
-
-# Install LDAPJDK packages
-RUN dnf localinstall -y /tmp/RPMS/*; rm -rf /tmp/RPMS
-
-# Install systemd to run the container
-RUN dnf install -y systemd
+RUN dnf install -y systemd \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf
 
 CMD [ "/usr/sbin/init" ]
+
+################################################################################
+FROM ldapjdk-base AS ldapjdk-deps
+
+ARG COPR_REPO
+
+# Enable COPR repo if specified
+RUN if [ -n "$COPR_REPO" ]; then dnf install -y dnf-plugins-core; dnf copr enable -y $COPR_REPO; fi
+
+# Install LDAP SDK runtime dependencies
+RUN dnf install -y dogtag-ldapjdk \
+    && dnf remove -y dogtag-* --noautoremove \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf
+
+################################################################################
+FROM ldapjdk-deps AS ldapjdk-builder-deps
+
+# Install build tools
+RUN dnf install -y rpm-build
+
+# Import LDAP SDK sources
+COPY ldapjdk.spec /root/ldapjdk/
+WORKDIR /root/ldapjdk
+
+# Install LDAP SDK build dependencies
+RUN dnf builddep -y --spec ldapjdk.spec
+
+################################################################################
+FROM ldapjdk-builder-deps AS ldapjdk-builder
+
+# Import LDAP SDK sources
+COPY . /root/ldapjdk/
+
+# Build LDAP SDK packages
+RUN ./build.sh --work-dir=build rpm
+
+################################################################################
+FROM ldapjdk-deps AS ldapjdk-runner
+
+# Import LDAP SDK packages
+COPY --from=ldapjdk-builder /root/ldapjdk/build/RPMS /tmp/RPMS/
+
+# Install LDAP SDK packages
+RUN dnf localinstall -y /tmp/RPMS/* \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf \
+    && rm -rf /tmp/RPMS
