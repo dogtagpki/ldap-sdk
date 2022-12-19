@@ -5,12 +5,12 @@
 #
 
 ARG BASE_IMAGE="registry.fedoraproject.org/fedora:latest"
-ARG COPR_REPO="@pki/master"
+ARG COPR_REPO=""
 
 ################################################################################
 FROM $BASE_IMAGE AS ldapjdk-base
 
-RUN dnf install -y systemd \
+RUN dnf install -y dnf-plugins-core systemd \
     && dnf clean all \
     && rm -rf /var/cache/dnf
 
@@ -22,7 +22,7 @@ FROM ldapjdk-base AS ldapjdk-deps
 ARG COPR_REPO
 
 # Enable COPR repo if specified
-RUN if [ -n "$COPR_REPO" ]; then dnf install -y dnf-plugins-core; dnf copr enable -y $COPR_REPO; fi
+RUN if [ -n "$COPR_REPO" ]; then dnf copr enable -y $COPR_REPO; fi
 
 # Install LDAP SDK runtime dependencies
 RUN dnf install -y dogtag-ldapjdk \
@@ -41,10 +41,19 @@ COPY ldapjdk.spec /root/ldapjdk/
 WORKDIR /root/ldapjdk
 
 # Install LDAP SDK build dependencies
-RUN dnf builddep -y --spec ldapjdk.spec
+RUN dnf builddep -y --skip-unavailable --spec ldapjdk.spec
 
 ################################################################################
 FROM ldapjdk-builder-deps AS ldapjdk-builder
+
+# Import JSS packages from jss-builder
+COPY --from=ghcr.io/dogtagpki/jss-builder:latest /root/jss/build/RPMS /tmp/RPMS/
+
+# Install build dependencies
+RUN dnf localinstall -y /tmp/RPMS/* \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf \
+    && rm -rf /tmp/RPMS
 
 # Import LDAP SDK sources
 COPY . /root/ldapjdk/
@@ -55,10 +64,13 @@ RUN ./build.sh --work-dir=build rpm
 ################################################################################
 FROM ldapjdk-deps AS ldapjdk-runner
 
+# Import JSS packages from jss-builder
+COPY --from=ghcr.io/dogtagpki/jss-builder:latest /root/jss/build/RPMS /tmp/RPMS/
+
 # Import LDAP SDK packages
 COPY --from=ldapjdk-builder /root/ldapjdk/build/RPMS /tmp/RPMS/
 
-# Install LDAP SDK packages
+# Install runtime packages
 RUN dnf localinstall -y /tmp/RPMS/* \
     && dnf clean all \
     && rm -rf /var/cache/dnf \

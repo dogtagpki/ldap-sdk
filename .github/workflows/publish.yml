@@ -38,8 +38,8 @@ jobs:
       - name: Publish ldapjdk-builder image
         run: |
           docker load --input ldapjdk-builder.tar
-          docker tag ldapjdk-builder ghcr.io/${{ github.repository_owner }}/ldapjdk-builder
-          docker push ghcr.io/${{ github.repository_owner }}/ldapjdk-builder
+          docker tag ldapjdk-builder ghcr.io/${{ github.repository_owner }}/ldapjdk-builder:latest
+          docker push ghcr.io/${{ github.repository_owner }}/ldapjdk-builder:latest
 
       - name: Retrieve ldapjdk-runner image
         uses: actions/cache@v3
@@ -50,5 +50,5 @@ jobs:
       - name: Publish ldapjdk-runner image
         run: |
           docker load --input ldapjdk-runner.tar
-          docker tag ldapjdk-runner ghcr.io/${{ github.repository_owner }}/ldapjdk-runner
-          docker push ghcr.io/${{ github.repository_owner }}/ldapjdk-runner
+          docker tag ldapjdk-runner ghcr.io/${{ github.repository_owner }}/ldapjdk-runner:latest
+          docker push ghcr.io/${{ github.repository_owner }}/ldapjdk-runner:latest
