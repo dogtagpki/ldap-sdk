@@ -1,0 +1,54 @@
+name: Publish LDAP SDK
+
+on:
+  workflow_run:
+    workflows: [ 'Build LDAP SDK' ]
+    branches:
+      - master
+    types:
+      - completed
+
+jobs:
+  init:
+    name: Initialization
+    uses: ./.github/workflows/init.yml
+    secrets: inherit
+    if: github.event.workflow_run.event == 'push' && github.event.workflow_run.conclusion == 'success'
+
+  publish:
+    name: Publishing LDAP SDK
+    needs: init
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJSON(needs.init.outputs.matrix) }}
+    steps:
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Retrieve ldapjdk-builder image
+        uses: actions/cache@v3
+        with:
+          key: ldapjdk-builder-${{ matrix.os }}-${{ github.sha }}
+          path: ldapjdk-builder.tar
+
+      - name: Publish ldapjdk-builder image
+        run: |
+          docker load --input ldapjdk-builder.tar
+          docker tag ldapjdk-builder ghcr.io/${{ github.repository_owner }}/ldapjdk-builder
+          docker push ghcr.io/${{ github.repository_owner }}/ldapjdk-builder
+
+      - name: Retrieve ldapjdk-runner image
+        uses: actions/cache@v3
+        with:
+          key: ldapjdk-runner-${{ matrix.os }}-${{ github.sha }}
+          path: ldapjdk-runner.tar
+
+      - name: Publish ldapjdk-runner image
+        run: |
+          docker load --input ldapjdk-runner.tar
+          docker tag ldapjdk-runner ghcr.io/${{ github.repository_owner }}/ldapjdk-runner
+          docker push ghcr.io/${{ github.repository_owner }}/ldapjdk-runner
