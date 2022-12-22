@@ -70,6 +70,24 @@ jobs:
           key: ldapjdk-builder-${{ matrix.os }}-${{ github.sha }}
           path: ldapjdk-builder.tar
 
+      - name: Build ldapjdk-dist image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          build-args: |
+            BASE_IMAGE=registry.fedoraproject.org/fedora:${{ matrix.os }}
+            COPR_REPO=${{ needs.init.outputs.repo }}
+          tags: ldapjdk-dist
+          target: ldapjdk-dist
+          cache-from: type=local,src=/tmp/.buildx-cache
+          outputs: type=docker,dest=ldapjdk-dist.tar
+
+      - name: Store ldapjdk-dist image
+        uses: actions/cache@v3
+        with:
+          key: ldapjdk-dist-${{ matrix.os }}-${{ github.sha }}
+          path: ldapjdk-dist.tar
+
       - name: Build ldapjdk-runner image
         uses: docker/build-push-action@v3
         with:

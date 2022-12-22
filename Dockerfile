@@ -46,8 +46,8 @@ RUN dnf builddep -y --skip-unavailable --spec ldapjdk.spec
 ################################################################################
 FROM ldapjdk-builder-deps AS ldapjdk-builder
 
-# Import JSS packages from jss-builder
-COPY --from=ghcr.io/dogtagpki/jss-builder:latest /root/jss/build/RPMS /tmp/RPMS/
+# Import JSS packages
+COPY --from=ghcr.io/dogtagpki/jss-dist:latest /root/RPMS /tmp/RPMS/
 
 # Install build dependencies
 RUN dnf localinstall -y /tmp/RPMS/* \
@@ -62,13 +62,19 @@ COPY . /root/ldapjdk/
 RUN ./build.sh --work-dir=build rpm
 
 ################################################################################
-FROM ldapjdk-deps AS ldapjdk-runner
-
-# Import JSS packages from jss-builder
-COPY --from=ghcr.io/dogtagpki/jss-builder:latest /root/jss/build/RPMS /tmp/RPMS/
+FROM alpine:latest AS ldapjdk-dist
 
 # Import LDAP SDK packages
-COPY --from=ldapjdk-builder /root/ldapjdk/build/RPMS /tmp/RPMS/
+COPY --from=ldapjdk-builder /root/ldapjdk/build/RPMS /root/RPMS/
+
+################################################################################
+FROM ldapjdk-deps AS ldapjdk-runner
+
+# Import JSS packages
+COPY --from=ghcr.io/dogtagpki/jss-dist:latest /root/RPMS /tmp/RPMS/
+
+# Import LDAP SDK packages
+COPY --from=ldapjdk-dist /root/RPMS /tmp/RPMS/
 
 # Install runtime packages
 RUN dnf localinstall -y /tmp/RPMS/* \
