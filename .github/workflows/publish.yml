@@ -19,8 +19,6 @@ jobs:
     name: Publishing LDAP SDK
     needs: init
     runs-on: ubuntu-latest
-    strategy:
-      matrix: ${{ fromJSON(needs.init.outputs.matrix) }}
     steps:
       - name: Log in to the Container registry
         uses: docker/login-action@v2
@@ -32,7 +30,7 @@ jobs:
       - name: Retrieve ldapjdk-dist image
         uses: actions/cache@v3
         with:
-          key: ldapjdk-dist-${{ matrix.os }}-${{ github.sha }}
+          key: ldapjdk-dist-${{ github.sha }}
           path: ldapjdk-dist.tar
 
       - name: Publish ldapjdk-dist image
@@ -44,7 +42,7 @@ jobs:
       - name: Retrieve ldapjdk-runner image
         uses: actions/cache@v3
         with:
-          key: ldapjdk-runner-${{ matrix.os }}-${{ github.sha }}
+          key: ldapjdk-runner-${{ github.sha }}
           path: ldapjdk-runner.tar
 
       - name: Publish ldapjdk-runner image
