@@ -12,14 +12,12 @@ jobs:
     name: Waiting for build
     needs: init
     runs-on: ubuntu-latest
-    strategy:
-      matrix: ${{ fromJSON(needs.init.outputs.matrix) }}
     steps:
       - name: Wait for build
         uses: lewagon/wait-on-check-action@v1.2.0
         with:
           ref: ${{ github.ref }}
-          check-name: 'Building LDAP SDK (${{ matrix.os }})'
+          check-name: 'Building LDAP SDK'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           wait-interval: 30
         if: github.event_name == 'push'
@@ -28,7 +26,7 @@ jobs:
         uses: lewagon/wait-on-check-action@v1.2.0
         with:
           ref: ${{ github.event.pull_request.head.sha }}
-          check-name: 'Building LDAP SDK (${{ matrix.os }})'
+          check-name: 'Building LDAP SDK'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           wait-interval: 30
         if: github.event_name == 'pull_request'
@@ -39,8 +37,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SHARED: /tmp/workdir/ldapjdk
-    strategy:
-      matrix: ${{ fromJSON(needs.init.outputs.matrix) }}
     steps:
       - name: Clone the repository
         uses: actions/checkout@v3
@@ -48,7 +44,7 @@ jobs:
       - name: Retrieve ldapjdk-runner image
         uses: actions/cache@v3
         with:
-          key: ldapjdk-runner-${{ matrix.os }}-${{ github.sha }}
+          key: ldapjdk-runner-${{ github.sha }}
           path: ldapjdk-runner.tar
 
       - name: Load ldapjdk-runner image
@@ -98,6 +94,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: ca-${{ matrix.os }}
+          name: ca
           path: |
             /tmp/artifacts/pki
