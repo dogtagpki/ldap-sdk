@@ -19,6 +19,40 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
+      - name: Build ldapjdk-builder image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          build-args: |
+            BASE_IMAGE=${{ needs.init.outputs.base-image }}
+            COPR_REPO=${{ needs.init.outputs.repo }}
+          tags: ldapjdk-builder
+          target: ldapjdk-builder
+          outputs: type=docker,dest=ldapjdk-builder.tar
+
+      - name: Store ldapjdk-builder image
+        uses: actions/cache@v3
+        with:
+          key: ldapjdk-builder-${{ github.sha }}
+          path: ldapjdk-builder.tar
+
+      - name: Build ldapjdk-dist image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          build-args: |
+            BASE_IMAGE=${{ needs.init.outputs.base-image }}
+            COPR_REPO=${{ needs.init.outputs.repo }}
+          tags: ldapjdk-dist
+          target: ldapjdk-dist
+          outputs: type=docker,dest=ldapjdk-dist.tar
+
+      - name: Store ldapjdk-dist image
+        uses: actions/cache@v3
+        with:
+          key: ldapjdk-dist-${{ github.sha }}
+          path: ldapjdk-dist.tar
+
       - name: Build ldapjdk-runner image
         uses: docker/build-push-action@v3
         with:
@@ -26,7 +60,6 @@ jobs:
           build-args: |
             BASE_IMAGE=${{ needs.init.outputs.base-image }}
             COPR_REPO=${{ needs.init.outputs.repo }}
-            BUILD_OPTS=--with-timestamp --with-commit-id
           tags: ldapjdk-runner
           target: ldapjdk-runner
           outputs: type=docker,dest=ldapjdk-runner.tar
