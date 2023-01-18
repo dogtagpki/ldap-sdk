@@ -47,7 +47,7 @@ RUN dnf builddep -y --skip-unavailable --spec ldapjdk.spec
 FROM ldapjdk-builder-deps AS ldapjdk-builder
 
 # Import JSS packages
-COPY --from=ghcr.io/dogtagpki/jss-dist:4 /root/RPMS /tmp/RPMS/
+COPY --from=quay.io/dogtagpki/jss-dist:4 /root/RPMS /tmp/RPMS/
 
 # Install build dependencies
 RUN dnf localinstall -y /tmp/RPMS/* \
@@ -64,14 +64,14 @@ RUN ./build.sh --work-dir=build rpm
 ################################################################################
 FROM alpine:latest AS ldapjdk-dist
 
-# Import Tomcat JSS packages
+# Import LDAP SDK packages
 COPY --from=ldapjdk-builder /root/ldapjdk/build/RPMS /root/RPMS/
 
 ################################################################################
 FROM ldapjdk-deps AS ldapjdk-runner
 
 # Import JSS packages
-COPY --from=ghcr.io/dogtagpki/jss-dist:4 /root/RPMS /tmp/RPMS/
+COPY --from=quay.io/dogtagpki/jss-dist:4 /root/RPMS /tmp/RPMS/
 
 # Import LDAP SDK packages
 COPY --from=ldapjdk-dist /root/RPMS /tmp/RPMS/
