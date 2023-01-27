@@ -65,13 +65,12 @@ class ContextEnv extends ShareableEnv  {
     public static final int    DEFAULT_SSL_PORT = 636;
     public static final int    DEFAULT_LDAP_VERSION = 3;
 
-    // JNDI defined environment propertiies
+    // JNDI defined environment properties
     public static final String P_PROVIDER_URL = Context.PROVIDER_URL;
     public static final String P_SECURITY_PROTOCOL = Context.SECURITY_PROTOCOL;
     public static final String P_SECURITY_AUTHMODE = Context.SECURITY_AUTHENTICATION;
     public static final String P_USER_DN = Context.SECURITY_PRINCIPAL;
     public static final String P_USER_PASSWORD = Context.SECURITY_CREDENTIALS;
-    public static final String P_APPLET = Context.APPLET;
     public static final String P_AUTHORITATIVE = Context.AUTHORITATIVE;
     public static final String P_LANGUAGE = Context.LANGUAGE;
     public static final String P_BATCHSIZE = Context.BATCHSIZE;
