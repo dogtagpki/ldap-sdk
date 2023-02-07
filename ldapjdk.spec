@@ -12,13 +12,13 @@ Name:             ldapjdk
 # Downstream release number:
 # - development/stabilization (unsupported): 0.<n> where n >= 1
 # - GA/update (supported): <n> where n >= 1
-%global           release_number 0.2
+%global           release_number 1
 
 # Development phase:
 # - development (unsupported): alpha<n> where n >= 1
 # - stabilization (unsupported): beta<n> where n >= 1
 # - GA/update (supported): <none>
-%global           phase beta1
+#global           phase
 
 %undefine         timestamp
 %undefine         commit_id
@@ -26,7 +26,6 @@ Name:             ldapjdk
 Summary:          LDAP SDK
 URL:              https://github.com/dogtagpki/ldap-sdk
 License:          MPLv1.1 or GPLv2+ or LGPLv2+
-BuildArch:        noarch
 Version:          %{major_version}.%{minor_version}.%{update_version}
 Release:          %{release_number}%{?phase:.}%{?phase}%{?timestamp:.}%{?timestamp}%{?commit_id:.}%{?commit_id}%{?dist}
 
@@ -44,6 +43,9 @@ Source: https://github.com/dogtagpki/ldap-sdk/archive/v%{version}%{?phase:-}%{?p
 #     <version tag> \
 #     > ldap-sdk-VERSION-RELEASE.patch
 # Patch: ldap-sdk-VERSION-RELEASE.patch
+
+BuildArch:        noarch
+ExclusiveArch:    %{java_arches} noarch
 
 ################################################################################
 # Java
