@@ -41,8 +41,8 @@ jobs:
       run: |
         mvn install:install-file \
             -Dfile=/usr/lib/java/jss.jar \
-            -DgroupId=org.dogtagpki \
-            -DartifactId=jss \
+            -DgroupId=org.dogtagpki.jss \
+            -DartifactId=jss-base \
             -Dversion=5.4.0-SNAPSHOT \
             -Dpackaging=jar \
             -DgeneratePom=true
@@ -54,31 +54,31 @@ jobs:
     - name: Compare ldapjdk.jar
       run: |
         jar tvf ~/build/ldapjdk/packages/ldapjdk.jar | awk '{print $8;}' | sort | tee ant.out
-        jar tvf java-sdk/ldapjdk/target/ldapjdk-5.3.0-SNAPSHOT.jar | awk '{print $8;}' | grep -v '^META-INF/maven/' | sort > maven.out
+        jar tvf java-sdk/ldapjdk/target/ldapjdk-5.4.0-SNAPSHOT.jar | awk '{print $8;}' | grep -v '^META-INF/maven/' | sort > maven.out
         diff ant.out maven.out
 
     - name: Compare ldapbeans.jar
       run: |
         jar tvf ~/build/ldapjdk/packages/ldapbeans.jar | awk '{print $8;}' | sort | tee ant.out
-        jar tvf java-sdk/ldapbeans/target/ldapbeans-5.3.0-SNAPSHOT.jar | awk '{print $8;}' | grep -v '^META-INF/maven/' | sort > maven.out
+        jar tvf java-sdk/ldapbeans/target/ldapbeans-5.4.0-SNAPSHOT.jar | awk '{print $8;}' | grep -v '^META-INF/maven/' | sort > maven.out
         diff ant.out maven.out
 
     - name: Compare ldapfilter.jar
       run: |
         jar tvf ~/build/ldapjdk/packages/ldapfilt.jar | awk '{print $8;}' | sort | tee ant.out
-        jar tvf java-sdk/ldapfilter/target/ldapfilter-5.3.0-SNAPSHOT.jar | awk '{print $8;}' | grep -v '^META-INF/maven/' | sort > maven.out
+        jar tvf java-sdk/ldapfilter/target/ldapfilter-5.4.0-SNAPSHOT.jar | awk '{print $8;}' | grep -v '^META-INF/maven/' | sort > maven.out
         diff ant.out maven.out
 
     - name: Compare ldapsp.jar
       run: |
         jar tvf ~/build/ldapjdk/packages/ldapsp.jar | awk '{print $8;}' | sort | tee ant.out
-        jar tvf java-sdk/ldapsp/target/ldapsp-5.3.0-SNAPSHOT.jar | awk '{print $8;}' | grep -v '^META-INF/maven/' | sort > maven.out
+        jar tvf java-sdk/ldapsp/target/ldapsp-5.4.0-SNAPSHOT.jar | awk '{print $8;}' | grep -v '^META-INF/maven/' | sort > maven.out
         diff ant.out maven.out
 
     - name: Compare ldaptools.jar
       run: |
         jar tvf ~/build/ldapjdk/packages/ldaptools.jar | awk '{print $8;}' | sort | tee ant.out
-        jar tvf java-sdk/ldaptools/target/ldaptools-5.3.0-SNAPSHOT.jar | awk '{print $8;}' | grep -v '^META-INF/maven/' | sort > maven.out
+        jar tvf java-sdk/ldaptools/target/ldaptools-5.4.0-SNAPSHOT.jar | awk '{print $8;}' | grep -v '^META-INF/maven/' | sort > maven.out
         diff ant.out maven.out
 
     - name: Build LDAP JDK RPMs with Ant

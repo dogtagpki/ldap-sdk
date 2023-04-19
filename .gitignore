@@ -6,6 +6,7 @@ TAGS
 Makefile
 now
 target/
+.flattened-pom.xml
 
 # User files that may appear at the root
 **/config/.cache
