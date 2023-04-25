@@ -53,6 +53,7 @@
                 </configuration>
             </plugin>
         </plugins>
+        <finalName>ldapbeans</finalName>
     </build>
 
 </project>
