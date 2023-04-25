@@ -54,6 +54,7 @@
                 </configuration>
             </plugin>
         </plugins>
+        <finalName>ldaptools</finalName>
     </build>
 
 </project>

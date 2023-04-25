@@ -59,10 +59,10 @@ Source: https://github.com/dogtagpki/ldap-sdk/archive/v%{version}%{?phase:-}%{?p
 
 BuildRequires:    ant
 BuildRequires:    %{java_devel}
-BuildRequires:    javapackages-local
-BuildRequires:    slf4j
-BuildRequires:    slf4j-jdk14
-BuildRequires:    jss = 5.4
+BuildRequires:    maven-local
+BuildRequires:    mvn(org.slf4j:slf4j-api)
+BuildRequires:    mvn(org.slf4j:slf4j-jdk14)
+BuildRequires:    mvn(org.dogtagpki.jss:jss-base) >= 5.4.0
 
 %description
 The Mozilla LDAP SDKs enable you to write applications which access,
@@ -75,10 +75,9 @@ manage, and update the information stored in an LDAP directory.
 Summary:          LDAP SDK
 
 Requires:         %{java_headless}
-Requires:         jpackage-utils >= 0:1.5
-Requires:         slf4j
-Requires:         slf4j-jdk14
-Requires:         jss = 5.4
+Requires:         mvn(org.slf4j:slf4j-api)
+Requires:         mvn(org.slf4j:slf4j-jdk14)
+Requires:         mvn(org.dogtagpki.jss:jss-base) >= 5.4.0
 
 Obsoletes:        ldapjdk < %{version}-%{release}
 Provides:         ldapjdk = %{version}-%{release}
@@ -117,25 +116,32 @@ Javadoc for LDAP SDK
 
 export JAVA_HOME=%{java_home}
 
-./build.sh \
-    %{?_verbose:-v} \
-    --work-dir=%{_vpath_builddir} \
-    dist
+# flatten-maven-plugin is not available in RPM
+%pom_remove_plugin org.codehaus.mojo:flatten-maven-plugin
+
+%mvn_build
 
 ################################################################################
 %install
 ################################################################################
 
-./build.sh \
-    %{?_verbose:-v} \
-    --work-dir=%{_vpath_builddir} \
-    --java-lib-dir=%{_javadir} \
-    --javadoc-dir=%{_javadocdir} \
-    --install-dir=%{buildroot} \
-    install
+%mvn_install
+
+# create links for backward compatibility
+ln -sf %{name}/ldapjdk.jar %{buildroot}%{_javadir}/ldapjdk.jar
+ln -sf %{name}/ldapsp.jar %{buildroot}%{_javadir}/ldapsp.jar
+ln -sf %{name}/ldapfilter.jar %{buildroot}%{_javadir}/ldapfilt.jar
+ln -sf %{name}/ldapbeans.jar %{buildroot}%{_javadir}/ldapbeans.jar
+ln -sf %{name}/ldaptools.jar %{buildroot}%{_javadir}/ldaptools.jar
+
+ln -sf %{name}/ldapjdk.pom %{buildroot}%{_mavenpomdir}/JPP-ldapjdk.pom
+ln -sf %{name}/ldapsp.pom %{buildroot}%{_mavenpomdir}/JPP-ldapsp.pom
+ln -sf %{name}/ldapfilter.pom %{buildroot}%{_mavenpomdir}/JPP-ldapfilter.pom
+ln -sf %{name}/ldapbeans.pom %{buildroot}%{_mavenpomdir}/JPP-ldapbeans.pom
+ln -sf %{name}/ldaptools.pom %{buildroot}%{_mavenpomdir}/JPP-ldaptools.pom
 
 ################################################################################
-%files -n %{product_id}
+%files -n %{product_id} -f .mfiles
 ################################################################################
 
 %{_javadir}/ldapjdk.jar
@@ -143,6 +149,7 @@ export JAVA_HOME=%{java_home}
 %{_javadir}/ldapfilt.jar
 %{_javadir}/ldapbeans.jar
 %{_javadir}/ldaptools.jar
+
 %{_mavenpomdir}/JPP-ldapjdk.pom
 %{_mavenpomdir}/JPP-ldapsp.pom
 %{_mavenpomdir}/JPP-ldapfilter.pom
@@ -150,11 +157,8 @@ export JAVA_HOME=%{java_home}
 %{_mavenpomdir}/JPP-ldaptools.pom
 
 ################################################################################
-%files -n %{product_id}-javadoc
+%files -n %{product_id}-javadoc -f .mfiles-javadoc
 ################################################################################
-
-%dir %{_javadocdir}/ldapjdk
-%{_javadocdir}/ldapjdk/*
 
 ################################################################################
 %changelog

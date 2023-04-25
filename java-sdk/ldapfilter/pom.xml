@@ -47,6 +47,7 @@
                 </configuration>
             </plugin>
         </plugins>
+        <finalName>ldapfilter</finalName>
     </build>
 
 </project>
