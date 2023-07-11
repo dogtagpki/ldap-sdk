@@ -66,7 +66,7 @@ BuildRequires:    %{java_devel}
 BuildRequires:    maven-local
 BuildRequires:    mvn(org.slf4j:slf4j-api)
 BuildRequires:    mvn(org.slf4j:slf4j-jdk14)
-BuildRequires:    mvn(org.dogtagpki.jss:jss-base) >= 5.4.0
+BuildRequires:    mvn(org.dogtagpki.jss:jss-base) >= 5.5.0
 
 %description
 The Mozilla LDAP SDKs enable you to write applications which access,
@@ -81,7 +81,7 @@ Summary:          LDAP SDK
 Requires:         %{java_headless}
 Requires:         mvn(org.slf4j:slf4j-api)
 Requires:         mvn(org.slf4j:slf4j-jdk14)
-Requires:         mvn(org.dogtagpki.jss:jss-base) >= 5.4.0
+Requires:         mvn(org.dogtagpki.jss:jss-base) >= 5.5.0
 
 Obsoletes:        ldapjdk < %{version}-%{release}
 Provides:         ldapjdk = %{version}-%{release}
