@@ -8,7 +8,7 @@
     <parent>
         <groupId>org.dogtagpki.ldap-sdk</groupId>
         <artifactId>java-sdk-parent</artifactId>
-        <version>${revision}</version>
+        <version>5.5.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>ldapbeans</artifactId>
