@@ -45,7 +45,7 @@ Source: https://github.com/dogtagpki/ldap-sdk/archive/v%{version}%{?phase:-}%{?p
 # Patch: ldap-sdk-VERSION-RELEASE.patch
 
 BuildArch:        noarch
-%if 0%{?fedora}
+%if 0%{?java_arches:1}
 ExclusiveArch:    %{java_arches} noarch
 %endif
 
