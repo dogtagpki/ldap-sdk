@@ -65,6 +65,7 @@ RUN ./build.sh --work-dir=build rpm
 FROM alpine:latest AS ldapjdk-dist
 
 # Import LDAP SDK packages
+COPY --from=ldapjdk-builder /root/ldapjdk/build/SRPMS /root/SRPMS/
 COPY --from=ldapjdk-builder /root/ldapjdk/build/RPMS /root/RPMS/
 
 ################################################################################
