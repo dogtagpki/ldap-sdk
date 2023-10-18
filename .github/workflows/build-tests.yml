@@ -6,14 +6,8 @@ env:
   COPR_REPO: ${{ vars.COPR_REPO || '@pki/master' }}
 
 jobs:
-  init:
-    name: Initialization
-    uses: ./.github/workflows/init.yml
-    secrets: inherit
-
   build-test:
     name: Build Test
-    needs: init
     runs-on: ubuntu-latest
     container: ${{ vars.BASE_IMAGE || 'registry.fedoraproject.org/fedora:latest' }}
     steps:

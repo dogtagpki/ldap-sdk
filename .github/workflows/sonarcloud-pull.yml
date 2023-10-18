@@ -72,15 +72,9 @@ jobs:
             var pr_base = fs.readFileSync('./BaseBranch');
             return pr_base;
 
-  init:
-    name: Initialization
-    needs: retrieve-pr
-    uses: ./.github/workflows/init.yml
-    secrets: inherit
-
   build:
     name: Building LDAP SDK
-    needs: [init, retrieve-pr]
+    needs: retrieve-pr
     runs-on: ubuntu-latest
     steps:
       - name: Clone the repository
@@ -119,7 +113,7 @@ jobs:
 
   sonarcloud:
     name: SonarCloud
-    needs: [retrieve-pr, init, build]
+    needs: [retrieve-pr, build]
     runs-on: ubuntu-latest
     env:
       SHARED: /tmp/workdir/ldapjdk

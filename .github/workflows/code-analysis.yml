@@ -1,15 +1,10 @@
 name: Code Analysis
 on: [push, pull_request]
-jobs:
-  init:
-    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
-    name: Initialization
-    uses: ./.github/workflows/init.yml
-    secrets: inherit
 
+jobs:
   build:
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
     name: Waiting for build
-    needs: init
     runs-on: ubuntu-latest
     steps:
       - name: Wait for build
@@ -32,7 +27,7 @@ jobs:
 
   sonarcloud:
     name: SonarCloud
-    needs: [init, build]
+    needs: build
     runs-on: ubuntu-latest
     env:
       SHARED: /tmp/workdir/ldapjdk
