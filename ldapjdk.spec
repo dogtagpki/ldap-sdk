@@ -114,14 +114,21 @@ Javadoc for LDAP SDK
 
 %autosetup -n ldap-sdk-%{version}%{?phase:-}%{?phase} -p 1
 
+# flatten-maven-plugin is not available in RPM
+%pom_remove_plugin org.codehaus.mojo:flatten-maven-plugin
+
+# specify Maven artifact locations
+%mvn_file org.dogtagpki.ldap-sdk:ldapjdk     ldapjdk/ldapjdk    ldapjdk
+%mvn_file org.dogtagpki.ldap-sdk:ldapbeans   ldapjdk/ldapbeans  ldapbeans
+%mvn_file org.dogtagpki.ldap-sdk:ldapfilter  ldapjdk/ldapfilter ldapfilt
+%mvn_file org.dogtagpki.ldap-sdk:ldapsp      ldapjdk/ldapsp     ldapsp
+%mvn_file org.dogtagpki.ldap-sdk:ldaptools   ldapjdk/ldaptools  ldaptools
+
 ################################################################################
 %build
 ################################################################################
 
 export JAVA_HOME=%{java_home}
-
-# flatten-maven-plugin is not available in RPM
-%pom_remove_plugin org.codehaus.mojo:flatten-maven-plugin
 
 %mvn_build
 
@@ -130,13 +137,6 @@ export JAVA_HOME=%{java_home}
 ################################################################################
 
 %mvn_install
-
-# create links for backward compatibility
-ln -sf %{name}/ldapjdk.jar %{buildroot}%{_javadir}/ldapjdk.jar
-ln -sf %{name}/ldapsp.jar %{buildroot}%{_javadir}/ldapsp.jar
-ln -sf %{name}/ldapfilter.jar %{buildroot}%{_javadir}/ldapfilt.jar
-ln -sf %{name}/ldapbeans.jar %{buildroot}%{_javadir}/ldapbeans.jar
-ln -sf %{name}/ldaptools.jar %{buildroot}%{_javadir}/ldaptools.jar
 
 ln -sf %{name}/ldapjdk.pom %{buildroot}%{_mavenpomdir}/JPP-ldapjdk.pom
 ln -sf %{name}/ldapsp.pom %{buildroot}%{_mavenpomdir}/JPP-ldapsp.pom
@@ -147,12 +147,6 @@ ln -sf %{name}/ldaptools.pom %{buildroot}%{_mavenpomdir}/JPP-ldaptools.pom
 ################################################################################
 %files -n %{product_id} -f .mfiles
 ################################################################################
-
-%{_javadir}/ldapjdk.jar
-%{_javadir}/ldapsp.jar
-%{_javadir}/ldapfilt.jar
-%{_javadir}/ldapbeans.jar
-%{_javadir}/ldaptools.jar
 
 %{_mavenpomdir}/JPP-ldapjdk.pom
 %{_mavenpomdir}/JPP-ldapsp.pom
