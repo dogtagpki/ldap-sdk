@@ -51,6 +51,7 @@ import netscape.ldap.ber.stream.BERSequence;
 import netscape.ldap.ber.stream.BERTag;
 import netscape.ldap.client.JDAPBERTagDecoder;
 import netscape.ldap.controls.LDAPEntryChangeControl;
+import netscape.ldap.controls.LDAPPagedResultsControl;
 import netscape.ldap.controls.LDAPPasswordExpiredControl;
 import netscape.ldap.controls.LDAPPasswordExpiringControl;
 import netscape.ldap.controls.LDAPSortControl;
@@ -534,6 +535,8 @@ public class LDAPControl implements Cloneable, java.io.Serializable {
                                   LDAPSortControl.class );
             LDAPControl.register( LDAPVirtualListResponse.VIRTUALLISTRESPONSE,
                                   LDAPVirtualListResponse.class );
+            LDAPControl.register( LDAPPagedResultsControl.PAGEDSEARCH,
+                                  LDAPPagedResultsControl.class );
         } catch (LDAPException e) {
         }
     }
