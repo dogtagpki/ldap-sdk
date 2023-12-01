@@ -88,7 +88,7 @@ import netscape.ldap.client.JDAPBERTagDecoder;
  *          cons.setServerControls(pagecon);
  * 
  *          // Start the paged search.
- *          String cookie = null;
+ *          byte[] cookie = null;
  *          int pag = 1;
  *          do{
  *              LDAPSearchResults res = ld.search(baseDn,
@@ -101,8 +101,8 @@ import netscape.ldap.client.JDAPBERTagDecoder;
  *              }
  *              for (LDAPControl c: res.getResponseControls()){
  *                  if(c instanceof LDAPPagedResultsControl resC){
+ *                      System.out.println("The control for pag " + pag + " return a total or " + resC.getPageSize());
  *                      cookie = resC.getCookie();
- *                      System.out.println("The control for pag " + pag + " return a total or " + resC.getPageSize() + " and cookie " + resC.getCookie());
  *                      if(cookie!=null){
  *                          pagecon = new LDAPPagedResultsControl(false, 3, cookie);
  *                          cons.setServerControls(pagecon);
@@ -110,7 +110,7 @@ import netscape.ldap.client.JDAPBERTagDecoder;
  *                  }
  *              }
  *              pag++;
- *          } while (cookie != null && !cookie.isEmpty());
+ *          } while (cookie != null);
  *      } catch (Exception e) {
  *          e.printStackTrace();
  *      }
@@ -125,7 +125,7 @@ import netscape.ldap.client.JDAPBERTagDecoder;
 public class LDAPPagedResultsControl extends LDAPControl {
     public static final String PAGEDSEARCH  = "1.2.840.113556.1.4.319";
     private int pageSize;
-    private String cookie;
+    private byte[] cookie;
 
     /**
      * Constructs an <CODE>LDAPPagedResultsControl</CODE> object
@@ -161,8 +161,7 @@ public class LDAPPagedResultsControl extends LDAPControl {
             return;
         }
         BEROctetString t = (BEROctetString)seq.elementAt(1);
-        byte[] cookie = t.getValue();
-        this.cookie = cookie == null ? null : new String(t.getValue(), StandardCharsets.UTF_8);
+        cookie = t.getValue();
     }
 
     /**
@@ -192,7 +191,7 @@ public class LDAPPagedResultsControl extends LDAPControl {
      *
      * @see netscape.ldap.LDAPControl
      */
-    public LDAPPagedResultsControl(boolean critical, int pageSize, String cookie) {
+    public LDAPPagedResultsControl(boolean critical, int pageSize, byte[] cookie) {
         super(PAGEDSEARCH, critical, null);
         this.pageSize = pageSize;
         this.cookie = cookie;
@@ -233,7 +232,7 @@ public class LDAPPagedResultsControl extends LDAPControl {
      * @return the cookie to use for the following request or null if all entries
      * have been returned.
      */
-    public String getCookie() {
+    public byte[] getCookie() {
         return cookie;
     }
 }
