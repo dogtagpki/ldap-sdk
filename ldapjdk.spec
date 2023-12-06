@@ -18,7 +18,7 @@ Name:             ldapjdk
 # - development (unsupported): alpha<n> where n >= 1
 # - stabilization (unsupported): beta<n> where n >= 1
 # - GA/update (supported): <none>
-%global           phase alpha3
+%global           phase alpha4
 
 %undefine         timestamp
 %undefine         commit_id
