@@ -78,14 +78,14 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
         if: vars.REGISTRY != 'ghcr.io'
 
-      - name: Retrieve ldapjdk-dist image
+      - name: Retrieve LDAP SDK image
         uses: actions/cache@v3
         with:
-          key: ldapjdk-dist-${{ github.sha }}
-          path: ldapjdk-dist.tar
+          key: ldapjdk-images-${{ github.sha }}
+          path: ldapjdk-images.tar
 
-      - name: Publish ldapjdk-dist image
+      - name: Publish LDAP SDK image
         run: |
-          docker load --input ldapjdk-dist.tar
+          docker load --input ldapjdk-images.tar
           docker tag ldapjdk-dist ${{ vars.REGISTRY }}/$NAMESPACE/ldapjdk-dist:latest
           docker push ${{ vars.REGISTRY }}/$NAMESPACE/ldapjdk-dist:latest

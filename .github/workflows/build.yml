@@ -58,13 +58,7 @@ jobs:
           tags: ldapjdk-builder
           target: ldapjdk-builder
           cache-from: type=local,src=/tmp/.buildx-cache
-          outputs: type=docker,dest=ldapjdk-builder.tar
-
-      - name: Store ldapjdk-builder image
-        uses: actions/cache@v3
-        with:
-          key: ldapjdk-builder-${{ github.sha }}
-          path: ldapjdk-builder.tar
+          outputs: type=docker
 
       - name: Build ldapjdk-dist image
         uses: docker/build-push-action@v3
@@ -76,13 +70,7 @@ jobs:
           tags: ldapjdk-dist
           target: ldapjdk-dist
           cache-from: type=local,src=/tmp/.buildx-cache
-          outputs: type=docker,dest=ldapjdk-dist.tar
-
-      - name: Store ldapjdk-dist image
-        uses: actions/cache@v3
-        with:
-          key: ldapjdk-dist-${{ github.sha }}
-          path: ldapjdk-dist.tar
+          outputs: type=docker
 
       - name: Build ldapjdk-runner image
         uses: docker/build-push-action@v3
@@ -94,10 +82,15 @@ jobs:
           tags: ldapjdk-runner
           target: ldapjdk-runner
           cache-from: type=local,src=/tmp/.buildx-cache
-          outputs: type=docker,dest=ldapjdk-runner.tar
+          outputs: type=docker
 
-      - name: Store ldapjdk-runner image
+      - name: Save LDAP SDK images
+        run: |
+          docker images
+          docker save -o ldapjdk-images.tar ldapjdk-builder ldapjdk-dist ldapjdk-runner
+
+      - name: Store LDAP SDK images
         uses: actions/cache@v3
         with:
-          key: ldapjdk-runner-${{ github.sha }}
-          path: ldapjdk-runner.tar
+          key: ldapjdk-images-${{ github.sha }}
+          path: ldapjdk-images.tar

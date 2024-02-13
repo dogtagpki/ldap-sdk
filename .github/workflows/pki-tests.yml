@@ -35,14 +35,14 @@ jobs:
       - name: Clone the repository
         uses: actions/checkout@v3
 
-      - name: Retrieve ldapjdk-runner image
+      - name: Retrieve LDAP SDK image
         uses: actions/cache@v3
         with:
-          key: ldapjdk-runner-${{ github.sha }}
-          path: ldapjdk-runner.tar
+          key: ldapjdk-images-${{ github.sha }}
+          path: ldapjdk-images.tar
 
-      - name: Load ldapjdk-runner image
-        run: docker load --input ldapjdk-runner.tar
+      - name: Load LDAP SDK image
+        run: docker load --input ldapjdk-images.tar
 
       - name: Run container
         run: |

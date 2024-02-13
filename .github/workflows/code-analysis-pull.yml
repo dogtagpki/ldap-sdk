@@ -1,4 +1,4 @@
-name: Sonarcloud-Pull
+name: Code Analysis for Pull Request
 
 on:
   workflow_run:
