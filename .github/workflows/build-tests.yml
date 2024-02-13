@@ -2,42 +2,65 @@ name: Build Tests
 
 on: [push, pull_request]
 
-env:
-  COPR_REPO: ${{ vars.COPR_REPO || '@pki/master' }}
-
 jobs:
+  wait-for-build:
+    name: Waiting for build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for build
+        uses: lewagon/wait-on-check-action@v1.3.1
+        with:
+          ref: ${{ github.ref }}
+          check-name: 'Building LDAP SDK'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 30
+        if: github.event_name == 'push'
+
+      - name: Wait for build
+        uses: lewagon/wait-on-check-action@v1.3.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          check-name: 'Building LDAP SDK'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 30
+        if: github.event_name == 'pull_request'
+
   build-test:
     name: Build Test
+    needs: wait-for-build
     runs-on: ubuntu-latest
-    container: ${{ vars.BASE_IMAGE || 'registry.fedoraproject.org/fedora:latest' }}
+    env:
+      SHARED: /tmp/workdir/ldapjdk
     steps:
     - name: Clone repository
       uses: actions/checkout@v3
 
-    - name: Install dependencies
-      run: |
-        dnf install -y dnf-plugins-core moby-engine maven rpm-build
-        if [ -n "$COPR_REPO" ]; then dnf copr enable -y $COPR_REPO; fi
-        dnf builddep -y --skip-unavailable --spec ldapjdk.spec
+    - name: Retrieve LDAP SDK images
+      uses: actions/cache@v3
+      with:
+        key: ldapjdk-images-${{ github.sha }}
+        path: ldapjdk-images.tar
 
-    - name: Install JSS packages from jss-dist
+    - name: Load LDAP SDK images
+      run: docker load --input ldapjdk-images.tar
+
+    - name: Set up LDAP SDK container
       run: |
-        docker pull quay.io/dogtagpki/jss-dist:latest
-        docker create --name=jss-dist quay.io/dogtagpki/jss-dist:latest
-        docker cp jss-dist:/root/RPMS /tmp/RPMS/
-        docker rm -f jss-dist
-        dnf localinstall -y /tmp/RPMS/*
+        tests/bin/runner-init.sh ldapjdk
+      env:
+        IMAGE: ldapjdk-builder
+        HOSTNAME: ldapjdk.example.com
 
     - name: Build with Ant
       run: |
-        ./build.sh
+        docker exec ldapjdk ./build.sh
 
     - name: Install JSS into local Maven repo
       run: |
         # get JSS <major>.<minor>.<update> version
-        JSS_VERSION=$(rpm -q --qf "%{version}" dogtag-jss)
+        JSS_VERSION=$(docker exec ldapjdk rpm -q --qf "%{version}" dogtag-jss)
 
-        mvn install:install-file \
+        docker exec ldapjdk mvn install:install-file \
             -Dfile=/usr/lib/java/jss.jar \
             -DgroupId=org.dogtagpki.jss \
             -DartifactId=jss-base \
@@ -47,47 +70,87 @@ jobs:
 
     - name: Build with Maven
       run: |
-        mvn package
+        docker exec ldapjdk mvn package
 
     - name: Compare ldapjdk.jar
       run: |
-        jar tvf ~/build/ldapjdk/packages/ldapjdk.jar | awk '{print $8;}' | sort | tee ldapjdk.ant
-        jar tvf java-sdk/ldapjdk/target/ldapjdk.jar | awk '{print $8;}' | grep -v '^META-INF/maven/' | sort | tee ldapjdk.maven
+        docker exec ldapjdk \
+            jar tvf /root/build/ldapjdk/packages/ldapjdk.jar \
+            | awk '{print $8;}' \
+            | sort \
+            | tee ldapjdk.ant
+        docker exec ldapjdk \
+            jar tvf java-sdk/ldapjdk/target/ldapjdk.jar \
+            | awk '{print $8;}' \
+            | grep -v '^META-INF/maven/' \
+            | sort \
+            | tee ldapjdk.maven
         diff ldapjdk.ant ldapjdk.maven
 
     - name: Compare ldapbeans.jar
       run: |
-        jar tvf ~/build/ldapjdk/packages/ldapbeans.jar | awk '{print $8;}' | sort | tee ldapbeans.ant
-        jar tvf java-sdk/ldapbeans/target/ldapbeans.jar | awk '{print $8;}' | grep -v '^META-INF/maven/' | sort | tee ldapbeans.maven
+        docker exec ldapjdk \
+            jar tvf /root/build/ldapjdk/packages/ldapbeans.jar \
+            | awk '{print $8;}' \
+            | sort \
+            | tee ldapbeans.ant
+        docker exec ldapjdk \
+            jar tvf java-sdk/ldapbeans/target/ldapbeans.jar \
+            | awk '{print $8;}' \
+            | grep -v '^META-INF/maven/' \
+            | sort \
+            | tee ldapbeans.maven
         diff ldapbeans.ant ldapbeans.maven
 
     - name: Compare ldapfilter.jar
       run: |
-        jar tvf ~/build/ldapjdk/packages/ldapfilt.jar | awk '{print $8;}' | sort | tee ldapfilt.ant
-        jar tvf java-sdk/ldapfilter/target/ldapfilter.jar | awk '{print $8;}' | grep -v '^META-INF/maven/' | sort | tee ldapfilt.maven
+        docker exec ldapjdk \
+            jar tvf /root/build/ldapjdk/packages/ldapfilt.jar \
+            | awk '{print $8;}' \
+            | sort \
+            | tee ldapfilt.ant
+        docker exec ldapjdk \
+            jar tvf java-sdk/ldapfilter/target/ldapfilter.jar \
+            | awk '{print $8;}' \
+            | grep -v '^META-INF/maven/' \
+            | sort \
+            | tee ldapfilt.maven
         diff ldapfilt.ant ldapfilt.maven
 
     - name: Compare ldapsp.jar
       run: |
-        jar tvf ~/build/ldapjdk/packages/ldapsp.jar | awk '{print $8;}' | sort | tee ldapsp.ant
-        jar tvf java-sdk/ldapsp/target/ldapsp.jar | awk '{print $8;}' | grep -v '^META-INF/maven/' | sort | tee ldapsp.maven
+        docker exec ldapjdk \
+            jar tvf /root/build/ldapjdk/packages/ldapsp.jar \
+            | awk '{print $8;}' \
+            | sort \
+            | tee ldapsp.ant
+        docker exec ldapjdk \
+            jar tvf java-sdk/ldapsp/target/ldapsp.jar \
+            | awk '{print $8;}' \
+            | grep -v '^META-INF/maven/' \
+            | sort \
+            | tee ldapsp.maven
         diff ldapsp.ant ldapsp.maven
 
     - name: Compare ldaptools.jar
       run: |
-        jar tvf ~/build/ldapjdk/packages/ldaptools.jar | awk '{print $8;}' | sort | tee ldaptools.ant
-        jar tvf java-sdk/ldaptools/target/ldaptools.jar | awk '{print $8;}' | grep -v '^META-INF/maven/' | sort | tee ldaptools.maven
+        docker exec ldapjdk jar tvf /root/build/ldapjdk/packages/ldaptools.jar \
+            | awk '{print $8;}' \
+            | sort \
+            | tee ldaptools.ant
+        docker exec ldapjdk \
+            jar tvf java-sdk/ldaptools/target/ldaptools.jar \
+            | awk '{print $8;}' \
+            | grep -v '^META-INF/maven/' \
+            | sort \
+            | tee ldaptools.maven
         diff ldaptools.ant ldaptools.maven
-
-    - name: Build LDAP JDK RPMs with Ant
-      run: |
-        ./build.sh --work-dir=build rpm
 
     - name: Install RPMInspect
       run: |
-        dnf install -y dnf-plugins-core
-        dnf copr enable -y copr.fedorainfracloud.org/dcantrell/rpminspect
-        dnf install -y rpminspect rpminspect-data-fedora
+        docker exec ldapjdk dnf copr enable -y copr.fedorainfracloud.org/dcantrell/rpminspect
+        docker exec ldapjdk dnf install -y rpminspect rpminspect-data-fedora
 
     - name: Run RPMInspect on SRPM and RPMs
-      run: ./tests/bin/rpminspect.sh
+      run: |
+        docker exec ldapjdk ./tests/bin/rpminspect.sh
