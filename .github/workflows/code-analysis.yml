@@ -46,9 +46,7 @@ jobs:
 
       - name: Run container
         run: |
-          IMAGE=ldapjdk-runner \
-          NAME=pki \
-          tests/bin/runner-init.sh
+          tests/bin/runner-init.sh pki
 
       - name: Copy builds in current folder
         run: |

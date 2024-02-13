@@ -46,10 +46,9 @@ jobs:
 
       - name: Run container
         run: |
-          IMAGE=ldapjdk-runner \
-          NAME=ds \
-          HOSTNAME=ds.example.com \
-          tests/bin/runner-init.sh
+          tests/bin/runner-init.sh ds
+        env:
+          HOSTNAME: ds.example.com
 
       - name: Install DS package
         run: docker exec ds dnf install -y 389-ds-base
@@ -97,10 +96,9 @@ jobs:
 
       - name: Run container
         run: |
-          IMAGE=ldapjdk-runner \
-          NAME=server \
-          HOSTNAME=server.example.com \
-          tests/bin/runner-init.sh
+          tests/bin/runner-init.sh server
+        env:
+          HOSTNAME: server.example.com
 
       - name: Install DS package
         run: docker exec server dnf install -y 389-ds-base dogtag-pki
