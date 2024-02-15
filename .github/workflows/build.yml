@@ -19,7 +19,7 @@ jobs:
 
       - name: Cache Docker layers
         id: cache-buildx
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: buildx-${{ hashFiles('ldapjdk.spec') }}
           path: /tmp/.buildx-cache
@@ -90,7 +90,7 @@ jobs:
           docker save -o ldapjdk-images.tar ldapjdk-builder ldapjdk-dist ldapjdk-runner
 
       - name: Store LDAP SDK images
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: ldapjdk-images-${{ github.sha }}
           path: ldapjdk-images.tar

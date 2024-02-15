@@ -106,7 +106,7 @@ jobs:
           outputs: type=docker,dest=sonar-runner.tar
 
       - name: Store runner image
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: sonar-runner-${{ github.event.workflow_run.id }}
           path: sonar-runner.tar
@@ -119,7 +119,7 @@ jobs:
       SHARED: /tmp/workdir/ldapjdk
     steps:
       - name: Retrieve runner image
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: sonar-runner-${{ github.event.workflow_run.id }}
           path: sonar-runner.tar

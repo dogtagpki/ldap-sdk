@@ -36,7 +36,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Retrieve LDAP SDK image
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: ldapjdk-images-${{ github.sha }}
           path: ldapjdk-images.tar
