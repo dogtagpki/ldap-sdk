@@ -2,6 +2,9 @@ name: PKI Tests
 
 on: [push, pull_request]
 
+env:
+  NAMESPACE: ${{ vars.REGISTRY_NAMESPACE || 'dogtagpki' }}
+
 jobs:
   build:
     name: Waiting for build
@@ -50,8 +53,17 @@ jobs:
         env:
           HOSTNAME: pki.example.com
 
-      - name: Install DS and PKI packages
-        run: docker exec pki dnf install -y 389-ds-base pki-ca
+      - name: Import PKI packages
+        run: |
+          docker create --name=pki-dist quay.io/$NAMESPACE/pki-dist:latest
+          docker cp pki-dist:/root/RPMS/. /tmp/RPMS/
+          docker rm -f pki-dist
+
+      - name: Install packages
+        run: |
+          docker exec pki dnf install -y 389-ds-base
+          docker cp /tmp/RPMS/. pki:/root/RPMS/
+          docker exec pki bash -c "dnf localinstall -y /root/RPMS/*"
 
       - name: Install DS
         run: docker exec pki ${SHARED}/tests/bin/ds-create.sh
