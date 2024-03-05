@@ -1,6 +1,5 @@
 #!/bin/bash
 
-JAVA_HOME=/usr/lib/jvm/jre-17-openjdk
 CLASSPATH=/usr/share/java/ldapjdk.jar:/usr/share/java/ldaptools.jar:/usr/share/java/slf4j/slf4j-api.jar:/usr/share/java/slf4j/slf4j-jdk14.jar
 
 echo "Checking Root DSE"
