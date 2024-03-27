@@ -6,19 +6,19 @@ Name:             ldapjdk
 
 # Upstream version number:
 %global           major_version 5
-%global           minor_version 5
+%global           minor_version 6
 %global           update_version 0
 
 # Downstream release number:
 # - development/stabilization (unsupported): 0.<n> where n >= 1
 # - GA/update (supported): <n> where n >= 1
-%global           release_number 1
+%global           release_number 0.1
 
 # Development phase:
 # - development (unsupported): alpha<n> where n >= 1
 # - stabilization (unsupported): beta<n> where n >= 1
 # - GA/update (supported): <none>
-#global           phase
+%global           phase alpha1
 
 %undefine         timestamp
 %undefine         commit_id
@@ -84,7 +84,7 @@ BuildRequires:    %{java_devel}
 BuildRequires:    maven-local
 BuildRequires:    mvn(org.slf4j:slf4j-api)
 BuildRequires:    mvn(org.slf4j:slf4j-jdk14)
-BuildRequires:    mvn(org.dogtagpki.jss:jss-base) >= 5.5.0
+BuildRequires:    mvn(org.dogtagpki.jss:jss-base) >= 5.6.0
 
 %description
 The Mozilla LDAP SDKs enable you to write applications which access,
@@ -99,7 +99,7 @@ Summary:          LDAP SDK
 Requires:         %{java_headless}
 Requires:         mvn(org.slf4j:slf4j-api)
 Requires:         mvn(org.slf4j:slf4j-jdk14)
-Requires:         mvn(org.dogtagpki.jss:jss-base) >= 5.5.0
+Requires:         mvn(org.dogtagpki.jss:jss-base) >= 5.6.0
 
 Obsoletes:        ldapjdk < %{version}-%{release}
 Provides:         ldapjdk = %{version}-%{release}
