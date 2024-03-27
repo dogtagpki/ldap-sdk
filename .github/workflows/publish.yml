@@ -3,7 +3,7 @@ name: Publish LDAP SDK
 on:
   push:
     branches:
-      - master
+      - v5.5
 
 env:
   NAMESPACE: ${{ vars.REGISTRY_NAMESPACE || github.repository_owner }}
@@ -87,5 +87,5 @@ jobs:
       - name: Publish LDAP SDK image
         run: |
           docker load --input ldapjdk-images.tar
-          docker tag ldapjdk-dist ${{ vars.REGISTRY }}/$NAMESPACE/ldapjdk-dist:latest
-          docker push ${{ vars.REGISTRY }}/$NAMESPACE/ldapjdk-dist:latest
+          docker tag ldapjdk-dist ${{ vars.REGISTRY }}/$NAMESPACE/ldapjdk-dist:5.5
+          docker push ${{ vars.REGISTRY }}/$NAMESPACE/ldapjdk-dist:5.5
