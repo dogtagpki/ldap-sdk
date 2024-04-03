@@ -37,7 +37,7 @@
  * ***** END LICENSE BLOCK ***** */
 package netscape.ldap;
 
-import java.util.Enumeration;
+import java.io.Serializable;
 import java.util.Vector;
 
 /**
@@ -55,7 +55,7 @@ import java.util.Vector;
  * @see netscape.ldap.LDAPConnection#search(java.lang.String, int, java.lang.String, java.lang.String[], boolean)
  * @see netscape.ldap.LDAPConnection#abandon(netscape.ldap.LDAPSearchResults)
  */
-public class LDAPSearchResults implements Enumeration<Object>, java.io.Serializable {
+public class LDAPSearchResults implements Serializable {
 
     static final long serialVersionUID = -501692208613904825L;
     private Vector<Object> entries = null;
