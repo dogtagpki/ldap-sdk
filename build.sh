@@ -15,6 +15,10 @@ WORK_DIR=
 JAVA_LIB_DIR="/usr/share/java"
 JAVADOC_DIR="/usr/share/javadoc"
 MAVEN_POM_DIR="/usr/share/maven-poms"
+
+SLF4J_LIB=
+JSS_LIB=
+
 INSTALL_DIR=
 
 SOURCE_TAG=
@@ -40,6 +44,8 @@ usage() {
     echo "    --java-lib-dir=<path>  Java library directory (default: $JAVA_LIB_DIR)."
     echo "    --javadoc-dir=<path>   Javadoc directory (default: $JAVADOC_DIR)."
     echo "    --maven-pom-dir=<path> Maven POM directory (default: $MAVEN_POM_DIR)."
+    echo "    --slf4j-lib=<path>     Path to SLF4J library"
+    echo "    --jss-lib=<path>       Path to JSS library"
     echo "    --install-dir=<path>   Installation directory."
     echo "    --source-tag=<tag>     Generate RPM sources from a source tag."
     echo "    --spec=<file>          Use the specified RPM spec (default: $SPEC_TEMPLATE)."
@@ -187,6 +193,12 @@ while getopts v-: arg ; do
         maven-pom-dir=?*)
             MAVEN_POM_DIR="$(readlink -f "$LONG_OPTARG")"
             ;;
+        slf4j-lib=?*)
+            SLF4J_LIB="$(readlink -f "$LONG_OPTARG")"
+            ;;
+        jss-lib=?*)
+            JSS_LIB="$(readlink -f "$LONG_OPTARG")"
+            ;;
         install-dir=?*)
             INSTALL_DIR="$(readlink -f "$LONG_OPTARG")"
             ;;
@@ -225,7 +237,8 @@ while getopts v-: arg ; do
         '')
             break # "--" terminates argument processing
             ;;
-        name* | work-dir* | java-lib-dir* | javadoc-dir* | maven-pom-dir* | install-dir* | source-tag* | spec* | version* | release* | dist*)
+        name* | work-dir* | java-lib-dir* | javadoc-dir* | maven-pom-dir* | slf4j-lib* | jss-lib | \
+        install-dir* | source-tag* | spec* | version* | release* | dist*)
             echo "ERROR: Missing argument for --$OPTARG option" >&2
             exit 1
             ;;
@@ -260,6 +273,8 @@ if [ "$DEBUG" = true ] ; then
     echo "JAVA_LIB_DIR: $JAVA_LIB_DIR"
     echo "JAVADOC_DIR: $JAVADOC_DIR"
     echo "MAVEN_POM_DIR: $MAVEN_POM_DIR"
+    echo "SLF4J_LIB: $SLF4J_LIB"
+    echo "JSS_LIB: $JSS_LIB"
     echo "INSTALL_DIR: $INSTALL_DIR"
     echo "BUILD_TARGET: $BUILD_TARGET"
 fi
@@ -296,7 +311,21 @@ if [ "$BUILD_TARGET" = "dist" ] ; then
     fi
 
     pushd $SRC_DIR/java-sdk
-    ant -Ddist=$WORK_DIR dist
+
+    OPTIONS=()
+
+    OPTIONS+=(-Ddist="$WORK_DIR")
+
+    if [ "$SLF4J_LIB" != "" ] ; then
+        OPTIONS+=(-Dslf4j.lib="$SLF4J_LIB")
+    fi
+
+    if [ "$JSS_LIB" != "" ] ; then
+        OPTIONS+=(-Djss.lib="$JSS_LIB")
+    fi
+
+    ant "${OPTIONS[@]}" dist
+
     popd
 
     echo
