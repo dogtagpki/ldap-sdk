@@ -55,22 +55,9 @@ jobs:
       run: |
         docker exec ldapjdk ./build.sh
 
-    - name: Install JSS into local Maven repo
-      run: |
-        # get JSS <major>.<minor>.<update> version
-        JSS_VERSION=$(docker exec ldapjdk rpm -q --qf "%{version}" dogtag-jss)
-
-        docker exec ldapjdk mvn install:install-file \
-            -Dfile=/usr/lib/java/jss.jar \
-            -DgroupId=org.dogtagpki.jss \
-            -DartifactId=jss-base \
-            -Dversion=$JSS_VERSION-SNAPSHOT \
-            -Dpackaging=jar \
-            -DgeneratePom=true
-
     - name: Build with Maven
       run: |
-        docker exec ldapjdk mvn package
+        docker exec ldapjdk mvn --batch-mode package
 
     - name: Compare ldapjdk.jar
       run: |
