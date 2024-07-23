@@ -41,11 +41,16 @@ import java.io.Serializable;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+
 import org.mozilla.jss.CryptoManager;
 import org.mozilla.jss.crypto.AlreadyInitializedException;
-import org.mozilla.jss.crypto.X509Certificate;
-import org.mozilla.jss.ssl.SSLCertificateApprovalCallback;
-import org.mozilla.jss.ssl.SSLSocket;
+import org.mozilla.jss.ssl.javax.JSSSocket;
 
 import netscape.ldap.LDAPConnection;
 import netscape.ldap.LDAPException;
@@ -67,10 +72,7 @@ import netscape.ldap.LDAPTLSSocketFactory;
  * @see LDAPConnection#LDAPConnection(netscape.ldap.LDAPSocketFactory)
  */
 
-public class JSSSocketFactory implements Serializable,
-                                         LDAPTLSSocketFactory,
-                                         SSLCertificateApprovalCallback
-{
+public class JSSSocketFactory implements Serializable, LDAPTLSSocketFactory {
 
     static final long serialVersionUID = -6926469178017736903L;
 
@@ -138,17 +140,20 @@ public class JSSSocketFactory implements Serializable,
      * @exception LDAPException on error creating socket
      */
     public Socket makeSocket( String host, int port ) throws LDAPException {
-        SSLSocket socket = null;
+        JSSSocket socket = null;
         try {
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance("NssX509", "Mozilla-JSS");
+            KeyManager[] kms = kmf.getKeyManagers();
 
-            socket = new SSLSocket( host, // address
-                                    port, // port
-                                    null, // localAddress
-                                    0,    // localPort
-                                    this, // certApprovalCallback
-                                    null  // clientCertSelectionCallback
-            );
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance("NssX509", "Mozilla-JSS");
+            TrustManager[] tms = tmf.getTrustManagers();
 
+            SSLContext ctx = SSLContext.getInstance("TLS", "Mozilla-JSS");
+            ctx.init(kms, tms, null);
+
+            SSLSocketFactory socketFactory = ctx.getSocketFactory();
+
+            socket = (JSSSocket) socketFactory.createSocket(host, port);
             socket.forceHandshake();
 
         }
@@ -167,24 +172,6 @@ public class JSSSocketFactory implements Serializable,
     }
 
     /**
-     * The default implementation of the SSLCertificateApprovalCallback
-     * interface.
-     * <P>
-     * This default implementation always returns true. If you need to
-     * verify the server certificate validity, then you should override
-     * this method.
-     * <P>
-     * @param serverCert X509 Certificate
-     * @param status The validity of the server certificate
-     * @return <CODE>true</CODE>, by default we trust the certificate
-     */
-    public boolean approve(X509Certificate serverCert,
-                           ValidityStatus status) {
-
-        return true;
-    }
-
-    /**
      * Creates an SSL socket layered over an existing socket.
      *
      * Used for the startTLS implementation (RFC2830).
@@ -195,16 +182,22 @@ public class JSSSocketFactory implements Serializable,
      * @since LDAPJDK 4.17
      */
     public Socket makeSocket(Socket s) throws LDAPException {
-        SSLSocket socket = null;
+        JSSSocket socket = null;
         String host = s.getInetAddress().getHostName();
         int port = s.getPort();
         try {
-            socket = new SSLSocket( s,
-                                    host,
-                                    this, // certApprovalCallback
-                                    null  // clientCertSelectionCallback
-            );
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance("NssX509", "Mozilla-JSS");
+            KeyManager[] kms = kmf.getKeyManagers();
 
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance("NssX509", "Mozilla-JSS");
+            TrustManager[] tms = tmf.getTrustManagers();
+
+            SSLContext ctx = SSLContext.getInstance("TLS", "Mozilla-JSS");
+            ctx.init(kms, tms, null);
+
+            SSLSocketFactory socketFactory = ctx.getSocketFactory();
+
+            socket = (JSSSocket) socketFactory.createSocket(host, port);
             socket.forceHandshake();
 
         } catch (Exception e) {
