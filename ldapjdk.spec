@@ -53,7 +53,7 @@ ExclusiveArch:    %{java_arches} noarch
 # Java
 ################################################################################
 
-%if 0%{?rhel}
+%if 0%{?rhel} && 0%{?rhel} <= 9
 
 %define java_devel java-17-openjdk-devel
 %define java_headless java-17-openjdk-headless
@@ -61,7 +61,7 @@ ExclusiveArch:    %{java_arches} noarch
 
 %else
 
-# Use Java 21 on Fedora 40+, otherwise use Java 17.
+# Use Java 21 on Fedora 40+ and RHEL 10, otherwise use Java 17.
 %global java_devel java-devel >= 1:17
 %global java_headless java-headless >= 1:17
 
