@@ -50,7 +50,7 @@ FROM ldapjdk-builder-deps AS ldapjdk-builder
 COPY --from=quay.io/dogtagpki/jss-dist:latest /root/RPMS /tmp/RPMS/
 
 # Install build dependencies
-RUN dnf localinstall -y /tmp/RPMS/* \
+RUN dnf install -y /tmp/RPMS/* \
     && dnf clean all \
     && rm -rf /var/cache/dnf \
     && rm -rf /tmp/RPMS
@@ -78,7 +78,7 @@ COPY --from=quay.io/dogtagpki/jss-dist:latest /root/RPMS /tmp/RPMS/
 COPY --from=ldapjdk-dist /root/RPMS /tmp/RPMS/
 
 # Install runtime packages
-RUN dnf localinstall -y /tmp/RPMS/* \
+RUN dnf install -y /tmp/RPMS/* \
     && dnf clean all \
     && rm -rf /var/cache/dnf \
     && rm -rf /tmp/RPMS
