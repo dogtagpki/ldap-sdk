@@ -54,19 +54,24 @@ ExclusiveArch:    %{java_arches} noarch
 # Java
 ################################################################################
 
+# use Java 17 on Fedora 39 or older and RHEL 9 or older
+# otherwise, use Java 21
+
+# maven-local is a subpackage of javapackages-tools
+
 %if 0%{?fedora} && 0%{?fedora} <= 39 || 0%{?rhel} && 0%{?rhel} <= 9
 
-# use Java 17 on Fedora 39 or older and RHEL 9 or older
 %define java_devel java-17-openjdk-devel
 %define java_headless java-17-openjdk-headless
 %define java_home %{_jvmdir}/jre-17-openjdk
+%define maven_local maven-local-openjdk17
 
 %else
 
-# otherwise, use Java 21
 %define java_devel java-21-openjdk-devel
 %define java_headless java-21-openjdk-headless
 %define java_home %{_jvmdir}/jre-21-openjdk
+%define maven_local maven-local
 
 %endif
 
@@ -76,7 +81,7 @@ ExclusiveArch:    %{java_arches} noarch
 
 BuildRequires:    ant
 BuildRequires:    %{java_devel}
-BuildRequires:    maven-local
+BuildRequires:    %{maven_local}
 BuildRequires:    mvn(org.slf4j:slf4j-api)
 BuildRequires:    mvn(org.slf4j:slf4j-jdk14)
 BuildRequires:    mvn(org.dogtagpki.jss:jss-base) >= 5.6.0
