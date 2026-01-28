@@ -7,19 +7,19 @@ Name:             ldapjdk
 
 # Upstream version number:
 %global           major_version 5
-%global           minor_version 6
+%global           minor_version 7
 %global           update_version 0
 
 # Downstream release number:
 # - development/stabilization (unsupported): 0.<n> where n >= 1
 # - GA/update (supported): <n> where n >= 1
-%global           release_number 1
+%global           release_number 0.1
 
 # Development phase:
 # - development (unsupported): alpha<n> where n >= 1
 # - stabilization (unsupported): beta<n> where n >= 1
 # - GA/update (supported): <none>
-#global           phase
+%global           phase alpha1
 
 %undefine         timestamp
 %undefine         commit_id
@@ -54,8 +54,9 @@ ExclusiveArch:    %{java_arches} noarch
 # Java
 ################################################################################
 
-# use Java 17 on Fedora 39 or older and RHEL 9 or older
-# otherwise, use Java 21
+# use Java 17 on Fedora 39 or older and RHEL 9 or older,
+# use Java 21 until  Fedora 42 and rhel 10,
+# use Java 25 for newer versions
 
 # maven-local is a subpackage of javapackages-tools
 
@@ -68,10 +69,21 @@ ExclusiveArch:    %{java_arches} noarch
 
 %else
 
+%if 0%{?fedora} && 0%{?fedora} < 43 || 0%{?rhel}
+
 %define java_devel java-21-openjdk-devel
 %define java_headless java-21-openjdk-headless
 %define java_home %{_jvmdir}/jre-21-openjdk
-%define maven_local maven-local
+%define maven_local maven-local-openjdk21
+
+%else
+
+%define java_devel java-25-openjdk-devel
+%define java_headless java-25-openjdk-headless
+%define java_home %{_jvmdir}/jre-25-openjdk
+%define maven_local maven-local-openjdk25
+
+%endif
 
 %endif
 
@@ -84,7 +96,7 @@ BuildRequires:    %{java_devel}
 BuildRequires:    %{maven_local}
 BuildRequires:    mvn(org.slf4j:slf4j-api)
 BuildRequires:    mvn(org.slf4j:slf4j-jdk14)
-BuildRequires:    mvn(org.dogtagpki.jss:jss-base) >= 5.6.0
+BuildRequires:    mvn(org.dogtagpki.jss:jss-base) >= 5.10.0
 
 %description
 The Mozilla LDAP SDKs enable you to write applications which access,
@@ -99,7 +111,7 @@ Summary:          LDAP SDK
 Requires:         %{java_headless}
 Requires:         mvn(org.slf4j:slf4j-api)
 Requires:         mvn(org.slf4j:slf4j-jdk14)
-Requires:         mvn(org.dogtagpki.jss:jss-base) >= 5.6.0
+Requires:         mvn(org.dogtagpki.jss:jss-base) >= 5.10.0
 
 Obsoletes:        ldapjdk < %{version}-%{release}
 Provides:         ldapjdk = %{version}-%{release}
