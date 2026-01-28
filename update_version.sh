@@ -39,7 +39,6 @@ verify_phase() {
 
 change_spec_version() {
     CURRENT_PHASE=$(grep "phase " ldapjdk.spec | grep -E 'alpha|beta' | awk '{print $(NF)}')
-    CURRENT_RELEASE_NUMBER=$(grep "release_number " ldapjdk.spec | grep -Eo '[0-9]+(\.[0-9]+)?$')
 
     echo "Update major version to $NEXT_MAJOR"
     sed -i "/major_version /c\%global           major_version $NEXT_MAJOR" ldapjdk.spec
@@ -52,20 +51,12 @@ change_spec_version() {
         if [ -z "$NEXT_PHASE" ] ; then
             echo "Remove phase"
             sed -i "/phase /c\#global           phase" ldapjdk.spec
-            echo "Update release_number"
-            sed -i "/release_number /c\%global           release_number 1" ldapjdk.spec
         elif [ -z "$CURRENT_PHASE" ] ; then
             echo "Add phase, set to $NEXT_PHASE"
             sed -i "/#global         phase/c\%global           phase $NEXT_PHASE" ldapjdk.spec
-            echo "Update release_number"
-            sed -i "/release_number /c\%global           release_number 0.1" ldapjdk.spec
         else
             echo "Update phase to $NEXT_PHASE"
             sed -i "/phase /c\%global           phase $NEXT_PHASE" ldapjdk.spec
-            echo "Update release_number"
-            IFS='.' read -ra CRL <<< "$CURRENT_RELEASE_NUMBER"
-            (( CRL[1]++ ))
-            sed -i "/release_number /c\%global           release_number ${CRL[0]}.${CRL[1]}" ldapjdk.spec
         fi
     fi
 }

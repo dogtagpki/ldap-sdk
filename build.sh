@@ -25,9 +25,6 @@ SOURCE_TAG=
 SPEC_TEMPLATE="$SRC_DIR/ldapjdk.spec"
 SPEC_FILE=
 
-VERSION=
-RELEASE=
-
 WITH_TIMESTAMP=
 WITH_COMMIT_ID=
 DIST=
@@ -49,10 +46,8 @@ usage() {
     echo "    --install-dir=<path>   Installation directory."
     echo "    --source-tag=<tag>     Generate RPM sources from a source tag."
     echo "    --spec=<file>          Use the specified RPM spec (default: $SPEC_TEMPLATE)."
-    echo "    --version=<version>    Use the specified version."
-    echo "    --release=<elease>     Use the specified release."
-    echo "    --with-timestamp       Append timestamp to release number."
-    echo "    --with-commit-id       Append commit ID to release number."
+    echo "    --with-timestamp       Append timestamp to RPM version number."
+    echo "    --with-commit-id       Append commit ID to RPM version number."
     echo "    --dist=<name>          Distribution name (e.g. fc28)."
     echo " -v,--verbose              Run in verbose mode."
     echo "    --debug                Run in debug mode."
@@ -125,7 +120,7 @@ generate_rpm_sources() {
 
 generate_patch() {
 
-    PATCH="ldap-sdk-$VERSION-$RELEASE.patch"
+    PATCH="ldap-sdk-$FULL_VERSION.patch"
 
     if [ "$VERBOSE" = true ] ; then
         echo "Generating $PATCH for all changes since $SOURCE_TAG tag"
@@ -208,12 +203,6 @@ while getopts v-: arg ; do
         spec=?*)
             SPEC_TEMPLATE="$LONG_OPTARG"
             ;;
-        version=?*)
-            VERSION="$LONG_OPTARG"
-            ;;
-        release=?*)
-            RELEASE="$LONG_OPTARG"
-            ;;
         with-timestamp)
             WITH_TIMESTAMP=true
             ;;
@@ -238,7 +227,7 @@ while getopts v-: arg ; do
             break # "--" terminates argument processing
             ;;
         name* | work-dir* | java-lib-dir* | javadoc-dir* | maven-pom-dir* | slf4j-lib* | jss-lib | \
-        install-dir* | source-tag* | spec* | version* | release* | dist*)
+        install-dir* | source-tag* | spec* | dist*)
             echo "ERROR: Missing argument for --$OPTARG option" >&2
             exit 1
             ;;
@@ -299,6 +288,105 @@ fi
 
 mkdir -p $WORK_DIR
 cd $WORK_DIR
+
+spec=$(<"$SPEC_TEMPLATE")
+
+if [ "$PRODUCT_NAME" = "" ] ; then
+    # if product name not specified, get from spec template
+
+    regex=$'%global *product_name *([^\n]+)'
+    if [[ $spec =~ $regex ]] ; then
+        PRODUCT_NAME="${BASH_REMATCH[1]}"
+    else
+        echo "ERROR: Missing product_name macro in $SPEC_TEMPLATE"
+        exit 1
+    fi
+fi
+
+if [ "$DEBUG" = true ] ; then
+    echo "PRODUCT_NAME: $PRODUCT_NAME"
+fi
+
+if [ "$PRODUCT_ID" = "" ] ; then
+    # if product ID not specified, get from spec template
+
+    regex=$'%global *product_id *([^\n]+)'
+    if [[ $spec =~ $regex ]] ; then
+        PRODUCT_ID="${BASH_REMATCH[1]}"
+    else
+        echo "ERROR: Missing product_id macro in $SPEC_TEMPLATE"
+        exit 1
+    fi
+fi
+
+if [ "$DEBUG" = true ] ; then
+    echo "PRODUCT_ID: $PRODUCT_ID"
+fi
+
+regex=$'%global *major_version *([^\n]+)'
+if [[ $spec =~ $regex ]] ; then
+    MAJOR_VERSION="${BASH_REMATCH[1]}"
+else
+    echo "ERROR: Missing major_version macro in $SPEC_TEMPLATE"
+    exit 1
+fi
+
+regex=$'%global *minor_version *([^\n]+)'
+if [[ $spec =~ $regex ]] ; then
+    MINOR_VERSION="${BASH_REMATCH[1]}"
+else
+    echo "ERROR: Missing minor_version macro in $SPEC_TEMPLATE"
+    exit 1
+fi
+
+regex=$'%global *update_version *([^\n]+)'
+if [[ $spec =~ $regex ]] ; then
+    UPDATE_VERSION="${BASH_REMATCH[1]}"
+else
+    echo "ERROR: Missing update_version macro in $SPEC_TEMPLATE"
+    exit 1
+fi
+
+VERSION="$MAJOR_VERSION.$MINOR_VERSION.$UPDATE_VERSION"
+
+if [ "$DEBUG" = true ] ; then
+    echo "VERSION: $VERSION"
+fi
+
+regex=$'%global *phase *([^\n]+)'
+if [[ $spec =~ $regex ]] ; then
+    PHASE="${BASH_REMATCH[1]}"
+fi
+
+if [ "$DEBUG" = true ] ; then
+    echo "PHASE: $PHASE"
+fi
+
+if [ "$WITH_TIMESTAMP" = true ] ; then
+    TIMESTAMP=$(date -u +"%Y%m%d%H%M%S")
+fi
+
+if [ "$DEBUG" = true ] ; then
+    echo "TIMESTAMP: $TIMESTAMP"
+fi
+
+if [ "$WITH_COMMIT_ID" = true ]; then
+    COMMIT_ID=$(git -C "$SRC_DIR" rev-parse --short=8 HEAD)
+fi
+
+if [ "$DEBUG" = true ] ; then
+    echo "COMMIT_ID: $COMMIT_ID"
+fi
+
+if [ "$PHASE" = "" ]; then
+    FULL_VERSION="$VERSION"
+else
+    FULL_VERSION="$VERSION-$PHASE"
+fi
+
+if [ "$DEBUG" = true ] ; then
+    echo "FULL_VERSION: $FULL_VERSION"
+fi
 
 ################################################################################
 # Build LDAP SDK
@@ -379,55 +467,7 @@ fi
 # Prepare RPM build
 ################################################################################
 
-if [ "$VERSION" = "" ] ; then
-    # if version not specified, get from spec template
-    VERSION="$(rpmspec -P "$SPEC_TEMPLATE" | grep "^Version:" | awk '{print $2;}')"
-fi
-
-if [ "$DEBUG" = true ] ; then
-    echo "VERSION: $VERSION"
-fi
-
-if [ "$RELEASE" = "" ] ; then
-    # if release not specified, get from spec template
-    RELEASE="$(rpmspec -P "$SPEC_TEMPLATE" --undefine dist | grep "^Release:" | awk '{print $2;}')"
-fi
-
-if [ "$DEBUG" = true ] ; then
-    echo "RELEASE: $RELEASE"
-fi
-
-spec=$(<"$SPEC_TEMPLATE")
-
-regex=$'%global *phase *([^\n]+)'
-if [[ $spec =~ $regex ]] ; then
-    PHASE="${BASH_REMATCH[1]}"
-    RELEASE=$RELEASE.$PHASE
-fi
-
-if [ "$DEBUG" = true ] ; then
-    echo "PHASE: $PHASE"
-fi
-
-if [ "$WITH_TIMESTAMP" = true ] ; then
-    TIMESTAMP=$(date -u +"%Y%m%d%H%M%S%Z")
-    RELEASE=$RELEASE.$TIMESTAMP
-fi
-
-if [ "$DEBUG" = true ] ; then
-    echo "TIMESTAMP: $TIMESTAMP"
-fi
-
-if [ "$WITH_COMMIT_ID" = true ]; then
-    COMMIT_ID=$(git -C "$SRC_DIR" rev-parse --short=8 HEAD)
-    RELEASE=$RELEASE.$COMMIT_ID
-fi
-
-if [ "$DEBUG" = true ] ; then
-    echo "COMMIT_ID: $COMMIT_ID"
-fi
-
-echo "Building $NAME-$VERSION-$RELEASE"
+echo "Building $NAME-$FULL_VERSION"
 
 rm -rf BUILD
 rm -rf RPMS

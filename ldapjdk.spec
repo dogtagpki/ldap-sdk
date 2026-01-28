@@ -3,17 +3,17 @@ Name:             ldapjdk
 ################################################################################
 
 %global           vendor_id dogtag
-%global           product_id %{vendor_id}-ldapjdk
+%global           product_name LDAP SDK
+%global           product_id dogtag-ldapjdk
+
+Summary:          %{product_name}
+URL:              https://github.com/dogtagpki/ldap-sdk
+License:          MPL-1.1 OR GPL-2.0-or-later OR LGPL-2.1-or-later
 
 # Upstream version number:
 %global           major_version 5
 %global           minor_version 7
 %global           update_version 0
-
-# Downstream release number:
-# - development/stabilization (unsupported): 0.<n> where n >= 1
-# - GA/update (supported): <n> where n >= 1
-%global           release_number 0.1
 
 # Development phase:
 # - development (unsupported): alpha<n> where n >= 1
@@ -21,14 +21,28 @@ Name:             ldapjdk
 # - GA/update (supported): <none>
 %global           phase alpha1
 
+# Full version number:
+# - development/stabilization: <major>.<minor>.<update>-<phase>
+# - GA/update:                 <major>.<minor>.<update>
+%global           full_version %{major_version}.%{minor_version}.%{update_version}%{?phase:-}%{?phase}
+
 %undefine         timestamp
 %undefine         commit_id
 
-Summary:          LDAP SDK
-URL:              https://github.com/dogtagpki/ldap-sdk
-License:          MPL-1.1 OR GPL-2.0-or-later OR LGPL-2.1-or-later
-Version:          %{major_version}.%{minor_version}.%{update_version}
-Release:          %{release_number}%{?phase:.}%{?phase}%{?timestamp:.}%{?timestamp}%{?commit_id:.}%{?commit_id}%{?dist}
+# RPM version number:
+# - development:   <major>.<minor>.<update>~<phase>^<timestamp>.<commit_id>
+# - stabilization: <major>.<minor>.<update>~<phase>
+# - GA/update:     <major>.<minor>.<update>
+#
+# https://docs.fedoraproject.org/en-US/packaging-guidelines/Versioning
+Version:          %{major_version}.%{minor_version}.%{update_version}%{?phase:~}%{?phase}%{?timestamp:^}%{?timestamp}%{?commit_id:.}%{?commit_id}
+
+# RPM release number
+%if 0%{?rhel} && 0%{?rhel} < 10
+Release:          1%{?dist}
+%else
+Release:          %autorelease
+%endif
 
 # To create a tarball from a version tag:
 # $ git archive \
@@ -36,7 +50,7 @@ Release:          %{release_number}%{?phase:.}%{?phase}%{?timestamp:.}%{?timesta
 #     --prefix ldap-sdk-<version>/ \
 #     -o ldap-sdk-<version>.tar.gz \
 #     <version tag>
-Source: https://github.com/dogtagpki/ldap-sdk/archive/v%{version}%{?phase:-}%{?phase}/ldap-sdk-%{version}%{?phase:-}%{?phase}.tar.gz
+Source: https://github.com/dogtagpki/ldap-sdk/archive/v%{full_version}/ldap-sdk-%{full_version}.tar.gz
 
 # To create a patch for all changes since a version tag:
 # $ git format-patch \
@@ -106,7 +120,7 @@ manage, and update the information stored in an LDAP directory.
 %package -n %{product_id}
 ################################################################################
 
-Summary:          LDAP SDK
+Summary:          %{product_name}
 
 Requires:         %{java_headless}
 Requires:         mvn(org.slf4j:slf4j-api)
@@ -119,7 +133,7 @@ Provides:         ldapjdk = %{major_version}.%{minor_version}
 Provides:         %{product_id} = %{major_version}.%{minor_version}
 
 %description -n %{product_id}
-The Mozilla LDAP SDKs enable you to write applications which access,
+%{product_name} enables you to write applications which access,
 manage, and update the information stored in an LDAP directory.
 
 %license docs/ldapjdk/license.txt
@@ -128,7 +142,7 @@ manage, and update the information stored in an LDAP directory.
 %package -n %{product_id}-javadoc
 ################################################################################
 
-Summary:          Javadoc for LDAP SDK
+Summary:          Javadoc for %{product_name}
 
 Obsoletes:        ldapjdk-javadoc < %{version}-%{release}
 Provides:         ldapjdk-javadoc = %{version}-%{release}
@@ -142,7 +156,7 @@ Javadoc for LDAP SDK
 %prep
 ################################################################################
 
-%autosetup -n ldap-sdk-%{version}%{?phase:-}%{?phase} -p 1
+%autosetup -n ldap-sdk-%{full_version} -p 1
 
 # flatten-maven-plugin is not available in RPM
 %pom_remove_plugin org.codehaus.mojo:flatten-maven-plugin
