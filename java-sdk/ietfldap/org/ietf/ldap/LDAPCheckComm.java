@@ -53,29 +53,6 @@ class LDAPCheckComm {
      *            Communicator.
      */
     static java.lang.reflect.Method getMethod(String classPackage, String name) throws LDAPException {
-      SecurityManager sec = System.getSecurityManager();
-
-        if ( sec == null ) {
-            /* Not an applet, we can do what we want to */
-            return null;
-        } else if ( sec.toString().startsWith("java.lang.NullSecurityManager") ) {
-            /* Not an applet, we can do what we want to */
-            return null;
-        } else if (sec.toString().startsWith("netscape.security.AppletSecurity")) {
-            /* Running as applet. Is PrivilegeManager around? */
-            try {
-                Class<?> c = Class.forName(classPackage);
-                java.lang.reflect.Method[] m = c.getMethods();
-                for( int i = 0; i < m.length; i++ ) {
-                    if ( m[i].getName().equals(name) ) {
-                        return m[i];
-                    }
-                }
-                throw new LDAPException("no enable privilege in " + classPackage);
-            } catch (ClassNotFoundException e) {
-                throw new LDAPException("Class not found");
-            }
-        }
         return null;
     }
 }

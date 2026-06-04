@@ -286,63 +286,6 @@ public class LDAPBasePropertySupport implements Serializable {
      */
     protected void connect( LDAPConnection conn, String host, int port )
         throws LDAPException {
-        boolean needsPrivileges = true;
-        /* Running standalone? */
-        SecurityManager sec = System.getSecurityManager();
-        printDebug( "Security manager = " + sec );
-        if ( sec == null ) {
-            printDebug( "No security manager" );
-            /* Not an applet, we can do what we want to */
-            needsPrivileges = false;
-        /* Can't do instanceof on an abstract class */
-        } else if ( sec.toString().startsWith("java.lang.NullSecurityManager") ) {
-            printDebug( "No security manager" );
-            /* Not an applet, we can do what we want to */
-            needsPrivileges = false;
-        } else if ( sec.toString().startsWith(
-            "netscape.security.AppletSecurity" ) ) {
-
-            /* Connecting to the local host? */
-            try {
-                if ( host.equalsIgnoreCase(
-                    java.net.InetAddress.getLocalHost().getHostName() ) )
-                    needsPrivileges = false;
-            } catch ( java.net.UnknownHostException e ) {
-            }
-        }
-
-        if ( needsPrivileges ) {
-            /* Running as applet. Is PrivilegeManager around? */
-            String mgr = "netscape.security.PrivilegeManager";
-            try {
-                Class<?> c = Class.forName( mgr );
-                java.lang.reflect.Method[] m = c.getMethods();
-                if ( m != null ) {
-                    for( int i = 0; i < m.length; i++ ) {
-                        if ( m[i].getName().equals( "enablePrivilege" ) ) {
-                            try {
-                                Object[] args = new Object[1];
-                                args[0] = new String( "UniversalConnect" );
-                                m[i].invoke( null, args );
-                                printDebug( "UniversalConnect enabled" );
-                                args[0] = new String( "UniversalPropertyRead" );
-                                m[i].invoke( null, args );
-                                printDebug( "UniversalPropertyRead enabled" );
-                            } catch ( Exception e ) {
-                                printDebug( "Exception on invoking " +
-                                            "enablePrivilege: " +
-                                            e.toString() );
-                                break;
-                            }
-                            break;
-                        }
-                    }
-                }
-            } catch ( ClassNotFoundException e ) {
-                printDebug( "no " + mgr );
-            }
-        }
-
         conn.connect( host, port );
         setDefaultReferralCredentials( conn );
     }

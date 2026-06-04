@@ -80,7 +80,6 @@ import javax.security.auth.callback.CallbackHandler;
  *
  * IMPLEMENTATION NOTE: To use this class on JDK1.2, the caller needs:
  *<ul><tt>
- *<li>java.lang.RuntimePermission("getSecurityManager")
  *<li>java.lang.RuntimePermission("getClassLoader")
  *<li>java.util.PropertyPermission("javax.security.sasl.client.pkgs", "read");
  *</tt></ul>
@@ -245,10 +244,6 @@ public class Sasl {
         if (clientFactory != null) {
             throw new IllegalStateException (
                 "SaslClientFactory already defined");
-        }
-        SecurityManager security = System.getSecurityManager();
-        if (security != null) {
-            security.checkSetFactory();
         }
         clientFactory = fac;
     }
