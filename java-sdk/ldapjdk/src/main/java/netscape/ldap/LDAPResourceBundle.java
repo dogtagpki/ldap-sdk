@@ -119,7 +119,7 @@ class LDAPResourceBundle implements java.io.Serializable {
      * an input stream on the file.
      * @param baseName the base name of the property file. The base name contains
      * no locale context and no . suffix.
-     * @param the locale string to insert into the file name
+     * @param locale the locale string to insert into the file name
      * @return the input stream of the property file.
      */
     private static InputStream getStream(String baseName, String locale) {

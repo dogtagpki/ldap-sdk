@@ -361,7 +361,7 @@ public class ObjectMapper {
     }
 
     /**
-     * Decode RefAddr according to the <draft-ryan-java-schema-01.rev.txt>
+     * Decode RefAddr according to the {@code draft-ryan-java-schema-01.rev.txt}
      * StringRefAddr are encoded as #posNo#refType#refValue where posNo is the
      * refAddr position (index) inside a rerference. BynaryRefAddr is encoded
      * as #posNo#refType##data where data is the base64 encoding of the serialized
@@ -451,7 +451,7 @@ public class ObjectMapper {
     }
 
     /**
-     * Encode RefAddr according to the <draft-ryan-java-schema-01.rev.txt>
+     * Encode RefAddr according to the {@code draft-ryan-java-schema-01.rev.txt}
      * StringRefAddr are encoded as #posNo#refType#refValue where posNo is the
      * refAddr position (index) inside a rerference. BynaryRefAddr is encoded
      * as #posNo#refType##data where data is the base64 encoding of the serialized

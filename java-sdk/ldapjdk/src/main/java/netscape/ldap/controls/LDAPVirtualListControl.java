@@ -47,7 +47,7 @@ import netscape.ldap.ber.stream.BERTag;
  * Represents control data for returning paged results from a search.
  *
  * Example of usage, with JFC:
- * <pre>{@Code
+ * <pre>{@code
  *  // Call this to initialize the list box, whenever the search
  *  // conditions change.
  *  // "filter" may be "objectclass=person", for example
@@ -223,7 +223,7 @@ import netscape.ldap.ber.stream.BERTag;
  *  }
  * }</pre>
  *
- * <pre>{@Code
+ * <pre>{@code
  *   VirtualListViewRequest ::= SEQUENCE {
  *            beforeCount    INTEGER (0 .. maxInt),
  *            afterCount     INTEGER (0 .. maxInt),

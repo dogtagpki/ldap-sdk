@@ -52,7 +52,7 @@ package netscape.ldap;
  * the directory manager's name and password are used to authenticate.
  * For all other LDAP servers, anonymous authentication is used.
  *
- * <pre>{@Code
+ * <pre>{@code
  * public class myLDAPRebind implements netscape.ldap.LDAPRebind
  * {
  *  private String myDN;

@@ -322,7 +322,7 @@ public class LDAPPersistSearchControl extends LDAPControl {
      * <P>
      *
      * For example:
-     * <pre>{@Code
+     * <pre>{@code
      * ...
      * LDAPConnection ld = new LDAPConnection();
      * try {

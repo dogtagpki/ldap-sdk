@@ -806,8 +806,8 @@ class TTLTimer implements Runnable{
     private Thread t = null;
 
     /**
-     * Constructor with the specified timout.
-     * @param timeout the timeout value in milliseconds
+     * Constructor with the specified cache.
+     * @param cache the LDAP cache instance
      */
     TTLTimer(LDAPCache cache) {
         m_cache = cache;

@@ -56,7 +56,7 @@ import java.io.OutputStream;
 public class BERSet extends BERConstruct {
     /**
      * Constructs a set element.
-     * @exception failed to construct
+     * @throws IOException failed to construct
      */
     public BERSet() throws IOException {
     }

@@ -150,8 +150,8 @@ class LDAPConnSetupMgr implements java.io.Serializable {
 
     /**
      * Constructor
-     * @param host list of host names to which to connect
-     * @param port list of port numbers corresponding to the host list
+     * @param hosts list of host names to which to connect
+     * @param ports list of port numbers corresponding to the host list
      * @param factory socket factory for SSL connections
      */
     LDAPConnSetupMgr(String[] hosts, int[] ports, LDAPSocketFactory factory)  throws LDAPException{

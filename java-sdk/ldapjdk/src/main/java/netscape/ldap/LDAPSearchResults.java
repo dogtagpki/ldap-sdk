@@ -335,9 +335,9 @@ public class LDAPSearchResults implements Serializable {
      * <P>
      *
      * You can use this method in conjunction with the
-     * {@Code hasMoreElements} method to iterate through
+     * {@code hasMoreElements} method to iterate through
      * each entry in the search results.  For example:
-     * <pre>{@Code
+     * <pre>{@code
      * LDAPSearchResults res = ld.search( MY_SEARCHBASE,
      *                         LDAPConnection.SCOPE_BASE, MY_FILTER,
      *                         null, false );

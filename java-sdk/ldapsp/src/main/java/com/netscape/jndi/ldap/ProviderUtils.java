@@ -80,9 +80,9 @@ class ProviderUtils {
     /**
      * Convert Attribute List to a LDAP filter
      *
-     * @return LDAP Filter
-     * @throw NamingException
      * @param attrs An Attribute List
+     * @return LDAP Filter
+     * @throws NamingException
      */
     static String attributesToFilter(Attributes attrs) throws NamingException{
 

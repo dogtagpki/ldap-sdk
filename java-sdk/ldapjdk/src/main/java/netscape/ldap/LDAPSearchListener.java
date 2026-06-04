@@ -63,10 +63,10 @@ public class LDAPSearchListener extends LDAPMessageQueue {
     }
 
     /**
-     * Block until all results are in. Used for synchronous search with 
+     * Block until all results are in. Used for synchronous search with
      * batch size of zero.
      * @return search response message.
-     * @exception Network exception error
+     * @throws LDAPException Network exception error
      */
     LDAPResponse completeSearchOperation () throws LDAPException{
         return completeRequest();

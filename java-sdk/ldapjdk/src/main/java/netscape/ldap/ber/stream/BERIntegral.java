@@ -45,7 +45,7 @@ import java.io.OutputStream;
  * This is the base class for integral types such as Integer and
  * Enumerated.
  *
- * <pre>{@Code
+ * <pre>{@code
  * ENCODING RULE:
  *   Primitive Definite length.
  *   tag = << depends on type >>

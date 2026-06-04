@@ -69,7 +69,7 @@ public abstract class JDAPFilter {
 
     /**
      * Constructs filter from filter string specified in RFC1558.
-     * <pre>{@Code
+     * <pre>{@code
      * <filter> ::= '(' <filtercomp> ')'
      * <filtercomp> ::= <and> | <or> | <not> | <item>
      * <and> ::= '&' <filterlist>

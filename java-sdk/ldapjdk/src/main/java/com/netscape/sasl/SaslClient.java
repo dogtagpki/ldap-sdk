@@ -60,7 +60,7 @@ import java.io.OutputStream;
  *</pre></blockquote>
  * It can then proceed to use the client for authentication.
  * For example, an LDAP library might use the client as follows:
- * <pre>{@Code
+ * <pre>{@code
  * InputStream is = ldap.getInputStream();
  * OutputStream os = ldap.getOutputStream();
  * byte[] toServer = sc.createInitialResponse();

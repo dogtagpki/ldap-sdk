@@ -632,12 +632,12 @@ public class LDAPConnection
      * Returns the delay in seconds when making concurrent connection attempts to
      * multiple servers.
      * @return the delay in seconds between connection attempts:<br>
-     * {@Code NODELAY_SERIAL} The serial connection setup policy is enabled
+     * {@code NODELAY_SERIAL} The serial connection setup policy is enabled
      * (no concurrency).<br>
-     * {@Code NODELAY_PARALLEL} The parallel connection setup policy with no delay
+     * {@code NODELAY_PARALLEL} The parallel connection setup policy with no delay
      *  is enabled.<br>
-     * {@Code delay > 0} The parallel connection setup policy with the delay of
-     * {@Code delay} seconds is enabled.
+     * {@code delay > 0} The parallel connection setup policy with the delay of
+     * {@code delay} seconds is enabled.
      * @see netscape.ldap.LDAPConnection#setConnSetupDelay
      */
     public int getConnSetupDelay () {
@@ -648,7 +648,7 @@ public class LDAPConnection
      * Specifies the delay in seconds when making concurrent connection attempts to
      * multiple servers.
      * <P>Effectively, selects the connection setup policy when a list of hosts is passed
-     * to the {@Code connect} method.
+     * to the {@code connect} method.
      *
      * <br>If the serial policy is selected, the default one, an attempt is made to
      * connect to the first host in the list. The next entry in
@@ -658,15 +658,15 @@ public class LDAPConnection
      * <br>If the parallel policy is selected, multiple connection attempts may run
      * concurrently on a separate thread. A new connection attempt to the next entry
      * in the list can be started with or without delay.
-     * <P>You must set the {@Code ConnSetupDelay} before making the call to the
-     * {@Code connect} method.
+     * <P>You must set the {@code ConnSetupDelay} before making the call to the
+     * {@code connect} method.
      *
      * @param delay the delay in seconds between connection attempts. Possible values are:<br>
-     * {@Code NODELAY_SERIAL} Use the serial connection setup policy.<br>
-     * {@Code NODELAY_PARALLEL} Use the parallel connection setup policy with no delay.
+     * {@code NODELAY_SERIAL} Use the serial connection setup policy.<br>
+     * {@code NODELAY_PARALLEL} Use the parallel connection setup policy with no delay.
      * Start all connection setup threads immediately.<br>
-     * {@Code delay > 0} Use the parallel connection setup policy with delay.
-     * Start another connection setup thread after {@Code delay} seconds.<br>
+     * {@code delay > 0} Use the parallel connection setup policy with delay.
+     * Start another connection setup thread after {@code delay} seconds.<br>
      * @see netscape.ldap.LDAPConnection#NODELAY_SERIAL
      * @see netscape.ldap.LDAPConnection#NODELAY_PARALLEL
      * @see netscape.ldap.LDAPConnection#connect(java.lang.String, int)
@@ -4587,7 +4587,7 @@ public class LDAPConnection
      * particular request. Used internally by LDAPSearchResults to
      * get response controls returned for a search request.
      * <P>
-     * @param msdid Message ID
+     * @param msgID Message ID
      */
     LDAPControl[] getResponseControls(int msgID) {
         LDAPControl[] controls = null;
@@ -4951,8 +4951,9 @@ public class LDAPConnection
      * operation, there will only ever be at most one set of controls
      * (controls from any earlier operation are replaced by controls
      * received on the latest operation on this connection by this thread).
-     * @param current the target thread
-     * @param con the server response controls
+     * @param client the target thread
+     * @param msgID the message ID
+     * @param ctrls the server response controls
      */
     void setResponseControls( Thread client, int msgID, LDAPControl[] ctrls ) {
         synchronized(m_responseControlTable) {
@@ -4971,7 +4972,7 @@ public class LDAPConnection
 
     /**
      * Set up connection for referral.
-     * @param u referral URL
+     * @param refList referral URLs
      * @param cons search constraints
      * @return new LDAPConnection, already connected and authenticated
      */

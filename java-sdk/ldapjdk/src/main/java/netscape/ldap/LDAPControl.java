@@ -395,7 +395,7 @@ public class LDAPControl implements Cloneable, java.io.Serializable {
      * is instantiated using the parameters.
      * @param el the <CODE>BERElement</CODE> containing the control
      * @return a newly instantiated <CODE>LDAPControl</CODE>.
-     * @see netscape.ldap.LPAPControl#register
+     * @see netscape.ldap.LDAPControl#register
      *
      * Note:
      * This code was extracted from <CODE>JDAPControl(BERElement el)</CODE>
@@ -437,7 +437,7 @@ public class LDAPControl implements Cloneable, java.io.Serializable {
      * @param data the LDAP message fragment in raw BER format
      * @return an <CODE>LDAPControl</CODE> array containing all of the controls
      * from the message fragment.
-     * @exception java.lang.IOException If the data passed to this method
+     * @throws IOException If the data passed to this method
      * is not a valid LDAP message fragment.
      * @see netscape.ldap.LDAPControl#register
      */

@@ -54,7 +54,7 @@ public class LDAPExtendedResponse extends LDAPResponse
      *
      * @param msgid message identifier
      * @param rsp extended operation response
-     * @paarm controls array of controls or null
+     * @param controls array of controls or null
      */
     LDAPExtendedResponse(int msgid, JDAPExtendedResponse rsp, LDAPControl controls[]) {
         super(msgid, rsp, controls);

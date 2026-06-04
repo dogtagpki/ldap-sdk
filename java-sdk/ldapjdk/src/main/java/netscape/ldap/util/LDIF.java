@@ -142,7 +142,7 @@ public class LDIF implements Serializable {
      * Parses ldif content. The list of attributes is
      * terminated by \r\n or '-'. This function is
      * also used to parse the attributes in modifications.
-     * @param ds data input stream
+     * @param d data input stream
      */
     private LDIFRecord parse_ldif_record(LineReader d)
           throws IOException {
@@ -192,7 +192,7 @@ public class LDIF implements Serializable {
      * Parses ldif content. The list of attributes is
      * terminated by \r\n or '-'. This function is
      * also used to parse the attributes in modifications.
-     * @param ds data input stream
+     * @param d data input stream
      */
     private LDIFContent parse_ldif_content(LineReader d)
           throws IOException {
@@ -344,7 +344,7 @@ public class LDIF implements Serializable {
 
     /**
      * Parses add content
-     * @param ds data input stream
+     * @param d data input stream
      */
     private LDIFAddContent parse_add_spec(LineReader d)
           throws IOException {
@@ -362,7 +362,7 @@ public class LDIF implements Serializable {
 
     /**
      * Parses delete content
-     * @param ds data input stream
+     * @param d data input stream
      */
     private LDIFDeleteContent parse_delete_spec(LineReader d)
           throws IOException {
@@ -392,7 +392,7 @@ public class LDIF implements Serializable {
 
     /**
      * Parses change modification.
-     * @param ds data input stream
+     * @param d data input stream
      */
     private LDIFModifyContent parse_mod_spec(LineReader d)
           throws IOException {

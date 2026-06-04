@@ -534,7 +534,7 @@ public class LDAPUrl implements java.io.Serializable {
      * Returns the scope of the search. If the scope returned is -1, then
      * the given string is not for the scope.
      * @param str the string against which to compare the scope type
-     * @returns the scope of the search, -1 is returned if the given string is
+     * @return the scope of the search, -1 is returned if the given string is
      * not SUB, ONE or BASE (the acceptable LDAPv2 values for scope).
      */
     private int getScope(String str) {

@@ -130,16 +130,16 @@ public class LDAPPagedResultsControl extends LDAPControl {
     /**
      * Constructs an <CODE>LDAPPagedResultsControl</CODE> object
      * that specifies a paged search.
-     * 
+     *
      * @param oid the oid of this control
      * @param critical <code>true</code> if this control is critical to the search
-     * @param value the value associated with this control
-     * 
-     * @see netscape.ldap.LDAPcontrol
-     * 
+     * @param vals the value associated with this control
+     *
+     * @see netscape.ldap.LDAPControl
+     *
      * @throws LDAPException
      * @throws IOException If value contains an invalid BER sequence.
-     * 
+     *
      * @see netscape.ldap.LDAPControl#register
      */
     public LDAPPagedResultsControl(String oid, boolean critical, byte[] vals)

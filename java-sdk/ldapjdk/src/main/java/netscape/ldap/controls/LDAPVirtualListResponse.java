@@ -152,11 +152,10 @@ public class LDAPVirtualListResponse extends LDAPControl {
     }
 
     /**
-     * Returns a control useful for subsequent paged results searches.
-     * "this" should be a control returned on a previous paged results
+     * Parses the control response from a virtual list search.
+     * The control should be returned on a previous paged results
      * search, so it contains information on the virtual result set
      * size.
-     * @return a control useful for subsequent paged results searches.
      */
     private void parseResponse() {
         /* Suck out the data and parse it */

@@ -51,13 +51,13 @@ abstract class LDAPStringControl extends LDAPControl {
     }
 
     /**
-     * Constructs an <CODE>LDAPStringControl</CODE> object, and stores the 
-     * value as a string. To retrieve this string value, use 
+     * Constructs an <CODE>LDAPStringControl</CODE> object, and stores the
+     * value as a string. To retrieve this string value, use
      * <CODE>getMsg()</CODE>.
      * @param oid the oid of this control
      * @param critical <code>true</code> if this control is critical to the search
      * @param value the value associated with this control
-     * @see netscape.ldap.LDAPcontrol
+     * @see netscape.ldap.LDAPControl
      */
     public LDAPStringControl( String oid, boolean critical, byte[] value ) {
         super( oid, critical, value );

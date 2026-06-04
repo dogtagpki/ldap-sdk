@@ -112,7 +112,6 @@ class LDAPSyntaxSchemaElement extends LDAPSchemaElement {
     /**
      * Convert from enumerated syntax type to a user-friendly
      * string
-     * @param syntax One of the enumerated syntax types
      * @return A user-friendly syntax description
      */
     String syntaxToString() {

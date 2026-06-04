@@ -49,7 +49,7 @@ package netscape.ldap;
  * on the LDAP server identified in the referral.  Ideally, this method would be
  * defined as part of a class implementing the <CODE>LDAPRebind</CODE> interface.
  *
- * <pre>{@Code
+ * <pre>{@code
  * private String myDN = "cn=Directory Manager,o=Ace Industry,c=US";
  * private String myPW = "alway4444";
  * private LDAPRebindAuth myRebindInfo;

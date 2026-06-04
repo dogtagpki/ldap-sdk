@@ -82,7 +82,7 @@ class LdapNameParser implements NameParser {
      * A convenience method for extracting RDN
      * @return RDN for the DN
      * @param dn Ldap Distinguished name
-     * @throw NamingException Name parsing failed
+     * @throws NamingException Name parsing failed
      */
     static String getRDN(String dn) throws NamingException {
         Name parsedName = getParser().parse(dn);
@@ -133,7 +133,7 @@ class LdapNameParser implements NameParser {
     /**
      * A convenience method for extracting relative name from the ancestor context
      * @return name relative to an ancestor context
-     * @param ctx ancestor context distinguished name
+     * @param contextName ancestor context distinguished name
      * @param entry distinguished name
      */
     static String getRelativeName(Name contextName, String entry) throws NamingException{
