@@ -17,7 +17,7 @@ License:          MPL-1.1 OR GPL-2.0-or-later OR LGPL-2.1-or-later
 
 # Development phase:
 # - development (unsupported): alpha<n> where n >= 1
-# - stabilization (unsupported): beta<n> where n >= 1
+# - stabilization (supported): beta<n> where n >= 1
 # - GA/update (supported): <none>
 %global           phase beta2
 
@@ -68,22 +68,11 @@ ExclusiveArch:    %{java_arches} noarch
 # Java
 ################################################################################
 
-# Use Java 21 before Fedora 44, otherwise use Java 25.
-# Use Java 17 before RHEL 9, otherwise use Java 21.
+# Use Java 21 before Fedora 43 or on RHEL, otherwise use Java 25.
 
-%global           fedora_java21_cutoff 44
-%global           rhel_java17_cutoff 9
+%global           fedora_java21_cutoff 43
 
 # maven-local is a subpackage of javapackages-tools
-
-%if 0%{?rhel} && 0%{?rhel} < %{rhel_java17_cutoff}
-
-%define java_devel java-17-openjdk-devel
-%define java_headless java-17-openjdk-headless
-%define java_home %{_jvmdir}/jre-17-openjdk
-%define maven_local maven-local
-
-%else
 
 %if 0%{?fedora} && 0%{?fedora} < %{fedora_java21_cutoff} || 0%{?rhel}
 
@@ -101,13 +90,10 @@ ExclusiveArch:    %{java_arches} noarch
 
 %endif
 
-%endif
-
 ################################################################################
 # Build Dependencies
 ################################################################################
 
-BuildRequires:    ant
 BuildRequires:    %{java_devel}
 BuildRequires:    %{maven_local}
 BuildRequires:    mvn(org.slf4j:slf4j-api)
@@ -205,8 +191,18 @@ ln -sf %{name}/ldaptools.pom %{buildroot}%{_mavenpomdir}/JPP-ldaptools.pom
 ################################################################################
 
 ################################################################################
+# For changelog header, use the RPM <version>~<phase>-<release>, for example
+# 5.6.0~alpha1-1.
+#
+# For changelog content, use the upstream <version>-<phase>, for example
+# "Rebase to LDAP SDK 5.6.0-alpha1" which means the RPM includes all enhancements
+# and bug fixes from that upstream version.
+#
+# The <phase> is only available during development/stabilization. It should
+# not be included in GA/update releases.
+#
 # For example:
-# * Fri Aug 10 2018 Dogtag PKI Team <pki-team@redhat.com> 4.20.0-0
+# * Fri Aug 10 2018 Dogtag PKI Team <pki-team@redhat.com> 4.20.0-1
 # - Rebase to LDAP SDK 4.20
 #
 # To list all changes in <branch> since <tag>:
