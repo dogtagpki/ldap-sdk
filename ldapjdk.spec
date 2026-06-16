@@ -2,6 +2,7 @@
 Name:             ldapjdk
 ################################################################################
 
+# Don't use macros in these params since they need to be parsed by build.sh
 %global           vendor_id dogtag
 %global           product_name LDAP SDK
 %global           product_id dogtag-ldapjdk
