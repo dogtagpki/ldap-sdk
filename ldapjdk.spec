@@ -20,7 +20,7 @@ License:          MPL-1.1 OR GPL-2.0-or-later OR LGPL-2.1-or-later
 # - development (unsupported): alpha<n> where n >= 1
 # - stabilization (supported): beta<n> where n >= 1
 # - GA/update (supported): <none>
-%global           phase beta2
+%undefine         phase
 
 # Full version number:
 # - development/stabilization: <major>.<minor>.<update>-<phase>
@@ -99,7 +99,7 @@ BuildRequires:    %{java_devel}
 BuildRequires:    %{maven_local}
 BuildRequires:    mvn(org.slf4j:slf4j-api)
 BuildRequires:    mvn(org.slf4j:slf4j-jdk14)
-BuildRequires:    %{vendor_id}-jss >= 5.10.0~beta2
+BuildRequires:    %{vendor_id}-jss >= 5.10.0
 
 %description
 The Mozilla LDAP SDKs enable you to write applications which access,
@@ -114,7 +114,7 @@ Summary:          %{product_name}
 Requires:         %{java_headless}
 Requires:         mvn(org.slf4j:slf4j-api)
 Requires:         mvn(org.slf4j:slf4j-jdk14)
-Requires:         %{vendor_id}-jss >= 5.10.0~beta2
+Requires:         %{vendor_id}-jss >= 5.10.0
 
 Obsoletes:        ldapjdk < %{version}-%{release}
 Provides:         ldapjdk = %{version}-%{release}
