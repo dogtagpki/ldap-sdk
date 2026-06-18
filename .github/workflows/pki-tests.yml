@@ -36,7 +36,7 @@ jobs:
       SHARED: /tmp/workdir/ldapjdk
     steps:
       - name: Clone the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Retrieve LDAP SDK image
         uses: actions/cache@v5

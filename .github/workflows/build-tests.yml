@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Clone repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
 
     - name: Set up Java
       uses: actions/setup-java@v4
@@ -147,7 +147,7 @@ jobs:
       SHARED: /tmp/workdir/ldapjdk
     steps:
     - name: Clone repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
 
     - name: Retrieve LDAP SDK images
       uses: actions/cache@v5
